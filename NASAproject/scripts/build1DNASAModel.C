@@ -18,7 +18,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include "AngularPdfFactory.cc"
+#include "../src/AngularPdfFactory.cc"
 //hep.pha.jhu.edu:/scratch/hep/ntran/HZZ_materials
 //to setup root: source /scratch/hep/ntran/ROOTdistributions/myROOT528_fromSource/root/bin/thisroot.csh
 
@@ -40,25 +40,25 @@ void plotVariablesZZ(){
     RooRealVar* phi1 = new RooRealVar("phistar1","phi1",-3.14,3.14);
  
     TChain* chain = new TChain("angles");
-    chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_1.root");
-    chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_2.root");
-    chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_3.root");
-    chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_4.root");
-    chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_5.root");
-    chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_6.root");
-    chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_7.root");
-    chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_8.root");
-    chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_9.root");
-    chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_10.root");
-    chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_11.root");
-    chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_12.root");
-    chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_13.root");
-    chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_14.root");
-    chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_15.root");
-    chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_16.root");
-    chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_17.root");
-    chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_18.root");
-    chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_19.root");
+    chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_1.root");
+    chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_2.root");
+    chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_3.root");
+    chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_4.root");
+    chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_5.root");
+    chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_6.root");
+    chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_7.root");
+    chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_8.root");
+    chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_9.root");
+    chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_10.root");
+    chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_11.root");
+    chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_12.root");
+    chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_13.root");
+    chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_14.root");
+    chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_15.root");
+    chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_16.root");
+    chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_17.root");
+    chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_18.root");
+    chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_19.root");
     
    
     RooDataSet *data = new RooDataSet("data","data",chain,RooArgSet(*m1,*m2,*mZZ,*costheta1,*costheta2,*costhetastar,*phi,*phi1));
@@ -207,25 +207,25 @@ void plotVariablesZZ(){
   //create TH3D and RooHistPdf
 void build8DTemplate(){
     TChain* chain = new TChain("angles");
-   chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_1.root");
-   chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_2.root");
-   chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_3.root");
-   chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_4.root");
-   chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_5.root");
-   chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_6.root");
-   chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_7.root");
-   chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_8.root");
-   chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_9.root");
-   chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_10.root");
-   chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_11.root");
-   chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_12.root");
-   chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_13.root");
-   chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_14.root");
-   chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_15.root");
-   chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_16.root");
-   chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_17.root");
-   chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_18.root");
-   chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_19.root");
+   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_1.root");
+   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_2.root");
+   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_3.root");
+   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_4.root");
+   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_5.root");
+   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_6.root");
+   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_7.root");
+   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_8.root");
+   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_9.root");
+   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_10.root");
+   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_11.root");
+   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_12.root");
+   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_13.root");
+   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_14.root");
+   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_15.root");
+   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_16.root");
+   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_17.root");
+   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_18.root");
+   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_19.root");
      
    /*RooDataSet *data = new RooDataSet("data","data",chain,RooArgSet(*m1,*m2,*mZZ),"zzmass<180");
    RooDataHist *dataHist = new RooDataHist("dataHist","dataHist",RooArgSet(*m1,*m2,*mZZ),*data);
@@ -296,7 +296,7 @@ void build8DTemplate(){
     h_mzzphi->Fill(mZZ,phi);
    }
    //save it in a file
-   TFile *f = new TFile("my8DTemplateNotNorm.root","RECREATE");
+   TFile *f = new TFile("../datafiles/my8DTemplateNotNorm.root","RECREATE");
    h_mzz->Write();
    h_mzzm1m2->Write();
    h_mzzcosthetastar->Write();
@@ -313,7 +313,7 @@ void build8DTemplate(){
 
 void plotmy8DTemplate(){
  //read from a file the 3D and 2D template
-  TFile *f = new TFile("my8DTemplateNotNorm.root","READ");
+  TFile *f = new TFile("../datafiles/my8DTemplateNotNorm.root","READ");
   TH1F *h_mzz= (TH1F*)(f->Get("h_mzz"));
   TH3F *h_mzzm1m2= (TH3F*)(f->Get("h_mzzm1m2"));
   TH2F *h_mzzcosthetastar= (TH2F*)(f->Get("h_mzzcosthetastar"));
@@ -383,7 +383,7 @@ void plotmy8DTemplate(){
 
 }
 
- TFile *f = new TFile("my8DTemplateNotNorm.root","READ");
+ TFile *f = new TFile("../datafiles/my8DTemplateNotNorm.root","READ");
 
 vector<double> my8DTemplate(bool normalized,double mZZ, double m1, double m2, double costhetastar, double costheta1, double costheta2, double phi, double phi1){
   //read from a file the 3D and 2D template
@@ -462,25 +462,25 @@ vector<double> my8DTemplate(bool normalized,double mZZ, double m1, double m2, do
 
 void plotPBackground(){
  TChain* chain = new TChain("angles");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_1.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_2.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_3.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_4.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_5.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_6.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_7.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_8.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_9.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_10.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_11.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_12.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_13.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_14.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_15.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_16.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_17.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_18.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_19.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_1.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_2.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_3.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_4.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_5.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_6.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_7.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_8.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_9.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_10.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_11.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_12.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_13.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_14.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_15.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_16.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_17.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_18.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_19.root");
   
   double mZZ, m2, m1, costhetastar, costheta1, costheta2, phi, phi1;
   chain->SetBranchAddress("zzmass",&mZZ);
@@ -605,7 +605,7 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
 TH1F *h_mzz= (TH1F*)(f->Get("h_mzz"));
 
 vector<TH1F*> LDDistributionSignal(){
-  TFile* file = new TFile("datafiles/SMHiggs_125_JHU.root");
+  TFile* file = new TFile("/scratch/hep/ntran/HZZ_materials/datafiles/JHUGenFiles/SMHiggs_125_JHU.root");
   TTree* tree = (TTree*) file->Get("angles");
   
   double mZZ, m2, m1, costhetastar, costheta1, costheta2, phi, phi1;
@@ -664,25 +664,25 @@ vector<TH1F*> LDDistributionSignal(){
 
 vector<TH1F*> LDDistributionBackground(){
   TChain* chain = new TChain("angles");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_1.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_2.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_3.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_4.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_5.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_6.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_7.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_8.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_9.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_10.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_11.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_12.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_13.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_14.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_15.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_16.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_17.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_18.root");
-  chain->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_19.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_1.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_2.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_3.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_4.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_5.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_6.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_7.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_8.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_9.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_10.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_11.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_12.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_13.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_14.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_15.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_16.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_17.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_18.root");
+  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_19.root");
   
   double mZZ, m2, m1, costhetastar, costheta1, costheta2, phi, phi1;
   chain->SetBranchAddress("zzmass",&mZZ);
@@ -825,29 +825,29 @@ void storeLDInfo(bool signal){
   TFile* file ;
   TChain* tree = new TChain("angles");
   if(signal){
-    tree->Add("datafiles/SMHiggs_125_JHU.root");
+    tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/JHUGenFiles/SMHiggs_125_JHU.root");
   }
 
   if(!signal){
-  tree->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_1.root");
-  tree->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_2.root");
-  tree->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_3.root");
-  tree->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_4.root");
-  tree->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_5.root");
-  tree->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_6.root");
-  tree->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_7.root");
-  tree->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_8.root");
-  tree->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_9.root");
-  tree->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_10.root");
-  tree->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_11.root");
-  tree->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_12.root");
-  tree->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_13.root");
-  tree->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_14.root");
-  tree->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_15.root");
-  tree->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_16.root");
-  tree->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_17.root");
-  tree->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_18.root");
-  tree->Add("datafiles/PowhegFiles/EWKZZ4l_Powheg_19.root");
+  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_1.root");
+  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_2.root");
+  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_3.root");
+  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_4.root");
+  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_5.root");
+  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_6.root");
+  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_7.root");
+  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_8.root");
+  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_9.root");
+  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_10.root");
+  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_11.root");
+  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_12.root");
+  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_13.root");
+  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_14.root");
+  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_15.root");
+  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_16.root");
+  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_17.root");
+  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_18.root");
+  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_19.root");
  
 
   }
@@ -864,9 +864,9 @@ void storeLDInfo(bool signal){
   TFile* fileOut; 
   double mZZout, m2out, m1out, costhetastarout, costheta1out, costheta2out, phiout, phi1out, Psig, Pbkg, D;
   if(signal)
-    fileOut = new TFile("datafiles/SMHiggs_125_JHU_withD.root","RECREATE");
+    fileOut = new TFile("../datafiles/SMHiggs_125_JHU_withD.root","RECREATE");
   else if(!signal)
-    fileOut = new TFile("datafiles/EWKZZ4l_Powheg_withD.root","RECREATE");
+    fileOut = new TFile("../datafiles/EWKZZ4l_Powheg_withD.root","RECREATE");
   TTree* treeOut = new TTree("eventInfo","angles, mzz, D");
   treeOut->Branch("zzmass",&mZZout,"zzmass/D");
   treeOut->Branch("z2mass",&m2out,"z2mass/D");
