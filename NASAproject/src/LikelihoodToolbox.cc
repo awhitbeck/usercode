@@ -160,7 +160,17 @@ public:
       return -1.;
     }
 
-    return 1/(1+pdf1->getVal()/pdf2->getVal());
+    if(measurables.size()==0){
+      cout << "something strange is going on here, there are no measurables" << endl;
+      return;
+    }
+
+    RooArgSet *argSet = new RooArgSet(*measurables[0]);
+    for(int iMeas=1; iMeas<measurables.size(); iMeas++)
+      argSet->add(*measurables[iMeas]);
+
+
+    return 1/(1+pdf1->getVal(argSet)/pdf2->getVal(argSet));
   };
 
   //=============================================================
@@ -329,7 +339,7 @@ public:
 
     for(int iToy=0; iToy<nToys; iToy++){
 
-      cout << "Toy: " << iToys << endl;
+      cout << "Toy: " << iToy << endl;
 
       if(generateFromSignal)
 	generateData(model, numEvents);
@@ -360,60 +370,51 @@ public:
     
   };
 
+  //=============================================================
+
   // The following methods have not yet been implemented 
   // and simply serve as an outline for things to be 
   // developed. 
 
-  TH1F* makeLDdistribution(){
+  void makeLDdistribution(TH1F& LDdist, RooDataSet* userData=0){
 
     if(debug)
       cout << "makeLDdistribution:" << endl;
  
-    TH1F* LDdist = new TH1F("LDdist","LDdist",LD_bins,0,1);
-    LDdist->SetLineColor(LD_lineColor);
-    LDdist->SetLineStyle(LD_lineStyle);
+    if(userData==0)
+      userData=dataSet;
 
-    if(debug)
-      cout << "histo initialized" << endl;
-
-    if(!data){
-      cout << "There is no data load.  Please use the method LikelihoodToolbox::addDataTree(TTree* t)" << endl;
-      return 0;
+    if(measurables.size()==0){
+      cout << "something strange is going on here, there are no measurables" << endl;
+      return;
     }
 
-    if(debug)
-      cout << "setting branch addresses" << endl;
+    RooArgSet *argSet = new RooArgSet(*measurables[0]);
+    for(int iMeas=1; iMeas<measurables.size(); iMeas++)
+      argSet->add(*measurables[iMeas]);
     
-    vector<double> val;
-    for(int iMeas=0; iMeas<measurables.size(); iMeas++){
-      val.push_back(0);
-      data->SetBranchAddress(measurables[iMeas]->GetName(),&val[iMeas]);
-    }
 
-    for(int iEvt=0; iEvt<data->GetEntries(); iEvt++){
+    //TH1F* LDdist = new TH1F("LDdist","LDdist",LD_bins,0,1);
+    LDdist.SetLineColor(LD_lineColor);
+    LDdist.SetLineStyle(LD_lineStyle);
+
+    for(int iEvt=0; iEvt<userData->sumEntries(); iEvt++){
 
       if(debug)
 	cout << "iEvt: " << iEvt << endl;
 
-      data->GetEntry(iEvt);
-      
+      if(iEvt%10000==0) 
+	cout << "iEvt: " << iEvt << endl;
+
       //set measurables
-      for(int iMeas=0; iMeas<measurables.size(); iMeas++){
-
-	cout << measurables[iMeas]->GetName() << ": " << val[iMeas] << endl;
-	measurables[iMeas]->setVal(val[iMeas]);
-
+      for(int iMeas=0; iMeas<measurables.size(); iMeas++){	
+	measurables[iMeas]->setVal(((RooRealVar*)userData->get(iEvt)->find(measurables[iMeas]->GetName()))->getVal());
       }
 
-      cout << "signal prob: " << signal->getVal() << endl;
-      cout << "altsignal prob: " << altSignal->getVal() << endl;
-      cout << "LD: " << 1/(1+(signal->getVal()/altSignal->getVal())) << endl;
-
-      LDdist->Fill(1/(1+(signal->getVal()/altSignal->getVal())));
+      LDdist.Fill(1/(1+(signal->getVal(argSet)/altSignal->getVal(argSet))));
       
     }// end loop over events
 
-    return LDdist;
   };
 
   TGraph* makeROCcurve(){return 0;};

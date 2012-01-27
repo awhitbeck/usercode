@@ -270,6 +270,7 @@ void build8DTemplate(){
      s = out.str();
      TString name = "h_m1m2_"+s;
      vh_m1m2.push_back((new TH2F(name,name,54,12.,180.,54,12.,120.)));
+
    }
 
    double mZZ, m2, m1, costhetastar, costheta1, costheta2, phi, phi1;
@@ -295,6 +296,7 @@ void build8DTemplate(){
     h_mzzphi1->Fill(mZZ,phi1);
     h_mzzphi->Fill(mZZ,phi);
    }
+
    //save it in a file
    TFile *f = new TFile("../datafiles/my8DTemplateNotNorm.root","RECREATE");
    h_mzz->Write();
@@ -397,7 +399,19 @@ vector<double> my8DTemplate(bool normalized,double mZZ, double m1, double m2, do
   //multiply the value
   double n = h_mzz->GetBinContent(h_mzz->FindBin(mZZ));
   double Pmzzm1m2 = h_mzzm1m2->GetBinContent(h_mzzm1m2->FindBin(mZZ,m1,m2));
-  //cout<<"Pmzzm1m2 "<<Pmzzm1m2<<endl;
+
+  // - - - - - - - - - - - - - - - whitbeck
+  // if bin has no events: add 1
+  // safety feature to prevent LD = 1 as a
+  // result of low statistics
+
+  if(Pmzzm1m2==0){
+    cout << "my8DTemplate says ... " << endl;
+    cout<<"Pmzzm1m2: "<<Pmzzm1m2<<endl;
+    Pmzzm1m2++;
+  }
+  // - - - - - - - - - - - - - - - 
+
   double Pmzzcosthetastar = h_mzzcosthetastar->GetBinContent(h_mzzcosthetastar->FindBin(mZZ,costhetastar));
   double Pmzzcostheta2 = h_mzzcostheta2->GetBinContent(h_mzzcostheta2->FindBin(mZZ,costheta2));
   double Pmzzcostheta1 = h_mzzcostheta1->GetBinContent(h_mzzcostheta1->FindBin(mZZ,costheta1));
@@ -561,7 +575,7 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
   //PSHiggs.makePSHiggs();
   //PSHiggs.makeParamsConst(true);
   RooRealVar* z1mass_rrv = new RooRealVar("z1mass","m_{Z1}",0,180);
-  RooRealVar* z2mass_rrv = new RooRealVar("z2mass","m_{Z2}",0,120);
+  RooRealVar* z2mass_rrv = new RooRealVar("z2mass","m_{Z2}",0,120); 
   RooRealVar* costheta1_rrv = new RooRealVar("costheta1","cos#theta_{1}",-1,1);  
   RooRealVar* costheta2_rrv = new RooRealVar("costheta2","cos#theta_{2}",-1,1);
   RooRealVar* phi_rrv= new RooRealVar("phi","#Phi",-3.1415,3.1415);
@@ -593,11 +607,31 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
   //double Psig=1;
   vector <double> P=my8DTemplate(1, mZZ,  m1,  m2,  costhetastar,  costheta1,  costheta2,  phi,  phi1);
   double Pbackg = P[0]*P[1]*P[2]*P[3]*P[4]*P[5];
+
+  // - - - - - - - - - - - - - - - - - - - - - Whitbeck 
+  // check whether P[i] is zero and print warning
+  // message if so
+
+  char* varName[6]={"m1/m2","costhetastar","costheta1","coshteta2","phi","phi1"};
+  for(int iVar=0; iVar<6; iVar++){
+
+    if(P[iVar]==0 && (m1+m2)<mZZ && m2>20 && mZZ>110 && mZZ<180)
+	cout << " uh oh... Probability of " << varName[iVar] << " is zero." << endl;
+  }
+  // - - - - - - - - - - - - - - - - - - - - - 
+
   //cout<<"PDF from ZZ EWK background "<<Pbackg<<endl;
 
   //double LD =  (Psig/(Psig+Pbackg)) ;
   //cout<<"LD "<<LD<<endl;
   //return  LD;
+
+  delete z1mass_rrv; 
+  delete z2mass_rrv; 
+  delete costheta1_rrv;
+  delete costheta2_rrv;
+  delete phi_rrv;
+  delete mzz_rrv; 
 
   return make_pair(Psig,Pbackg);
 }
@@ -661,7 +695,7 @@ vector<TH1F*> LDDistributionSignal(){
 
   return vh_LDsignal;
 }
-
+//============================================================
 vector<TH1F*> LDDistributionBackground(){
   TChain* chain = new TChain("angles");
   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_1.root");
@@ -737,6 +771,150 @@ vector<TH1F*> LDDistributionBackground(){
  
   return vh_LDbackground;
 }
+
+//=======================================================================
+
+double separationLikelihoodDiscriminant(double mzz,double m1,double m2,double h1,double h2,double phi){
+
+  // initialize measurables
+  RooRealVar* z1mass_rrv = new RooRealVar("z1mass","m_{Z1}",m1,0,180);
+  RooRealVar* z2mass_rrv = new RooRealVar("z2mass","m_{Z2}",m2,0,120); 
+  RooRealVar* costheta1_rrv = new RooRealVar("costheta1","cos#theta_{1}",h1,-1,1);  
+  RooRealVar* costheta2_rrv = new RooRealVar("costheta2","cos#theta_{2}",h2,-1,1);
+  RooRealVar* phi_rrv= new RooRealVar("phi","#Phi",phi,-3.1415,3.1415);
+  RooRealVar* mzz_rrv= new RooRealVar("mzz","mZZ",mzz,110,180);
+
+  // build PDFs
+  AngularPdfFactory SMHiggs(z1mass_rrv,z2mass_rrv,costheta1_rrv,costheta2_rrv,phi_rrv,mzz_rrv);
+  SMHiggs.makeSMHiggs();
+  SMHiggs.makeParamsConst(true);
+  AngularPdfFactory PSHiggs(z1mass_rrv,z2mass_rrv,costheta1_rrv,costheta2_rrv,phi_rrv,mzz_rrv);
+  PSHiggs.makePSHiggs();
+  PSHiggs.makeParamsConst(true);
+
+  return 1/(1+SMHiggs.getVal(mzz_rrv->getVal())/PSHiggs.getVal(mzz_rrv->getVal()));
+
+}
+
+//=======================================================================
+
+void addDtoTree(char* inputFile){
+
+  char inputFileName[50];
+  char outputFileName[50];
+  sprintf(inputFileName,"%s.root",inputFile);
+  sprintf(outputFileName,"%s_withDiscriminants.root",inputFile);
+
+  TFile* sigFile = new TFile(inputFileName);
+  TTree* sigTree = (TTree*) sigFile->Get("angles");
+
+  TFile* newFile = new TFile(outputFileName,"RECREATE");
+  TTree* newTree = new TTree("newTree","angles");
+
+  double m1,m2,mzz,h1,h2,hs,phi,phi1,D,sigP,bkgP,sepLD;
+  sigTree->SetBranchAddress("z1mass",&m1);
+  sigTree->SetBranchAddress("z2mass",&m2);
+  sigTree->SetBranchAddress("zzmass",&mzz);
+  sigTree->SetBranchAddress("costheta1",&h1); 
+  sigTree->SetBranchAddress("costheta2",&h2);
+  sigTree->SetBranchAddress("costhetastar",&hs);
+  sigTree->SetBranchAddress("phi",&phi);  
+  sigTree->SetBranchAddress("phistar1",&phi1);
+  sigTree->Branch("nasaLD",&D,"nasaLD/D");  
+
+  newTree->Branch("z1mass",&m1,"z1mass/D");
+  newTree->Branch("z2mass",&m2,"z2mass/D");
+  newTree->Branch("zzmass",&mzz,"zzmass/D");
+  newTree->Branch("costheta1",&h1,"costheta1/D"); 
+  newTree->Branch("costheta2",&h2,"costheta2/D");
+  newTree->Branch("costhetastar",&hs,"costhetastar/D");
+  newTree->Branch("phi",&phi,"phi/D");  
+  newTree->Branch("phistar1",&phi1,"phistar1/D");
+  newTree->Branch("nasaLD",&D,"nasaLD/D");  
+  newTree->Branch("nasaSigProb",&sigP,"nasaSigProb/D"); 
+  newTree->Branch("nasaBkgProb",&bkgP,"nasaBkgProb/D");  
+  newTree->Branch("sigSepLD",&sepLD,"sigSepLD/D");    
+
+  for(int iEvt=0; iEvt<sigTree->GetEntries(); iEvt++){
+
+    if(iEvt%5000==0) cout << "event: " << iEvt << endl;
+
+    sigTree->GetEntry(iEvt);
+
+    if(mzz>110 && mzz<180 && m2>20){
+
+      pair<double,double> P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1);
+
+      sigP=P.first;
+      bkgP=P.second;
+      D=P.first/(P.first+P.second);
+      sepLD=separationLikelihoodDiscriminant(mzz,m1,m2,h1,h2,phi);
+      newTree->Fill();
+    }
+
+  }
+
+  newFile->cd();
+  newTree->Write("angles");
+  newFile->Close();
+
+}
+
+//=======================================================================
+
+void plotROCcurve(char* sigFileName,char* bkgFileName){
+
+  cout << "plotting ROC curve " << endl;
+
+  TFile* file1 = new TFile(sigFileName);
+  TTree* tree1 = (TTree*) file1->Get("angles");
+  TH1F* h_LD1 = new TH1F("h_LD1","h_LD1",100,0,1);
+  
+  TFile* file2 = new TFile(bkgFileName);
+  TTree* tree2 = (TTree*) file2->Get("angles");
+  TH1F* h_LD2 = new TH1F("h_LD2","h_LD2",100,0,1);
+
+  double sigEff[100],bkgEff[100];
+
+  double LD;
+  tree1->SetBranchAddress("nasaLD",&LD);  
+  tree2->SetBranchAddress("nasaLD",&LD);
+
+  //Get Histos for LD
+  for(int iEvt=0; iEvt<tree1->GetEntries(); iEvt++){
+    tree1->GetEntry(iEvt);
+    h_LD1->Fill(LD);
+  }
+  for(int iEvt=0; iEvt<tree2->GetEntries(); iEvt++){
+    tree2->GetEntry(iEvt);
+    h_LD2->Fill(LD);
+  }
+  h_LD1->Scale(1/h_LD1->Integral());
+  h_LD2->Scale(1/h_LD2->Integral());
+
+  //loop over cut values
+  for(int iCut=0; iCut<100; iCut++){
+    sigEff[iCut]=h_LD1->Integral(iCut+1,100);
+    bkgEff[iCut]=1-h_LD2->Integral(iCut+1,100);
+  }
+
+  TCanvas* ROCcanvas = new TCanvas("ROCcanvas","ROC curve for LD",600,600);
+  double lineX[100],lineY[100];
+  for(int i=0; i<100; i++){
+    lineX[i]=(double)i/100;
+    lineY[i]=1.-(double)i/100;
+  }
+  TGraph* line = new TGraph(100,lineX,lineY);
+  line->SetLineColor(2);
+  TGraph* ROC = new TGraph(100,sigEff,bkgEff);
+  ROC->GetXaxis()->SetTitle("#epsilon_{signal}");
+  ROC->GetYaxis()->SetTitle("#epsilon_{background}");
+  ROC->Draw("AC*");
+  line->Draw("SAME");
+
+}
+
+//========================================================================
 
 void plotLDDistribution(){
   //SMHiggs.makeSMHiggs();
