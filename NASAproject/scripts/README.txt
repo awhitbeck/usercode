@@ -37,3 +37,22 @@ storeLDDistribution(1) //for signal
 storeLDDistribution(0) //for background
 storeLDInfo(1) //for signla
 storeLDInfo(0) // for background
+
+readOutAngles_LMH.C (converter.sh/converter_Powheg.sh)
+----------------------------------------------------------
+Converts *.lhe files into *.root files.  Can also apply smearing to pt and angles. 
+Currently Pt is tuned to matched the mZZ distribution in the public ZZ->4l analysis
+at low mass (~125).
+
+To run:
+
+converter.sh fileName    
+
+ - - - - - - 
+fileName should be the full path to the lhe file you want converted.  Be sure to 
+leave off the file extension. Current this script will automatically apply resolution.
+If you want to change this switch the second argument of readOutAngles_LMH() in converter.sh
+to be false.
+
+All of the same applies to converter_Powheg.sh.  This must be run on Powheg only.  
+
