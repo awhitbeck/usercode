@@ -589,6 +589,30 @@ vector<TH1F*> LDDistributionBackground(){
   return vh_LDbackground;
 }
 
+//=======================================================================
+
+double separationLikelihoodDiscriminant(double mzz,double m1,double m2,double h1,double h2,double phi){
+
+  // initialize measurables
+  RooRealVar* z1mass_rrv = new RooRealVar("z1mass","m_{Z1}",m1,0,180);
+  RooRealVar* z2mass_rrv = new RooRealVar("z2mass","m_{Z2}",m2,0,120); 
+  RooRealVar* costheta1_rrv = new RooRealVar("costheta1","cos#theta_{1}",h1,-1,1);  
+  RooRealVar* costheta2_rrv = new RooRealVar("costheta2","cos#theta_{2}",h2,-1,1);
+  RooRealVar* phi_rrv= new RooRealVar("phi","#Phi",phi,-3.1415,3.1415);
+  RooRealVar* mzz_rrv= new RooRealVar("mzz","mZZ",mzz,110,180);
+
+  // build PDFs
+  AngularPdfFactory SMHiggs(z1mass_rrv,z2mass_rrv,costheta1_rrv,costheta2_rrv,phi_rrv,mzz_rrv);
+  SMHiggs.makeSMHiggs();
+  SMHiggs.makeParamsConst(true);
+  AngularPdfFactory PSHiggs(z1mass_rrv,z2mass_rrv,costheta1_rrv,costheta2_rrv,phi_rrv,mzz_rrv);
+  PSHiggs.makePSHiggs();
+  PSHiggs.makeParamsConst(true);
+
+  return 1/(1+SMHiggs.getVal(mzz_rrv->getVal())/PSHiggs.getVal(mzz_rrv->getVal()));
+
+}
+
 
 //=======================================================================
 
@@ -877,30 +901,6 @@ void plotROCcurve(char* sigFileName,char* bkgFileName){
   ROC->GetYaxis()->SetTitle("#epsilon_{background}");
   ROC->Draw("AC*");
   line->Draw("SAME");
-
-}
-
-//=======================================================================
-
-double separationLikelihoodDiscriminant(double mzz,double m1,double m2,double h1,double h2,double phi){
-
-  // initialize measurables
-  RooRealVar* z1mass_rrv = new RooRealVar("z1mass","m_{Z1}",m1,0,180);
-  RooRealVar* z2mass_rrv = new RooRealVar("z2mass","m_{Z2}",m2,0,120); 
-  RooRealVar* costheta1_rrv = new RooRealVar("costheta1","cos#theta_{1}",h1,-1,1);  
-  RooRealVar* costheta2_rrv = new RooRealVar("costheta2","cos#theta_{2}",h2,-1,1);
-  RooRealVar* phi_rrv= new RooRealVar("phi","#Phi",phi,-3.1415,3.1415);
-  RooRealVar* mzz_rrv= new RooRealVar("mzz","mZZ",mzz,110,180);
-
-  // build PDFs
-  AngularPdfFactory SMHiggs(z1mass_rrv,z2mass_rrv,costheta1_rrv,costheta2_rrv,phi_rrv,mzz_rrv);
-  SMHiggs.makeSMHiggs();
-  SMHiggs.makeParamsConst(true);
-  AngularPdfFactory PSHiggs(z1mass_rrv,z2mass_rrv,costheta1_rrv,costheta2_rrv,phi_rrv,mzz_rrv);
-  PSHiggs.makePSHiggs();
-  PSHiggs.makeParamsConst(true);
-
-  return 1/(1+SMHiggs.getVal(mzz_rrv->getVal())/PSHiggs.getVal(mzz_rrv->getVal()));
 
 }
 
