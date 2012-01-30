@@ -1,9 +1,27 @@
 #include "RooRealVar.h"
 #include "RooPlot.h"
 #include "RooDataSet.h"
-#include "TFile.h"
-#include "TTree.h"
+#include "RooDataSet.h"
+#include "RooRealVar.h"
+#include "RooDataSet.h"
+#include "RooDataHist.h"
+#include "RooHistPdf.h"
+#include "RooGaussian.h"
 #include "TCanvas.h"
+#include "TString.h"
+#include "TAxis.h"
+#include "RooPlot.h"
+#include "TFile.h"
+#include "TLegend.h"
+#include "TChain.h"
+#include "TH1F.h"
+#include "TH2F.h"
+#include "TH3F.h"
+#include "TString.h"
+#include <sstream>
+#include <string>
+#include <vector>
+#include "TTree.h"
 #include "../src/AngularPdfFactory.cc"
 
 using namespace RooFit;
