@@ -4,7 +4,7 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TCanvas.h"
-#include "AngularPdfFactory.cc"
+#include "../src/AngularPdfFactory.cc"
 
 using namespace RooFit;
 void plotVariablesZZ_background(){
