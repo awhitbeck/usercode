@@ -206,16 +206,17 @@ void plotAngularDistributions_signal(){
   RooRealVar* costheta1 = new RooRealVar("costheta1","cos#theta_{1}",-1,1);  
   RooRealVar* costheta2 = new RooRealVar("costheta2","cos#theta_{2}",-1,1);
   RooRealVar* phi= new RooRealVar("phi","#Phi",-3.1415,3.1415);
+  RooRealVar* mzz= new RooRealVar("mzz","mZZ",110,180);
   
-  AngularPdfFactory SMHiggs(z1mass,z2mass,costheta1,costheta2,phi);
+  AngularPdfFactory SMHiggs(z1mass,z2mass,costheta1,costheta2,phi,mzz);
   SMHiggs.makeSMHiggs();
   SMHiggs.makeParamsConst(true);
 
-  AngularPdfFactory PSHiggs(z1mass,z2mass,costheta1,costheta2,phi);
+  AngularPdfFactory PSHiggs(z1mass,z2mass,costheta1,costheta2,phi,mzz);
   PSHiggs.makePSHiggs();
   PSHiggs.makeParamsConst(true);
 
-  TFile* fin = new TFile("../datafiles/SMHiggs_125_JHU.root");
+  TFile* fin = new TFile("../datafiles/JHUGenFiles/SMHiggs_125_JHU.root");
   TTree* tin = (TTree*) fin->Get("angles");
   RooDataSet data("data","data",tin,RooArgSet(*z1mass,*z2mass,*costheta1,*costheta2,*phi));
 
