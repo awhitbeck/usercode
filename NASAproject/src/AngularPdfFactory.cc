@@ -1,5 +1,5 @@
 #include "RooRealVar.h"
-#include "/scratch/hep/ntran/HZZ_materials/HZsZs_analysis/PDFs/RooXZsZs_5D.cxx"
+#include "../PDFs/RooXZsZs_5D.cxx"
 #include <cmath>
 
 class AngularPdfFactory{
