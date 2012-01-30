@@ -257,3 +257,167 @@ void plotAngularDistributions_signal(){
   plot_Phi->Draw();
 
 }
+
+void plotAngularDistributions_mZZ125(){
+    
+  //gROOT->ProcessLine(".L ~ntran/tdrstyle.C");
+  // setTDRStyle();
+  //gStyle->SetPadLeftMargin(0.16);
+    
+    RooRealVar* m1 = new RooRealVar("z1mass","m1",10,120);
+    RooRealVar* m2 = new RooRealVar("z2mass","m2",10,80);
+    RooRealVar* mZZ = new RooRealVar("zzmass","mZZ",0,3000);
+    RooRealVar* costheta1 = new RooRealVar("costheta1","costheta1",-1,1);
+    RooRealVar* costheta2 = new RooRealVar("costheta2","costheta2",-1,1);
+    RooRealVar* costhetastar = new RooRealVar("costhetastar","costhetastar",-1,1);
+    RooRealVar* phi = new RooRealVar("phi","phi",-3.14,3.14);
+    RooRealVar* phi1 = new RooRealVar("phi1","phi1",-3.14,3.14);
+ 
+    TChain* chain = new TChain("angles");
+    chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_1.root");
+    chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_2.root");
+    chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_3.root");
+    chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_4.root");
+    chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_5.root");
+    chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_6.root");
+    chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_7.root");
+    chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_8.root");
+    chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_9.root");
+    chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_10.root");
+    chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_11.root");
+    chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_12.root");
+    chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_13.root");
+    chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_14.root");
+    chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_15.root");
+    chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_16.root");
+    chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_17.root");
+    chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_18.root");
+    chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_19.root");
+    
+   
+    RooDataSet *data_bkg = new RooDataSet("data_cut1","data_cut1",chain,RooArgSet(*m1,*m2,*mZZ,*costheta1,*costheta2,*costhetastar,*phi,*phi1),"zzmass>124 && zzmass<126");
+
+    TFile* fin = new TFile("../datafiles/JHUGenFiles/SMHiggs_125_JHU_withCuts.root");
+    TTree* tin = (TTree*) fin->Get("angles");
+    RooDataSet *data_sig = new RooDataSet("data","data",tin,RooArgSet(*m1,*m2,*mZZ,*costheta1,*costheta2,*costhetastar,*phi,*phi1));
+     
+    RooPlot* z1frame =  m1->frame(55);
+    data_bkg->plotOn(z1frame);
+    data_sig->plotOn(z1frame,MarkerColor(kRed),DrawOption("LP"),LineColor(kRed));
+     //myPDF->plotOn(z1frame);
+    //myPDFA->plotOn(z1frame, LineColor(2));
+
+    for (int i=0; i<z1frame->numItems(); i++) {
+    TString obj_name=z1frame->nameOf(i); 
+    cout << Form("%d. '%s'\n",i,obj_name.Data());
+    }    
+
+    RooPlot* z2frame =  m2->frame(55);
+    data_bkg->plotOn(z2frame,DrawOption("LP"));
+    data_sig->plotOn(z2frame,MarkerColor(kRed),DrawOption("LP"),LineColor(kRed));
+     
+    RooPlot* mzzframe =  mZZ->frame(55);
+    data_bkg->plotOn(mzzframe,DrawOption("LP"));
+    data_sig->plotOn(mzzframe,MarkerColor(kRed),DrawOption("LP"),LineColor(kRed));
+
+    RooPlot* costhetastarframe =  costhetastar->frame(55);
+    data_bkg->plotOn(costhetastarframe,DrawOption("LP"));
+    data_sig->plotOn(costhetastarframe,MarkerColor(kRed),DrawOption("LP"),LineColor(kRed));
+
+    RooPlot* costheta1frame =  costheta1->frame(55);
+    data_bkg->plotOn(costheta1frame,DrawOption("LP"));
+    data_sig->plotOn(costheta1frame,MarkerColor(kRed),DrawOption("LP"),LineColor(kRed));
+
+    RooPlot* costheta2frame =  costheta2->frame(55);
+    data_bkg->plotOn(costheta2frame,DrawOption("LP"));
+    data_sig->plotOn(costheta2frame,MarkerColor(kRed),DrawOption("LP"),LineColor(kRed));
+
+    RooPlot* phiframe =  phi->frame(55);
+    data_bkg->plotOn(phiframe,DrawOption("LP"));
+    data_sig->plotOn(phiframe,MarkerColor(kRed),DrawOption("LP"),LineColor(kRed));
+
+    RooPlot* phi1frame =  phi1->frame(55);
+    data_bkg->plotOn(phi1frame,DrawOption("LP"));
+    data_sig->plotOn(phi1frame,MarkerColor(kRed),DrawOption("LP"),LineColor(kRed));
+
+    TCanvas* cz12 = new TCanvas( "cz12_sigBkg_mzz125", "cz12_sigBkg_mzz125", 1000, 600 );
+    cz12->Divide(2,1);
+    cz12->cd(1);
+    z1frame->Draw();
+    cz12->cd(2);
+    z2frame->Draw();
+
+    TCanvas* czz = new TCanvas("czz_sigBkg_mzz125","czz_sigBkg_mzz125",1000,600);
+    mzzframe->Draw();
+
+    TCanvas* cangles = new TCanvas( "cangles_sigBkg_mzz125", "cangles_sigBkg_mzz125", 1000, 600 );
+    cangles->Divide(3,2);
+
+    //decay angles
+    cangles->cd(6);
+    phiframe->Draw();
+    cangles->cd(5);
+    costheta1frame->Draw();
+    cangles->cd(4);
+    costheta2frame->Draw();
+
+    //production angles
+    cangles->cd(1);
+    costhetastarframe->Draw();
+    cangles->cd(2);
+    phi1frame->Draw();
+
+}
+
+void applyCutSignal(){
+  TFile* file ;
+  TChain* tree = new TChain("angles");
+  tree->Add("../datafiles/JHUGenFiles/SMHiggs_125_JHU.root");
+  double mZZ, m2, m1, costhetastar, costheta1, costheta2, phi, phi1,sepLD;
+  tree->SetBranchAddress("zzmass",&mZZ);
+  tree->SetBranchAddress("z2mass",&m2);
+  tree->SetBranchAddress("z1mass",&m1);
+  tree->SetBranchAddress("costhetastar",&costhetastar);
+  tree->SetBranchAddress("phi",&phi);
+  tree->SetBranchAddress("costheta1",&costheta1);
+  tree->SetBranchAddress("costheta2",&costheta2);
+  tree->SetBranchAddress("phi1",&phi1);
+
+  TFile* fileOut; 
+  double mZZout, m2out, m1out, costhetastarout, costheta1out, costheta2out, phiout, phi1out, Psig, Pbkg, D;
+  fileOut = new TFile("../datafiles/JHUGenFiles/SMHiggs_125_JHU_withCuts.root","RECREATE");
+
+  TTree* treeOut = new TTree("angles","angles, mzz, D");
+  treeOut->Branch("zzmass",&mZZout,"zzmass/D");
+  treeOut->Branch("z2mass",&m2out,"z2mass/D");
+  treeOut->Branch("z1mass",&m1out,"z1mass/D");
+  treeOut->Branch("costhetastar",&costhetastarout,"costhetastar/D");
+  treeOut->Branch("phi",&phiout,"phi/D");
+  treeOut->Branch("costheta1",&costheta1out,"costheta1/D");
+  treeOut->Branch("costheta2",&costheta2out,"costheta2/D");
+  treeOut->Branch("phi1",&phi1out,"phi1/D");
+
+  for (Int_t i=0; i<tree->GetEntries();i++) {
+    tree->GetEvent(i); 
+    if(mZZ>180 || mZZ<110)
+      continue;
+    //if(m1+m2>125)
+    //continue;
+    if((i%10000)==0)
+      cout<<"event "<<i<<endl;
+
+    mZZout=mZZ;
+    m1out= m1;
+    m2out=m2;
+    costhetastarout=costhetastar;
+    costheta1out=costheta1;
+    costheta2out=costheta2;
+    phiout=phi;
+    phi1out=phi1;
+    if(m1>20 && m2>20)
+      treeOut->Fill();
+ }
+
+  fileOut->cd();
+  treeOut->Write();
+}

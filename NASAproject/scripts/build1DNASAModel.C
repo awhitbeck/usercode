@@ -14,6 +14,7 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TH3F.h"
+#include "TF1.h"
 #include "TString.h"
 #include <sstream>
 #include <string>
@@ -113,7 +114,8 @@ void build8DTemplate(){
     h_mzzphi1->Fill(mZZ,phi1);
     h_mzzphi->Fill(mZZ,phi);
    }
-
+   
+   
    //save it in a file
    TFile *f = new TFile("../datafiles/my8DTemplateNotNorm.root","RECREATE");
    h_mzz->Write();
@@ -223,10 +225,11 @@ vector<double> my8DTemplate(bool normalized,double mZZ, double m1, double m2, do
   // result of low statistics
 
   if(Pmzzm1m2==0){
+    cout<<mZZ<<" "<<m1<<" "<<m2<<" "<<costhetastar<<" "<<costheta1<<" "<<costheta2<<" "<<phi<<" "<<phi1<<endl;
     cout << "my8DTemplate says ... " << endl;
     cout<<"Pmzzm1m2: "<<Pmzzm1m2<<endl;
     Pmzzm1m2++;
-  }
+    }
   // - - - - - - - - - - - - - - - 
 
   double Pmzzcosthetastar = h_mzzcosthetastar->GetBinContent(h_mzzcosthetastar->FindBin(mZZ,costhetastar));
@@ -456,7 +459,7 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
 TH1F *h_mzz= (TH1F*)(f->Get("h_mzz"));
 
 vector<TH1F*> LDDistributionSignal(){
-  TFile* file = new TFile("../datafiles/JHUGenFiles/SMHiggs_125_JHU.root");
+  TFile* file = new TFile("../datafiles/JHUGenFiles/SMHiggs_125_JHU_withCuts.root");
   TTree* tree = (TTree*) file->Get("angles");
   
   double mZZ, m2, m1, costhetastar, costheta1, costheta2, phi, phi1;
@@ -469,7 +472,7 @@ vector<TH1F*> LDDistributionSignal(){
   tree->SetBranchAddress("costheta2",&costheta2);
   tree->SetBranchAddress("phi1",&phi1);
 
-  TH1F *h_LDsignal= new TH1F("LD_signal","LD_signal",100,0,1);
+  TH1F *h_LDsignal= new TH1F("LD_signal","LD_signal",101,0,1.01);
   TH1F *h_Psignal= new TH1F("P_signal","P_signal",100,0,0.0002);
   TH1F *h_Pbackground= new TH1F("P_background","P_background",100,0,0.0002);
   vector<TH1F*> vh_LDsignal;
@@ -547,7 +550,7 @@ vector<TH1F*> LDDistributionBackground(){
 
   TH1F *h_Psignal= new TH1F("P_signal","P_signal",100,0,0.0002);
   TH1F *h_Pbackground= new TH1F("P_background","P_background",100,0,0.0002);
-  TH1F *h_LDbackground= new TH1F("LD_background","LD_background",100,0,1);
+  TH1F *h_LDbackground= new TH1F("LD_background","LD_background",101,0,1.01);
   vector<TH1F*> vh_LDbackground;
   for (int i=1; i<36; i++){
     std::string s;
@@ -615,7 +618,6 @@ double separationLikelihoodDiscriminant(double mzz,double m1,double m2,double h1
 
 
 //=======================================================================
-
 void addDtoTree(char* inputFile){
 
   char inputFileName[50];
@@ -627,7 +629,7 @@ void addDtoTree(char* inputFile){
   TTree* sigTree = (TTree*) sigFile->Get("angles");
 
   TFile* newFile = new TFile(outputFileName,"RECREATE");
-  TTree* newTree = new TTree("newTree","angles");
+  TTree* newTree = new TTree("newTree","angles"); ///??????
 
   double m1,m2,mzz,h1,h2,hs,phi,phi1,D,sigP,bkgP,sepLD;
   sigTree->SetBranchAddress("z1mass",&m1);
@@ -638,7 +640,7 @@ void addDtoTree(char* inputFile){
   sigTree->SetBranchAddress("costhetastar",&hs);
   sigTree->SetBranchAddress("phi",&phi);  
   sigTree->SetBranchAddress("phistar1",&phi1);
-  sigTree->Branch("nasaLD",&D,"nasaLD/D");  
+  sigTree->Branch("nasaLD",&D,"nasaLD/D");    //???????
 
   newTree->Branch("z1mass",&m1,"z1mass/D");
   newTree->Branch("z2mass",&m2,"z2mass/D");
@@ -659,7 +661,7 @@ void addDtoTree(char* inputFile){
 
     sigTree->GetEntry(iEvt);
 
-    if(mzz>110 && mzz<180 && m2>20){
+    if(mzz>110 && mzz<180 && m2>20){  //???????????????
 
       pair<double,double> P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1);
 
@@ -673,7 +675,7 @@ void addDtoTree(char* inputFile){
   }
 
   newFile->cd();
-  newTree->Write("angles");
+  newTree->Write("angles"); ///???????
   newFile->Close();
 
 }
@@ -767,7 +769,7 @@ void storeLDInfo(bool signal){
   TFile* file ;
   TChain* tree = new TChain("angles");
   if(signal){
-    tree->Add("../datafiles/JHUGenFiles/SMHiggs_125_JHU.root");
+    tree->Add("../datafiles/JHUGenFiles/SMHiggs_125_JHU_withCuts.root");
   }
 
   if(!signal){
@@ -793,7 +795,7 @@ void storeLDInfo(bool signal){
  
 
   }
-  double mZZ, m2, m1, costhetastar, costheta1, costheta2, phi, phi1;
+  double mZZ, m2, m1, costhetastar, costheta1, costheta2, phi, phi1,sepLD;
   tree->SetBranchAddress("zzmass",&mZZ);
   tree->SetBranchAddress("z2mass",&m2);
   tree->SetBranchAddress("z1mass",&m1);
@@ -806,9 +808,9 @@ void storeLDInfo(bool signal){
   TFile* fileOut; 
   double mZZout, m2out, m1out, costhetastarout, costheta1out, costheta2out, phiout, phi1out, Psig, Pbkg, D;
   if(signal)
-    fileOut = new TFile("../datafiles/SMHiggs_125_JHU_withD.root","RECREATE");
+    fileOut = new TFile("../datafiles/JHUGenFiles/SMHiggs_125_JHU_withCuts_withD.root","RECREATE");
   else if(!signal)
-    fileOut = new TFile("../datafiles/EWKZZ4l_Powheg_withD.root","RECREATE");
+    fileOut = new TFile("../datafiles/PowhegFiles/EWKZZ4l_Powheg_withCuts_withD.root","RECREATE");
   TTree* treeOut = new TTree("eventInfo","angles, mzz, D");
   treeOut->Branch("zzmass",&mZZout,"zzmass/D");
   treeOut->Branch("z2mass",&m2out,"z2mass/D");
@@ -821,6 +823,7 @@ void storeLDInfo(bool signal){
   treeOut->Branch("Psig",&Psig,"Psig/D");
   treeOut->Branch("Pbkg",&Pbkg,"Pbkg/D");
   treeOut->Branch("D",&D,"D/D");
+  treeOut->Branch("sigSepLD",&sepLD,"sigSepLD/D");    
 
   for (Int_t i=0; i<tree->GetEntries();i++) {
     tree->GetEvent(i); 
@@ -834,6 +837,7 @@ void storeLDInfo(bool signal){
     Psig=P.first;
     Pbkg=P.second;
     D= P.first/(P.first+P.second);
+    //sepLD=separationLikelihoodDiscriminant(mZZ,m1,m2,costheta1,costheta2,phi);
 
     mZZout=mZZ;
     m1out= m1;
@@ -852,55 +856,174 @@ void storeLDInfo(bool signal){
 
 //=======================================================================
 
-void plotROCcurve(char* sigFileName,char* bkgFileName){
+void plotROCcurve(){ //only in mZZ 124-126
 
   cout << "plotting ROC curve " << endl;
 
-  TFile* file1 = new TFile(sigFileName);
-  TTree* tree1 = (TTree*) file1->Get("angles");
-  TH1F* h_LD1 = new TH1F("h_LD1","h_LD1",100,0,1);
-  
-  TFile* file2 = new TFile(bkgFileName);
-  TTree* tree2 = (TTree*) file2->Get("angles");
-  TH1F* h_LD2 = new TH1F("h_LD2","h_LD2",100,0,1);
+  TFile* file_sig = new TFile("../datafiles/JHUGenFiles/SMHiggs_125_JHU_withCuts_withD.root","read");
+  TTree* tree_sig = (TTree*) file_sig->Get("eventInfo");
+  TH1F* h_LD_sig = new TH1F("h_LD_sig","h_LD_sig",101,0,1.01);
+  TH1F *h_costhetastar_sig = new TH1F("h_costhetastar_sig","h_costhetastar_sig",50,-1,1);
+  TH1F *h_costheta1_sig = new TH1F("h_costheta1_sig","h_costheta1_sig",50,-1,1);
+  TH1F *h_costheta2_sig = new TH1F("h_costheta2_sig","h_costheta2_sig",50,-1,1);
+  TH1F *h_phi_sig = new TH1F("h_phi_sig","h_phi_sig",50,-3.14,3.14);
+  TH1F *h_phi1_sig = new TH1F("h_phi1_sig","h_phi1_sig",50,-3.14,3.14);
+  TH1F* h_m2_sig = new TH1F("h_m2_sig","h_m2_sig",44,20,64);
+ 
+  TFile* file_bkg = new TFile("../datafiles/PowhegFiles/EWKZZ4l_Powheg_withCuts_withD.root","read");
+  TTree* tree_bkg = (TTree*) file_bkg->Get("eventInfo");
+  TH1F* h_LD_bkg = new TH1F("h_LD_bkg","h_LD_bkg",101,0,1.01);
+  TH1F *h_costhetastar_bkg = new TH1F("h_costhetastar_bkg","h_costhetastar_bkg",50,-1,1);
+  TH1F *h_costheta1_bkg = new TH1F("h_costheta1_bkg","h_costheta1_bkg",50,-1,1);
+  TH1F *h_costheta2_bkg = new TH1F("h_costheta2_bkg","h_costheta2_bkg",50,-1,1);
+  TH1F *h_phi_bkg = new TH1F("h_phi_bkg","h_phi_bkg",50,-3.14,3.14);
+  TH1F *h_phi1_bkg = new TH1F("h_phi1_bkg","h_phi1_bkg",50,-3.14,3.14);
+  TH1F* h_m2_bkg = new TH1F("h_m2_bkg","h_m2_bkg",44,20,64);
 
-  double sigEff[100],bkgEff[100];
+  double sigEff_LD[100],bkgEff_LD[100];
+  double sigEff_costhetastar[25],bkgEff_costhetastar[25];
+  double sigEff_costheta1[25],bkgEff_costheta1[25];
+  double sigEff_costheta2[25],bkgEff_costheta2[25];
+  double sigEff_phi[25],bkgEff_phi[25];
+  double sigEff_m2[44],bkgEff_m2[44];
 
-  double LD;
-  tree1->SetBranchAddress("nasaLD",&LD);  
-  tree2->SetBranchAddress("nasaLD",&LD);
+  double LD, costhetastar, costheta1, costheta2, phi, phi1,mZZ,m2;
+  //tree1->SetBranchAddress("nasaLD",&LD);  
+  //tree2->SetBranchAddress("nasaLD",&LD);
+  tree_sig->SetBranchAddress("D",&LD);  
+  tree_sig->SetBranchAddress("costhetastar",&costhetastar);
+  tree_sig->SetBranchAddress("phi",&phi);
+  tree_sig->SetBranchAddress("costheta1",&costheta1);
+  tree_sig->SetBranchAddress("costheta2",&costheta2);
+  tree_sig->SetBranchAddress("phi1",&phi1);
+  tree_sig->SetBranchAddress("zzmass",&mZZ);
+  tree_sig->SetBranchAddress("z2mass",&m2);
+
+  tree_bkg->SetBranchAddress("D",&LD);
+  tree_bkg->SetBranchAddress("costhetastar",&costhetastar);
+  tree_bkg->SetBranchAddress("phi",&phi);
+  tree_bkg->SetBranchAddress("costheta1",&costheta1);
+  tree_bkg->SetBranchAddress("costheta2",&costheta2);
+  tree_bkg->SetBranchAddress("phi1",&phi1);
+  tree_bkg->SetBranchAddress("zzmass",&mZZ);
+  tree_bkg->SetBranchAddress("z2mass",&m2);
 
   //Get Histos for LD
-  for(int iEvt=0; iEvt<tree1->GetEntries(); iEvt++){
-    tree1->GetEntry(iEvt);
-    h_LD1->Fill(LD);
+  for(int iEvt=0; iEvt<tree_sig->GetEntries(); iEvt++){
+    tree_sig->GetEntry(iEvt);
+    if(mZZ>126 || mZZ<124)
+      continue;
+    h_LD_sig->Fill(LD);
+    h_costhetastar_sig->Fill(costhetastar);
+    h_costheta1_sig->Fill(costheta1);
+    h_costheta2_sig->Fill(costheta2);
+    h_phi1_sig->Fill(phi1);
+    h_phi_sig->Fill(phi);
+    h_m2_sig->Fill(m2);
+   }
+  for(int iEvt=0; iEvt<tree_bkg->GetEntries(); iEvt++){
+    tree_bkg->GetEntry(iEvt);
+     if(mZZ>126 || mZZ<124)
+      continue;
+     h_LD_bkg->Fill(LD);
+    h_costhetastar_bkg->Fill(costhetastar);
+    h_costheta1_bkg->Fill(costheta1);
+    h_costheta2_bkg->Fill(costheta2);
+    h_phi1_bkg->Fill(phi1);
+    h_phi_bkg->Fill(phi);
+    h_m2_bkg->Fill(m2);
   }
-  for(int iEvt=0; iEvt<tree2->GetEntries(); iEvt++){
-    tree2->GetEntry(iEvt);
-    h_LD2->Fill(LD);
-  }
-  h_LD1->Scale(1/h_LD1->Integral());
-  h_LD2->Scale(1/h_LD2->Integral());
+  h_LD_sig->Scale(1/h_LD_sig->Integral());
+  h_costhetastar_sig->Scale(1/h_costhetastar_sig->Integral());
+  h_costheta1_sig->Scale(1/h_costheta1_sig->Integral());
+  h_costheta2_sig->Scale(1/h_costheta2_sig->Integral());
+  h_phi_sig->Scale(1/h_phi_sig->Integral());
+  h_phi1_sig->Scale(1/h_phi1_sig->Integral());
+  h_m2_sig->Scale(1/h_m2_sig->Integral());
+  h_LD_bkg->Scale(1/h_LD_bkg->Integral());
+  h_costhetastar_bkg->Scale(1/h_costhetastar_bkg->Integral());
+  h_costheta1_bkg->Scale(1/h_costheta1_bkg->Integral());
+  h_costheta2_bkg->Scale(1/h_costheta2_bkg->Integral());
+  h_phi_bkg->Scale(1/h_phi_bkg->Integral());
+  h_phi1_bkg->Scale(1/h_phi1_bkg->Integral());
+  h_m2_bkg->Scale(1/h_m2_bkg->Integral());
 
   //loop over cut values
   for(int iCut=0; iCut<100; iCut++){
-    sigEff[iCut]=h_LD1->Integral(iCut+1,100);
-    bkgEff[iCut]=1-h_LD2->Integral(iCut+1,100);
+    sigEff_LD[iCut]=h_LD_sig->Integral(iCut,100);
+    bkgEff_LD[iCut]=1-h_LD_bkg->Integral(iCut,100);
+  }
+  for(int iCut=0; iCut<25; iCut++){
+    sigEff_costhetastar[iCut]=h_costhetastar_sig->Integral(0+iCut,50-iCut);
+    bkgEff_costhetastar[iCut]=1-h_costhetastar_bkg->Integral(0+iCut,50-iCut);
+  }
+  for(int iCut=0; iCut<25; iCut++){
+    sigEff_costheta1[iCut]=h_costheta1_sig->Integral(0+iCut,50-iCut);
+    bkgEff_costheta1[iCut]=1-h_costheta1_bkg->Integral(0+iCut,50-iCut);
+  }
+  for(int iCut=0; iCut<25; iCut++){
+    sigEff_costheta2[iCut]=h_costheta2_sig->Integral(0+iCut,50-iCut);
+    bkgEff_costheta2[iCut]=1-h_costheta2_bkg->Integral(0+iCut,50-iCut);
+  }
+  for(int iCut=0; iCut<25; iCut++){
+    sigEff_phi[iCut]=h_phi_sig->Integral(25-iCut,25+iCut);
+    bkgEff_phi[iCut]=1-h_phi_bkg->Integral(25-iCut,25+iCut);
+  }
+  for(int iCut=0; iCut<44; iCut++){
+    sigEff_m2[iCut]=h_m2_sig->Integral(iCut,44);
+    bkgEff_m2[iCut]=1-h_m2_bkg->Integral(iCut,44);
   }
 
   TCanvas* ROCcanvas = new TCanvas("ROCcanvas","ROC curve for LD",600,600);
-  double lineX[100],lineY[100];
+  /*double lineX[100],lineY[100];
   for(int i=0; i<100; i++){
     lineX[i]=(double)i/100;
     lineY[i]=1.-(double)i/100;
   }
   TGraph* line = new TGraph(100,lineX,lineY);
-  line->SetLineColor(2);
-  TGraph* ROC = new TGraph(100,sigEff,bkgEff);
-  ROC->GetXaxis()->SetTitle("#epsilon_{signal}");
-  ROC->GetYaxis()->SetTitle("#epsilon_{background}");
-  ROC->Draw("AC*");
-  line->Draw("SAME");
+  line->SetLineColor(2);*/
+  TF1* f= new TF1("f","1-x",0,1.2);
+  f->SetLineColor(2);
+  TGraph* ROC_LD = new TGraph(100,sigEff_LD,bkgEff_LD);
+  ROC_LD->GetXaxis()->SetTitle("#epsilon_{signal}");
+  ROC_LD->GetYaxis()->SetTitle("#epsilon_{background}");
+  ROC_LD->SetMarkerStyle(8);
+  ROC_LD->Draw("APL");
+  TGraph* ROC_costhetastar = new TGraph(25,sigEff_costhetastar,bkgEff_costhetastar);
+  ROC_costhetastar->SetMarkerStyle(24);
+  ROC_costhetastar->SetMarkerColor(2);
+  ROC_costhetastar->Draw("PLsame");
+  TGraph* ROC_costheta1 = new TGraph(25,sigEff_costheta1,bkgEff_costheta1);
+  ROC_costheta1->SetMarkerStyle(24);
+  ROC_costheta1->SetMarkerColor(4);
+  ROC_costheta1->Draw("PLsame");
+  TGraph* ROC_costheta2 = new TGraph(25,sigEff_costheta2,bkgEff_costheta2);
+  ROC_costheta2->SetMarkerStyle(24);
+  ROC_costheta2->SetMarkerColor(kGreen+2);
+  ROC_costheta2->Draw("PLsame");
+  TGraph* ROC_phi = new TGraph(25,sigEff_phi,bkgEff_phi);
+  ROC_phi->SetMarkerStyle(29);
+  ROC_phi->SetMarkerColor(kMagenta);
+  ROC_phi->Draw("PLsame");
+  TGraph* ROC_m2 = new TGraph(44,sigEff_m2,bkgEff_m2);
+  ROC_m2->SetMarkerStyle(34);
+  ROC_m2->SetMarkerColor(kOrange);
+  ROC_m2->Draw("PLsame");
+
+
+  f->Draw("same");
+  
+  TLegend *leg = new TLegend(0.5,0.6,0.7,0.8);
+  leg->AddEntry(ROC_LD,"NASA LD","LP");
+  leg->AddEntry(ROC_costhetastar,"|costhetastar|<cut(1-0)","LP");
+  leg->AddEntry(ROC_costheta1,"|costheta1|<cut(1-0)","LP");
+  leg->AddEntry(ROC_costheta2,"|costheta2|<cut(1-0)","LP");
+  leg->AddEntry(ROC_phi,"|phi|>cut(0-3.14)","LP");
+  leg->AddEntry(ROC_m2,"m2>cut(20-64)","LP");
+
+  leg->Draw("same");
+  ROCcanvas->Print("ROCcanvas.eps");
+
 
 }
 

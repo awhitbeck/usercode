@@ -29,14 +29,18 @@ storeLDDistribution -> to store the D variables in mZZ slices in a file
 storeLDInfo -> to store D value event by event in the trees
 (addDtoTree should do the same...)
 
+plotROCcurve() -> to plot ROC curves for single variables and LD
+
 separationLikelihoodDiscriminant() -> to evaluate LD for 2 signals PS vs SM
 
+---------------------------
 To run the full analysis you sould do
 build8DTemplate()
 storeLDDistribution(1) //for signal
 storeLDDistribution(0) //for background
 storeLDInfo(1) //for signla
 storeLDInfo(0) // for background
+
 
 readOutAngles_LMH.C (converter.sh/converter_Powheg.sh)
 ----------------------------------------------------------
@@ -55,4 +59,5 @@ If you want to change this switch the second argument of readOutAngles_LMH() in 
 to be false.
 
 All of the same applies to converter_Powheg.sh.  This must be run on Powheg only.  
+
 
