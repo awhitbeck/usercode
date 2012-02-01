@@ -16,24 +16,30 @@ using namespace RooFit;
 
  RooNASAModelBkg::RooNASAModelBkg(const char *name, const char *title, 
 				  RooAbsReal& _mZZ,
-				  RooAbsReal& _D,
+				  RooAbsReal& _D, 
+				  RooAbsReal& _a0,
 				  RooAbsReal& _a1,
 				  RooAbsReal& _a2,
 				  RooAbsReal& _a3,
-				  RooAbsReal& _b1,
-				  RooAbsReal& _b2,
-				  RooAbsReal& _b3,
-				  RooAbsReal& _frac) :
+				  RooAbsReal& _a4,
+				  RooAbsReal& _a5,
+				  RooAbsReal& _a6,
+				  RooAbsReal& _a7,
+				  RooAbsReal& _a8,
+				  RooAbsReal& _a9) :
    RooAbsPdf(name,title), 
    mZZ("mZZ","mZZ",this,_mZZ),
    D("D","D",this,_D),
+   a0("a0","a0",this,_a0),
    a1("a1","a1",this,_a1),
    a2("a2","a2",this,_a2),
    a3("a3","a3",this,_a3),
-   b1("b1","b1",this,_b1),
-   b2("b2","b2",this,_b2),
-   b3("b3","b3",this,_b3),
-   frac("frac","frac",this,_frac)
+   a4("a4","a4",this,_a4),
+   a5("a5","a5",this,_a5),
+   a6("a6","a6",this,_a6),
+   a7("a7","a7",this,_a7),
+   a8("a8","a8",this,_a8),
+   a9("a9","a9",this,_a9)
  { 
 
  } 
@@ -42,43 +48,58 @@ RooNASAModelBkg::RooNASAModelBkg(const RooNASAModelBkg& other, const char* name)
    RooAbsPdf(other,name), 
    mZZ("mZZ",this,other.mZZ),
    D("D",this,other.D),
+   a0("a0",this,other.a0),
    a1("a1",this,other.a1),
    a2("a2",this,other.a2),
    a3("a3",this,other.a3),
-   b1("b1",this,other.b1),
-   b2("b2",this,other.b2),
-   b3("b3",this,other.b3),
-   frac("frac","frac",this,other.frac)
+   a4("a4",this,other.a4),
+   a5("a5",this,other.a5),
+   a6("a6",this,other.a6),
+   a7("a7",this,other.a7),
+   a8("a8",this,other.a8),
+   a9("a9",this,other.a9)
  { 
    
  }
 
-void RooNASAModelBkg::setD(TFile* f){
-  h_mzzD= (TH2F*)(f->Get("h_mzzD"));
+//void RooNASAModelBkg::setD(TFile* f){
+//  h_mzzD= (TH2F*)(f->Get("h_mzzD"));
+//}
+void RooNASAModelBkg::setD(TH2F h_mzzD_){
+  h_mzzD= h_mzzD_;
+  cout<<"setD"<<endl;
+  /*for(int i=0;i<h_mzzD.GetXaxis()->GetNbins();i++) {
+     for(int j=0;j<h_mzzD.GetYaxis()->GetNbins();j++){
+       cout<<"bin "<<i<<" "<<j<<endl;
+       cout<<h_mzzD.GetBinContent(i,j)<<endl;
+     }
+     }*/
+  cout<<h_mzzD.FindBin(120,0.5)<<endl;
+  cout<< h_mzzD.GetBinContent(h_mzzD.FindBin(120,0.5))<<endl;
+  cout<<"setD_ended"<<endl;
 }
 
 double RooNASAModelBkg::evaluate() const 
  { 
-   double PmzzD = h_mzzD->GetBinContent(h_mzzD->FindBin(mZZ,D));
+   int binX = ((mZZ-110)/2);  //check!!!!!!!
+   int binY = (D/0.01);  //check!!!!!!!!!
+   double PmzzD = h_mzzD.GetBinContent(binX,binY);
+   //double PmzzD = h_mzzD.GetBinContent(24,20);
+   //cout<<PmzzD<<endl;
+   //cout<<h_mzzD<<endl;
+   /*for(int i=0;i<h_mzzD.GetXaxis()->GetNbins();i++) {
+     for(int j=0;j<h_mzzD.GetYaxis()->GetNbins();j++){
+       cout<<"bin "<<i<<" "<<j<<endl;
+       cout<<h_mzzD.GetBinContent(i,j)<<endl;
+     }
+     }*/
+   //cout<<h_mzzD.FindBin(120,0.5)<<endl;
+   //cout<< h_mzzD.GetBinContent(24,20)<<endl;
 
-   double signa = 0.;
-   if ((mZZ-a1) > 0) { signa = 1.; }
-   else if ((mZZ-a1) < 0) { signa = -1.; }
-   else { signa = 0.; }
-   
-   double signb = 0.;
-   if ((mZZ-b1) > 0) { signb = 1.; }
-   else if ((mZZ-b1) < 0) { signb = -1.; }
-   else { signb = 0.; }
-   
-   double bkglo = (0.5 + 0.5*signa * TMath::Erf(TMath::Abs(mZZ-a1)/a2)) * exp(-1.*mZZ/a3);
-   double bkghi = (0.5 + 0.5*signb * TMath::Erf(TMath::Abs(mZZ-b1)/b2)) * exp(-1.*mZZ/b3);
-   double total = bkglo*frac + (1-frac)*bkghi;
-   
-   double dynamicKqq = 1. + mZZ*0.001074 + mZZ*mZZ*-7.851e-07;
-   
-   double totalNLO = total*dynamicKqq;
+   //PmzzD=1;
+   double ZZ = (.5+.5*TMath::Erf((mZZ-a0)/a1))*(a3/(1+exp((mZZ-a0)/a2)))
+     +(.5+.5*TMath::Erf((mZZ-a4)/a5))*(a7/(1+exp((mZZ-a4)/a6))+a9/(1+exp((mZZ-a4)/a8)));
   
-   return totalNLO*PmzzD;
+   return ZZ*PmzzD;
  } 
 
