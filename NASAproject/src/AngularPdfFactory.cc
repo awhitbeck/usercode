@@ -1,5 +1,5 @@
 #include "RooRealVar.h"
-#include "../PDFs/RooXZsZs_5D.cxx"
+#include "/scratch/hep/ntran/HZZ_materials/HZsZs_analysis/PDFs/RooXZsZs_5D.cxx"
 #include <cmath>
 
 class AngularPdfFactory{
@@ -41,6 +41,23 @@ public:
     R2Val  = new RooRealVar("R2Val","R2Val",0.15);
 
     PDF = new RooXZsZs_5D("PDF","PDF",*m1,*m2,*h1,*h2,*Phi,*a1Val,*phi1Val,*a2Val,*phi2Val,*a3Val,*phi3Val,*mZ,*gamZ,*mZZ,*R1Val,*R2Val);
+
+  };
+
+  ~AngularPdfFactory(){
+
+    delete mZ;
+    delete gamZ;
+    delete a1Val;
+    delete phi1Val;
+    delete a2Val;
+    delete phi2Val;
+    delete a3Val;
+    delete phi3Val;
+    delete R1Val;
+    delete R2Val;
+    
+    delete PDF;
 
   };
 

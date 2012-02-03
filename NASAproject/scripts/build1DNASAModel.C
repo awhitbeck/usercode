@@ -20,6 +20,18 @@
 #include <string>
 #include <vector>
 #include "../src/AngularPdfFactory.cc"
+#include "TMVA/Tools.h"
+#include "TMVA/Reader.h"
+#include "TMVA/MethodCuts.h"
+
+/*
+//hep.pha.jhu.edu:/scratch/hep/ntran/HZZ_materials
+//to setup root: source /scratch/hep/ntran/ROOTdistributions/myROOT528_fromSource/root/bin/thisroot.csh
+//be sure to compile/load everything:
+.L /scratch/hep/ntran/HZZ_materials/HZsZs_analysis/PDFs/RooXZsZs_5D.cxx+
+.L AngularPdfFactory.cc+
+.L build1DNASAModel.C+
+*/
 
 using namespace RooFit ;
 
@@ -400,9 +412,9 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
   RooRealVar* costheta2_rrv = new RooRealVar("costheta2","cos#theta_{2}",-1,1);
   RooRealVar* phi_rrv= new RooRealVar("phi","#Phi",-3.1415,3.1415);
   RooRealVar* mzz_rrv= new RooRealVar("mzz","mZZ",110,180);
-  AngularPdfFactory SMHiggs(z1mass_rrv,z2mass_rrv,costheta1_rrv,costheta2_rrv,phi_rrv,mzz_rrv);
-  SMHiggs.makeSMHiggs();
-  SMHiggs.makeParamsConst(true);
+  AngularPdfFactory *SMHiggs = new AngularPdfFactory(z1mass_rrv,z2mass_rrv,costheta1_rrv,costheta2_rrv,phi_rrv,mzz_rrv);
+  SMHiggs->makeSMHiggs();
+  SMHiggs->makeParamsConst(true);
 
   z1mass_rrv->setVal(m1);  
   z2mass_rrv->setVal(m2);
@@ -413,7 +425,7 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
 
   //RooArgSet *ras = new RooArgSet(*z1mass_rrv,*z2mass_rrv,*costheta1_rrv,*costheta2_rrv,*phi_rrv);
   //double Psig = SMHiggs.PDF->getVal(ras);///SMHiggs.PDF->getNorm(ras);
-  double Psig = SMHiggs.getVal(mZZ);
+  double Psig = SMHiggs->getVal(mZZ);
 
   /*if(fabs(SMHiggs.PDF->getVal(ras) - 4.68449e-11)>1/pow(10,10) ){
     cout<<"val "<<SMHiggs.PDF->getVal(ras)<<endl;
@@ -452,6 +464,8 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
   delete costheta2_rrv;
   delete phi_rrv;
   delete mzz_rrv; 
+
+  delete SMHiggs;
 
   return make_pair(Psig,Pbackg);
 }
@@ -605,14 +619,26 @@ double separationLikelihoodDiscriminant(double mzz,double m1,double m2,double h1
   RooRealVar* mzz_rrv= new RooRealVar("mzz","mZZ",mzz,110,180);
 
   // build PDFs
-  AngularPdfFactory SMHiggs(z1mass_rrv,z2mass_rrv,costheta1_rrv,costheta2_rrv,phi_rrv,mzz_rrv);
-  SMHiggs.makeSMHiggs();
-  SMHiggs.makeParamsConst(true);
-  AngularPdfFactory PSHiggs(z1mass_rrv,z2mass_rrv,costheta1_rrv,costheta2_rrv,phi_rrv,mzz_rrv);
-  PSHiggs.makePSHiggs();
-  PSHiggs.makeParamsConst(true);
+  AngularPdfFactory *SMHiggs = new AngularPdfFactory(z1mass_rrv,z2mass_rrv,costheta1_rrv,costheta2_rrv,phi_rrv,mzz_rrv);
+  SMHiggs->makeSMHiggs();
+  SMHiggs->makeParamsConst(true);
+  AngularPdfFactory *PSHiggs = new AngularPdfFactory(z1mass_rrv,z2mass_rrv,costheta1_rrv,costheta2_rrv,phi_rrv,mzz_rrv);
+  PSHiggs->makePSHiggs();
+  PSHiggs->makeParamsConst(true);
 
-  return 1/(1+SMHiggs.getVal(mzz_rrv->getVal())/PSHiggs.getVal(mzz_rrv->getVal()));
+  double LD=1/(1+PSHiggs->getVal(mzz_rrv->getVal())/SMHiggs->getVal(mzz_rrv->getVal()));
+
+  delete z1mass_rrv;
+  delete z2mass_rrv;
+  delete costheta1_rrv;
+  delete costheta2_rrv;
+  delete phi_rrv;
+  delete mzz_rrv;
+
+  delete SMHiggs;
+  delete PSHiggs;
+
+  return LD;
 
 }
 
@@ -626,12 +652,17 @@ void addDtoTree(char* inputFile){
   sprintf(outputFileName,"%s_withDiscriminants.root",inputFile);
 
   TFile* sigFile = new TFile(inputFileName);
-  TTree* sigTree = (TTree*) sigFile->Get("angles");
+  TTree* sigTree;
+    if(sigFile)
+        sigTree = (TTree*) sigFile->Get("angles");
+    if(!sigTree)
+        return;
 
   TFile* newFile = new TFile(outputFileName,"RECREATE");
   TTree* newTree = new TTree("newTree","angles"); ///??????
 
   double m1,m2,mzz,h1,h2,hs,phi,phi1,D,sigP,bkgP,sepLD;
+  double tmva_likelihood, tmva_bdt,tmva_likelihood_sigSep, tmva_bdt_sigSep;
   sigTree->SetBranchAddress("z1mass",&m1);
   sigTree->SetBranchAddress("z2mass",&m2);
   sigTree->SetBranchAddress("zzmass",&mzz);
@@ -640,7 +671,12 @@ void addDtoTree(char* inputFile){
   sigTree->SetBranchAddress("costhetastar",&hs);
   sigTree->SetBranchAddress("phi",&phi);  
   sigTree->SetBranchAddress("phistar1",&phi1);
+
+/********
   sigTree->Branch("nasaLD",&D,"nasaLD/D");    //???????
+  sigTree->Branch("tmva_likelihood",&tmva_likelihood,"tmva_likelihood/D");  
+  sigTree->Branch("tmva_bdt",&tmva_bdt,"tmva_bdt/D");  
+*/
 
   newTree->Branch("z1mass",&m1,"z1mass/D");
   newTree->Branch("z2mass",&m2,"z2mass/D");
@@ -653,7 +689,37 @@ void addDtoTree(char* inputFile){
   newTree->Branch("nasaLD",&D,"nasaLD/D");  
   newTree->Branch("nasaSigProb",&sigP,"nasaSigProb/D"); 
   newTree->Branch("nasaBkgProb",&bkgP,"nasaBkgProb/D");  
-  newTree->Branch("sigSepLD",&sepLD,"sigSepLD/D");    
+  newTree->Branch("tmva_likelihood",&tmva_likelihood,"tmva_likelihood/D");  
+  newTree->Branch("tmva_bdt",&tmva_bdt,"tmva_bdt/D");  
+  newTree->Branch("tmva_bdt_sigSep",&tmva_bdt_sigSep,"tmva_bdt_sigSep/D");
+  newTree->Branch("tmva_likelihood_sigSep",&tmva_likelihood_sigSep,"tmva_likelihood_sigSep/D");  newTree->Branch("sigSepLD",&sepLD,"sigSepLD/D");    
+
+  ///// Setting up TMVA
+  //gSystem->Load("/home/ntran/ROOTdistributions/myROOT528_fromSource/root/lib/libTMVA.so");
+  TMVA::Reader *reader = new TMVA::Reader( "!Color:!Silent" );    
+  TMVA::Reader *reader_sigSep = new TMVA::Reader( "!Color:!Silent" );    
+  float r_z1mass, r_z2mass, r_costheta1, r_costheta2, r_costhetastar, r_phi, r_phistar1, r_zzmass;
+  reader->AddVariable( "z1mass", &r_z1mass );
+  reader->AddVariable( "z2mass", &r_z2mass );
+  reader->AddVariable( "costheta1", &r_costheta1 );
+  reader->AddVariable( "costheta2", &r_costheta2 );
+  reader->AddVariable( "phi", &r_phi );
+  reader->AddVariable( "costhetastar", &r_costhetastar );
+  reader->AddVariable( "phistar1", &r_phistar1 );
+  reader->AddSpectator( "zzmass",   &r_zzmass );
+  reader->BookMVA( "Likelihood method", "/scratch/hep/ntran/HZZ_materials/HZsZs_analysis/TMVAanalysis/weights/TMVA_zz4l_m125_Likelihood.weights.xml" ); 
+  reader->BookMVA( "BDT method", "/scratch/hep/ntran/HZZ_materials/HZsZs_analysis/TMVAanalysis/weights/TMVA_zz4l_m125_BDT.weights.xml" ); 
+
+  reader_sigSep->AddVariable( "z1mass", &r_z1mass );
+  reader_sigSep->AddVariable( "z2mass", &r_z2mass );
+  reader_sigSep->AddVariable( "costheta1", &r_costheta1 );
+  reader_sigSep->AddVariable( "costheta2", &r_costheta2 );
+  reader_sigSep->AddVariable( "phi", &r_phi );
+  reader_sigSep->AddVariable( "costhetastar", &r_costhetastar );
+  reader_sigSep->AddVariable( "phistar1", &r_phistar1 );
+  reader_sigSep->AddSpectator( "zzmass",   &r_zzmass );
+  reader_sigSep->BookMVA( "Likelihood method", "/home/whitbeck/4lHelicity/TMVAanalysis/weights/TMVA_zz4l_m125_Likelihood.weights.xml" ); 
+  reader_sigSep->BookMVA( "BDT method", "/home/whitbeck/4lHelicity/TMVAanalysis/weights/TMVA_zz4l_m125_BDT.weights.xml" ); 
 
   for(int iEvt=0; iEvt<sigTree->GetEntries(); iEvt++){
 
@@ -662,13 +728,27 @@ void addDtoTree(char* inputFile){
     sigTree->GetEntry(iEvt);
 
     if(mzz>110 && mzz<180 && m2>20){  //???????????????
-
+      //NASA LD
       pair<double,double> P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1);
 
       sigP=P.first;
       bkgP=P.second;
       D=P.first/(P.first+P.second);
       sepLD=separationLikelihoodDiscriminant(mzz,m1,m2,h1,h2,phi);
+
+      //TMVA LD
+      r_z1mass = (float) m1;
+      r_z2mass = (float) m2;
+      r_costheta1 = (float) h1;
+      r_costheta2 = (float) h2;
+      r_phi = (float) phi;
+      r_costhetastar = (float) hs;
+      r_phistar1 = (float) phi1;
+      tmva_likelihood = reader->EvaluateMVA( "Likelihood method" );
+      tmva_bdt = reader->EvaluateMVA( "BDT method" );
+      tmva_likelihood_sigSep = .5;//reader_sigSep->EvaluateMVA( "Likelihood method" );
+      tmva_bdt_sigSep = .5;//reader_sigSep->EvaluateMVA( "BDT method" );
+
       newTree->Fill();
     }
 
@@ -677,6 +757,79 @@ void addDtoTree(char* inputFile){
   newFile->cd();
   newTree->Write("angles"); ///???????
   newFile->Close();
+
+}
+
+//========================================================================
+
+TGraph* plotSingleROCcurve(char* sigFileName,char* bkgFileName,char* var){
+
+  cout << "plotting ROC curve " << endl;
+
+  TFile* file1 = new TFile(sigFileName);
+  TTree* tree1 = (TTree*) file1->Get("angles");
+  TH1F* h_LD1 = new TH1F("h_LD1","h_LD1",100,-1,1);
+  
+  TFile* file2 = new TFile(bkgFileName);
+  TTree* tree2 = (TTree*) file2->Get("angles");
+  TH1F* h_LD2 = new TH1F("h_LD2","h_LD2",100,-1,1);
+
+  double sigEff[100],bkgEff[100];
+
+  double LD,mzz,m2;
+  tree1->SetBranchAddress(var,&LD);  
+  tree1->SetBranchAddress("zzmass",&mzz);  
+  tree1->SetBranchAddress("z2mass",&m2);  
+  tree2->SetBranchAddress(var,&LD);
+  tree2->SetBranchAddress("zzmass",&mzz);  
+  tree2->SetBranchAddress("z2mass",&m2);  
+
+  //Get Histos for LD
+  for(int iEvt=0; iEvt<tree1->GetEntries(); iEvt++){
+    tree1->GetEntry(iEvt);
+    if(mzz>124 && mzz<126 && m2>20)
+      h_LD1->Fill(LD);
+  }
+  for(int iEvt=0; iEvt<tree2->GetEntries(); iEvt++){
+    tree2->GetEntry(iEvt);
+    if(mzz>124 && mzz<126 && m2>20)
+      h_LD2->Fill(LD);
+  }
+
+  h_LD1->Scale(1/h_LD1->Integral());
+  h_LD2->Scale(1/h_LD2->Integral());
+
+  //loop over cut values
+  for(int iCut=0; iCut<100; iCut++){
+    sigEff[iCut]=h_LD1->Integral(iCut+1,100);
+    bkgEff[iCut]=1-h_LD2->Integral(iCut+1,100);
+  }
+
+  TCanvas* ROCcanvas = new TCanvas("ROCcanvas","ROC curve for LD",600,600);
+  double lineX[100],lineY[100];
+  for(int i=0; i<100; i++){
+    lineX[i]=(double)i/100;
+    lineY[i]=1.-(double)i/100;
+  }
+  TGraph* line = new TGraph(100,lineX,lineY);
+  line->SetLineColor(2);
+  TGraph* ROC = new TGraph(100,sigEff,bkgEff);
+  ROC->GetXaxis()->SetTitle("#epsilon_{signal}");
+  ROC->GetYaxis()->SetTitle("1-#epsilon_{background}");
+  ROC->Draw("AC*");
+  line->Draw("SAME");
+  
+  
+  //delete file1; 
+  delete tree1; 
+  delete h_LD1;
+  
+  //delete file2; 
+  delete tree2; 
+  delete h_LD2; 
+
+
+  return ROC;
 
 }
 
@@ -851,7 +1004,7 @@ void storeLDInfo(bool signal){
  }
 
   fileOut->cd();
-  treeOut->Write();
+  treeOut->Write("angles");
 }
 
 //=======================================================================
