@@ -37,8 +37,6 @@ public:
   RooNASAModelSig(const RooNASAModelSig& other, const char* name=0) ;
   virtual TObject* clone(const char* newname) const { return new RooNASAModelSig(*this,newname); }
   inline virtual ~RooNASAModelSig() { }
-
-  void setD(TH2F& h_mzzD);
   
 protected:
 
@@ -53,7 +51,6 @@ protected:
   Double_t evaluate() const ;
 
 private:
-
   ClassDef(RooNASAModelSig,1) 
 };
  

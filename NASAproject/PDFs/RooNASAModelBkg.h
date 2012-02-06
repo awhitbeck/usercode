@@ -43,9 +43,6 @@ public:
   virtual TObject* clone(const char* newname) const { return new RooNASAModelBkg(*this,newname); }
   inline virtual ~RooNASAModelBkg() { }
 
-  //void setD(TFile* f);
-  void setD(TH2F f); //if I use a pointer the value of the pointer change!!
-
 protected:
 
   RooRealProxy mZZ ;
@@ -60,8 +57,6 @@ protected:
   RooRealProxy a7 ;
   RooRealProxy a8 ;
   RooRealProxy a9 ;
-  
-  TH2F h_mzzD;
 
   Double_t evaluate() const ;
 

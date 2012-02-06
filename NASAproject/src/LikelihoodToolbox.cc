@@ -372,14 +372,10 @@ public:
 
   //=============================================================
 
-  // The following methods have not yet been implemented 
-  // and simply serve as an outline for things to be 
-  // developed. 
-
-  void makeLDdistribution(TH1F& LDdist, RooDataSet* userData=0){
+  void makeLDdistSigVSig(TH1F& LDdist, RooDataSet* userData=0){
 
     if(debug)
-      cout << "makeLDdistribution:" << endl;
+      cout << "make LD distribution between two signal hypotheses:" << endl;
  
     if(userData==0)
       userData=dataSet;
@@ -393,8 +389,6 @@ public:
     for(int iMeas=1; iMeas<measurables.size(); iMeas++)
       argSet->add(*measurables[iMeas]);
     
-
-    //TH1F* LDdist = new TH1F("LDdist","LDdist",LD_bins,0,1);
     LDdist.SetLineColor(LD_lineColor);
     LDdist.SetLineStyle(LD_lineStyle);
 
@@ -416,6 +410,53 @@ public:
     }// end loop over events
 
   };
+
+    //=============================================================
+
+  void makeLDdistSigVBkg(TH1F& LDdist, RooDataSet* userData=0){
+
+    if(debug)
+      cout << "make LD distribution between two signal hypotheses:" << endl;
+ 
+    if(userData==0)
+      userData=dataSet;
+
+    if(measurables.size()==0){
+      cout << "something strange is going on here, there are no measurables" << endl;
+      return;
+    }
+
+    RooArgSet *argSet = new RooArgSet(*measurables[0]);
+    for(int iMeas=1; iMeas<measurables.size(); iMeas++)
+      argSet->add(*measurables[iMeas]);
+    
+    LDdist.SetLineColor(LD_lineColor);
+    LDdist.SetLineStyle(LD_lineStyle);
+
+    for(int iEvt=0; iEvt<userData->sumEntries(); iEvt++){
+
+      if(debug)
+	cout << "iEvt: " << iEvt << endl;
+
+      if(iEvt%10000==0) 
+	cout << "iEvt: " << iEvt << endl;
+
+      //set measurables
+      for(int iMeas=0; iMeas<measurables.size(); iMeas++){	
+	measurables[iMeas]->setVal(((RooRealVar*)userData->get(iEvt)->find(measurables[iMeas]->GetName()))->getVal());
+      }
+
+      LDdist.Fill(1/(1+(background->getVal(argSet)/signal->getVal(argSet))));
+      
+    }// end loop over events
+
+  };
+
+  //=============================================================
+
+  // The following methods have not yet been implemented 
+  // and simply serve as an outline for things to be 
+  // developed. 
 
   TGraph* makeROCcurve(){return 0;};
   TH1F*   makeLikelihoodRatio(){return 0;};

@@ -1,6 +1,15 @@
 #!/bin/bash
 
 f=$1
+
+if [ $# == 1 ] 
+    then 
+    applySmear="false"
+    elif [ $# == 2 ] 
+    then
+    applySmear=$2
+    fi
+
 fr="${f%.*}"
 ff="${f%.*}.txt"
 echo $f, $ff
@@ -9,7 +18,17 @@ awk '/<event>/,/LesHouchesEvents>/' $f | grep -iv "<event>" | grep -iv "</event>
 
 frt='"'$fr'"'
 echo $frt
-root -l -q -b "readOutAngles_LMH.C(${frt},true)"
+
+if [ $applySmear == "true" ]
+    then
+    root -l -q -b "readOutAngles_LMH.C(${frt},true)"
+    elif [ $applySmear == "false" ] 
+    then
+    root -l -q -b "readOutAngles_LMH.C(${frt},false)"
+    else
+    echo "I don't recognize your second option..." 
+    fi
+
 #rm $ff
 
 echo "done"
