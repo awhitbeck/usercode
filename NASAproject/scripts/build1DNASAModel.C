@@ -401,7 +401,7 @@ RooRealVar* phi_rrv= new RooRealVar("phi","#Phi",-3.1415,3.1415);*/
 
 //AngularPdfFactory SMHiggs(z1mass_rrv,z2mass_rrv,costheta1_rrv,costheta2_rrv,phi_rrv);
 
-pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, double costhetastar, double costheta1, double costheta2, double phi, double phi1){
+pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, double costhetastar, double costheta1, double costheta2, double phi, double phi1,double scaleFactor=5.0){
 
   //AngularPdfFactory PSHiggs(z1mass,z2mass,costheta1,costheta2,phi);
   //PSHiggs.makePSHiggs();
@@ -438,7 +438,7 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
   cout<<"no "<<endl;*/
   //double Psig=1;
   vector <double> P=my8DTemplate(1, mZZ,  m1,  m2,  costhetastar,  costheta1,  costheta2,  phi,  phi1);
-  double Pbackg = P[0]*P[1]*P[2]*P[3]*P[4]*P[5];
+  double Pbackg = P[0]*P[1]*P[2]*P[3]*P[4]*P[5]*scaleFactor;
 
   // - - - - - - - - - - - - - - - - - - - - - Whitbeck 
   // check whether P[i] is zero and print warning
@@ -473,7 +473,7 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
 TH1F *h_mzz= (TH1F*)(f->Get("h_mzz"));
 
 vector<TH1F*> LDDistributionSignal(){
-  TFile* file = new TFile("../datafiles/SMHiggs_COMB_JHU_wResolution.root");
+  TFile* file = new TFile("../datafiles/SMHiggs_COMB_JHU_wResolution_withDiscriminants.root");
   TTree* tree = (TTree*) file->Get("angles");
   
   double mZZ, m2, m1, costhetastar, costheta1, costheta2, phi, phi1;
@@ -537,8 +537,9 @@ vector<TH1F*> LDDistributionSignal(){
 //============================================================
 vector<TH1F*> LDDistributionBackground(){
 
-  /*
   TChain* chain = new TChain("angles");
+
+  /*
   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_1.root");
   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_2.root");
   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_3.root");
@@ -560,8 +561,11 @@ vector<TH1F*> LDDistributionBackground(){
   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_19.root");
   */
 
-  TFile *powhegFile = new TFile("../datafiles/EWKZZ4l_Powheg_total_v5_wResolution.root");
-  TTree* chain = (TTree* ) powhegFile->Get("angles");
+  chain->Add("../datafiles/EWKZZ4l_Powheg_total_v5_wResolution_withDiscriminants.root");
+  chain->Add("../datafiles/EWKZZ4l_Powheg_total_v6_wResolution_withDiscriminants.root");
+  chain->Add("../datafiles/EWKZZ4l_Powheg_total_v7_wResolution_withDiscriminants.root");
+  chain->Add("../datafiles/EWKZZ4l_Powheg_total_v8_wResolution_withDiscriminants.root");
+
 
   double mZZ, m2, m1, costhetastar, costheta1, costheta2, phi, phi1;
   chain->SetBranchAddress("zzmass",&mZZ);
@@ -673,6 +677,7 @@ void addDtoTree(char* inputFile){
   TTree* newTree = new TTree("newTree","angles"); ///??????
 
   double m1,m2,mzz,h1,h2,hs,phi,phi1,D,sigP,bkgP,sepLD;
+  double l1p_pt,l1m_pt,l2p_pt,l2m_pt,l1p_eta,l1m_eta,l2p_eta,l2m_eta;
   double tmva_likelihood, tmva_bdt,tmva_likelihood_sigSep, tmva_bdt_sigSep;
   sigTree->SetBranchAddress("z1mass",&m1);
   sigTree->SetBranchAddress("z2mass",&m2);
@@ -682,12 +687,14 @@ void addDtoTree(char* inputFile){
   sigTree->SetBranchAddress("costhetastar",&hs);
   sigTree->SetBranchAddress("phi",&phi);  
   sigTree->SetBranchAddress("phistar1",&phi1);
-
-/********
-  sigTree->Branch("nasaLD",&D,"nasaLD/D");    //???????
-  sigTree->Branch("tmva_likelihood",&tmva_likelihood,"tmva_likelihood/D");  
-  sigTree->Branch("tmva_bdt",&tmva_bdt,"tmva_bdt/D");  
-*/
+  sigTree->SetBranchAddress("l1p_pT",&l1p_pt);  
+  sigTree->SetBranchAddress("l1m_pT",&l1m_pt);  
+  sigTree->SetBranchAddress("l2p_pT",&l2p_pt);  
+  sigTree->SetBranchAddress("l2m_pT",&l2m_pt);  
+  sigTree->SetBranchAddress("l1p_eta",&l1p_eta);  
+  sigTree->SetBranchAddress("l1m_eta",&l1m_eta);  
+  sigTree->SetBranchAddress("l2p_eta",&l2p_eta);  
+  sigTree->SetBranchAddress("l2m_eta",&l2m_eta);  
 
   newTree->Branch("z1mass",&m1,"z1mass/D");
   newTree->Branch("z2mass",&m2,"z2mass/D");
@@ -697,6 +704,14 @@ void addDtoTree(char* inputFile){
   newTree->Branch("costhetastar",&hs,"costhetastar/D");
   newTree->Branch("phi",&phi,"phi/D");  
   newTree->Branch("phistar1",&phi1,"phistar1/D");
+  newTree->Branch("l1p_pT",&l1p_pt,"l1p_pT/D");  
+  newTree->Branch("l1m_pT",&l1m_pt,"l1m_pT/D");
+  newTree->Branch("l2p_pT",&l2p_pt,"l2p_pT/D");  
+  newTree->Branch("l2m_pT",&l2m_pt,"l2m_pT/D");  
+  newTree->Branch("l1p_eta",&l1p_eta,"l1p_eta/D");  
+  newTree->Branch("l1m_eta",&l1m_eta,"l1m_eta/D");
+  newTree->Branch("l2p_eta",&l2p_eta,"l2p_eta/D");  
+  newTree->Branch("l2m_eta",&l2m_eta,"l2m_eta/D");  
   newTree->Branch("nasaLD",&D,"nasaLD/D");  
   newTree->Branch("nasaSigProb",&sigP,"nasaSigProb/D"); 
   newTree->Branch("nasaBkgProb",&bkgP,"nasaBkgProb/D");  
@@ -732,13 +747,26 @@ void addDtoTree(char* inputFile){
   reader_sigSep->BookMVA( "Likelihood method", "/home/whitbeck/4lHelicity/TMVAanalysis/weights/TMVA_zz4l_m125_Likelihood.weights.xml" ); 
   reader_sigSep->BookMVA( "BDT method", "/home/whitbeck/4lHelicity/TMVAanalysis/weights/TMVA_zz4l_m125_BDT.weights.xml" ); 
 
+  vector<double> pT;
+  
   for(int iEvt=0; iEvt<sigTree->GetEntries(); iEvt++){
 
     if(iEvt%5000==0) cout << "event: " << iEvt << endl;
 
     sigTree->GetEntry(iEvt);
 
-    if(mzz>110 && mzz<180 && m2>20){  //???????????????
+    pT.push_back(l1p_pt);
+    pT.push_back(l1m_pt);
+    pT.push_back(l2p_pt);
+    pT.push_back(l2m_pt);
+
+    sort(pT.begin(),pT.end());
+
+    if(mzz>110. && mzz<180. && m2>20. && 
+       pT[3]>17. && pT[2]>8. && pT[1]>7. && pT[0]>5. &&
+       fabs(l1m_eta)<2.4 && fabs(l2m_eta)<2.4 && 
+       fabs(l1p_eta)<2.4 && fabs(l2p_eta)<2.4 ){
+
       //NASA LD
       pair<double,double> P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1);
 
@@ -757,11 +785,14 @@ void addDtoTree(char* inputFile){
       r_phistar1 = (float) phi1;
       tmva_likelihood = reader->EvaluateMVA( "Likelihood method" );
       tmva_bdt = reader->EvaluateMVA( "BDT method" );
-      tmva_likelihood_sigSep = .5;//reader_sigSep->EvaluateMVA( "Likelihood method" );
-      tmva_bdt_sigSep = .5;//reader_sigSep->EvaluateMVA( "BDT method" );
+      tmva_likelihood_sigSep = reader_sigSep->EvaluateMVA( "Likelihood method" );
+      tmva_bdt_sigSep = reader_sigSep->EvaluateMVA( "BDT method" );
 
       newTree->Fill();
+
     }
+
+      pT.clear();
 
   }
 
@@ -779,13 +810,13 @@ TGraph* plotSingleROCcurve(char* sigFileName,char* bkgFileName,char* var){
 
   TFile* file1 = new TFile(sigFileName);
   TTree* tree1 = (TTree*) file1->Get("angles");
-  TH1F* h_LD1 = new TH1F("h_LD1","h_LD1",100,-1,1);
+  TH1F* h_LD1 = new TH1F("h_LD1","h_LD1",200,-1.2,1.2);
   
   TFile* file2 = new TFile(bkgFileName);
   TTree* tree2 = (TTree*) file2->Get("angles");
-  TH1F* h_LD2 = new TH1F("h_LD2","h_LD2",100,-1,1);
+  TH1F* h_LD2 = new TH1F("h_LD2","h_LD2",200,-1.2,1.2);
 
-  double sigEff[100],bkgEff[100];
+  double sigEff[200],bkgEff[200];
 
   double LD,mzz,m2;
   tree1->SetBranchAddress(var,&LD);  
@@ -811,23 +842,23 @@ TGraph* plotSingleROCcurve(char* sigFileName,char* bkgFileName,char* var){
   h_LD2->Scale(1/h_LD2->Integral());
 
   //loop over cut values
-  for(int iCut=0; iCut<100; iCut++){
-    sigEff[iCut]=h_LD1->Integral(iCut+1,100);
-    bkgEff[iCut]=1-h_LD2->Integral(iCut+1,100);
+  for(int iCut=0; iCut<200; iCut++){
+    sigEff[iCut]=h_LD1->Integral(iCut+1,200);
+    bkgEff[iCut]=1-h_LD2->Integral(iCut+1,200);
   }
 
   TCanvas* ROCcanvas = new TCanvas("ROCcanvas","ROC curve for LD",600,600);
-  double lineX[100],lineY[100];
-  for(int i=0; i<100; i++){
-    lineX[i]=(double)i/100;
-    lineY[i]=1.-(double)i/100;
+  double lineX[200],lineY[200];
+  for(int i=0; i<200; i++){
+    lineX[i]=(double)i/200;
+    lineY[i]=1.-(double)i/200;
   }
-  TGraph* line = new TGraph(100,lineX,lineY);
+  TGraph* line = new TGraph(200,lineX,lineY);
   line->SetLineColor(2);
-  TGraph* ROC = new TGraph(100,sigEff,bkgEff);
+  TGraph* ROC = new TGraph(200,sigEff,bkgEff);
   ROC->GetXaxis()->SetTitle("#epsilon_{signal}");
   ROC->GetYaxis()->SetTitle("1-#epsilon_{background}");
-  ROC->Draw("AC*");
+  ROC->Draw("AL");
   line->Draw("SAME");
   
   

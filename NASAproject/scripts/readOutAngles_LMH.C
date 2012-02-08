@@ -55,10 +55,15 @@ void readOutAngles_LMH(std::string filename, bool applyRes=false){
     tree->Branch("phistar12", &m_phistar12, "phistar12/D");
     
     Double_t m_l1minus_pT, m_l1plus_pT, m_l2minus_pT, m_l2plus_pT;
+    Double_t m_l1minus_eta, m_l1plus_eta, m_l2minus_eta, m_l2plus_eta;
     tree->Branch("l1m_pT", &m_l1minus_pT, "l1m_pT/D");
     tree->Branch("l1p_pT", &m_l1plus_pT, "l1p_pT/D");
     tree->Branch("l2m_pT", &m_l2minus_pT, "l2m_pT/D");
     tree->Branch("l2p_pT", &m_l2plus_pT, "l2p_pT/D");
+    tree->Branch("l1m_eta", &m_l1minus_eta, "l1m_eta/D");
+    tree->Branch("l1p_eta", &m_l1plus_eta, "l1p_eta/D");
+    tree->Branch("l2m_eta", &m_l2minus_eta, "l2m_eta/D");
+    tree->Branch("l2p_eta", &m_l2plus_eta, "l2p_eta/D");
     
     int ctr = 0;
     int iFile = 0;
@@ -168,6 +173,11 @@ void readOutAngles_LMH(std::string filename, bool applyRes=false){
 		m_l1plus_pT = pl1_p.Pt();
 		m_l2minus_pT = pl2_m.Pt();
 		m_l2plus_pT = pl2_p.Pt();
+
+		m_l1minus_eta = pl1_m.Eta();
+		m_l1plus_eta = pl1_p.Eta();
+		m_l2minus_eta = pl2_m.Eta();
+		m_l2plus_eta = pl2_p.Eta();
 		
 		tree->Fill();
 		

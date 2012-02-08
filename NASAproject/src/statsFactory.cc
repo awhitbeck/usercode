@@ -89,6 +89,10 @@ void statsFactory::runSignificance(double nSig, double nBkg, int nToys,
     // --- ntuple
     TNtuple* signifTuple = new TNtuple("signifTuple","signifTuple", "sig:nll0:nll1:nPoiss:nSigFit:nBkgFit"); 
     TRandom rng;
+
+    // --- histogram
+    TH1F* signifHisto = new TH1F("signifHisto","signifHisto",100,0.,10.);
+    TH1F* pullHisto = new TH1F("pullHisto","pullHisto",100,-5.,5.);
     
     std::cout << "Performing " << nToys << " toys..." << std::endl;
     for (int i = 0; i < nToys; i++){
@@ -153,6 +157,8 @@ void statsFactory::runSignificance(double nSig, double nBkg, int nToys,
         std::cout << "significance: " << significance << std::endl;
 
         signifTuple->Fill( significance,r->minNll(),r0->minNll(), nPoissSig+nPoissBkg, nSigFit, nBkgFit );
+	pullHisto->Fill( (nSigFit-nSig)/nsig->getError() );
+	signifHisto->Fill( significance );
         
         delete data;
         delete r;  
@@ -160,14 +166,18 @@ void statsFactory::runSignificance(double nSig, double nBkg, int nToys,
     }
     
     fout->cd();
+    signifHisto->Write("h_significance");
+    pullHisto->Write("h_pull");
     signifTuple->Write();
-    
+    delete signifHisto;
+    delete pullHisto;
+
 }
 
 // SIGNIFICANCE CALCULATION
 void statsFactory::runSignificance(double nSig, double nBkg, int nToys){
     
-   //Extended Likelihood Formalism
+    //Extended Likelihood Formalism
     double nsignal=nSig;
     double nbackground=nBkg;
     double nPoiss;
@@ -178,11 +188,16 @@ void statsFactory::runSignificance(double nSig, double nBkg, int nToys){
     // --- ntuple
     TNtuple* signifTuple = new TNtuple("signifTuple","signifTuple", "sig:nll0:nll1:nPoiss:nSigFit:nBkgFit"); 
     TRandom rng;
+
+    // --- histogram 
+    TH1F* signifHisto = new TH1F("signifHisto","signifHisto",100,0.,10.);    
+    TH1F* pullHisto = new TH1F("pullHisto","pullHisto",100,-5.,5.);    
     
     std::cout << "Performing " << nToys << " toys..." << std::endl;
     for (int i = 0; i < nToys; i++){
 
-        if(i%100==0) cout << "toy number " << i << endl;
+      //if(i%100==0) cout << "toy number " << i << endl;
+      cout << "toy number " << i << endl;
 
         nPoiss = rng.Poisson(nsignal+nbackground);
         nsig->setVal(nsignal);
@@ -206,18 +221,22 @@ void statsFactory::runSignificance(double nSig, double nBkg, int nToys){
         //std::cout << "FCN r0: " << r0->minNll() << std::endl;
         
         Double_t significance = sqrt(2*fabs(r->minNll() - r0->minNll()));
-        //std::cout << "significance: " << significance << std::endl;
-
+        std::cout << "significance: " << significance << std::endl;
+	pullHisto->Fill( (nSigFit-nSig)/nsig->getError() );
         signifTuple->Fill( significance,r->minNll(),r0->minNll(), nPoiss, nSigFit, nBkgFit );
-        
+	signifHisto->Fill( significance );
+
         delete data;
         delete r;  
         delete r0;  
     }
     
     fout->cd();
+    signifHisto->Write("h_significance");
+    pullHisto->Write("h_pull");
     signifTuple->Write();
-    
+    delete signifHisto;
+    delete pullHisto;
 }
 
 // UPPER LIMIT CALCULATION
@@ -232,19 +251,12 @@ void statsFactory::runUpperLimit(double nSig, double nBkg, int nToys){
     double nbackground=nBkg;
     double nPoiss;
 
-    /*
-      // moved to constructor ...
-      RooRealVar nsig("nsig","number of signal events",nsignal,0.,300) ;
-      RooRealVar nbkg("nbkg","number of background events",nbackground,0.,300) ;
-      //Construct composite PDF
-      RooAddPdf totalPdf("totalPdf","totalPdf",RooArgList(*H0pdf,*H1pdf),RooArgList(nsig,nbkg));
-    */
-
     nsig->setVal(nsignal);
     nbkg->setVal(nbackground);
 
     double stepSize = nbackground*sclFactor/( (double) iLoopScans);
     TNtuple* ulTuple = new TNtuple("ulTuple","ulTuple", "UL:nPoiss"); 
+    TH1F* ulHisto = new TH1F("ulHisto","ulHisto",100,0,nSig*2);
     TRandom rng;
 
     // start running toys
@@ -292,7 +304,8 @@ void statsFactory::runUpperLimit(double nSig, double nBkg, int nToys){
         
         Double_t nUL = getNUL95( h_likeliScan_reScl );
         ulTuple->Fill( nUL, nPoiss );
-        
+	ulHisto->Fill( nUL );
+
         delete data;
         delete h_likeliScan_reScl;
         delete h_chi2Scan;
@@ -300,6 +313,7 @@ void statsFactory::runUpperLimit(double nSig, double nBkg, int nToys){
     }
    
     fout->cd();
+    ulHisto->Write("h_nUL");
     ulTuple->Write();
 
 }
