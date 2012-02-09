@@ -68,7 +68,7 @@ void build8DTemplate(){
    chain->SetBranchAddress("phi",&phi);
    chain->SetBranchAddress("costheta1",&costheta1);
    chain->SetBranchAddress("costheta2",&costheta2);
-   chain->SetBranchAddress("phi1",&phi1);
+   chain->SetBranchAddress("phistar1",&phi1);
 
    for (Int_t i=0; i<chain->GetEntries();i++) {
     chain->GetEvent(i); 
@@ -278,7 +278,7 @@ void plotPBackground(){
   chain->SetBranchAddress("phi",&phi);
   chain->SetBranchAddress("costheta1",&costheta1);
   chain->SetBranchAddress("costheta2",&costheta2);
-  chain->SetBranchAddress("phi1",&phi1);
+  chain->SetBranchAddress("phistar1",&phi1);
 
   TH1F *h_P= new TH1F("h_P","h_P",1000,0,0.0002);
   TH1F *h_Pmzzm1m2= new TH1F("h_Pmzzm1m2","h_Pmzzm1m2",1000,0,0.1);
@@ -399,7 +399,7 @@ TH1F *h_mzz= (TH1F*)(f->Get("h_mzz"));
 
 vector<TH1F*> LDDistributionSignal(){
 
-  TFile* file = new TFile("../datafiles/JHUGenFiles/SMHiggs_125_JHU.root");
+  TFile* file = new TFile("../datafiles/JHUGenFiles/SMHiggs_125_JHU_wResolution_withDiscriminants_withCuts.root");
   //TFile* file = new TFile("../datafiles/JHUGenFiles/SMHiggs_125_JHU_wResolution.root");
   TTree* tree = (TTree*) file->Get("angles");
   double mZZ, m2, m1, costhetastar, costheta1, costheta2, phi, phi1;
@@ -410,7 +410,7 @@ vector<TH1F*> LDDistributionSignal(){
   tree->SetBranchAddress("phi",&phi);
   tree->SetBranchAddress("costheta1",&costheta1);
   tree->SetBranchAddress("costheta2",&costheta2);
-  tree->SetBranchAddress("phi1",&phi1);
+  tree->SetBranchAddress("phistar1",&phi1);
 
   TH1F *h_LDsignal= new TH1F("LD_signal","LD_signal",101,0,1.01);
   TH1F *h_Psignal= new TH1F("P_signal","P_signal",100,0,0.0002);
@@ -462,8 +462,8 @@ vector<TH1F*> LDDistributionBackground(){
 
   TChain* chain = new TChain("angles");
 
-  chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v8.root");
-  chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v9.root");
+  chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v8_wResolution_withDiscriminants_withCuts.root");
+  chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v9_wResolution_withDiscriminants_withCuts.root");
   /*chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v8_wResolution.root");
     chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v9_wResolution.root");*/
 
@@ -475,7 +475,7 @@ vector<TH1F*> LDDistributionBackground(){
   chain->SetBranchAddress("phi",&phi);
   chain->SetBranchAddress("costheta1",&costheta1);
   chain->SetBranchAddress("costheta2",&costheta2);
-  chain->SetBranchAddress("phi1",&phi1);
+  chain->SetBranchAddress("phistar1",&phi1);
 
   TH1F *h_Psignal= new TH1F("P_signal","P_signal",100,0,0.0002);
   TH1F *h_Pbackground= new TH1F("P_background","P_background",100,0,0.0002);
@@ -683,7 +683,7 @@ void addDtoTree(char* inputFile){
   char inputFileName[100];
   char outputFileName[100];
   sprintf(inputFileName,"%s.root",inputFile);
-  sprintf(outputFileName,"%s_withDiscriminants.root",inputFile);
+  sprintf(outputFileName,"%s_withDiscriminants_withCuts.root",inputFile);
 
   TFile* sigFile = new TFile(inputFileName);
   TTree* sigTree;
@@ -1026,8 +1026,8 @@ void storeLDDistribution(bool signal){
 void plotROCcurve(){ //only in mZZ 124-126
 
   cout << "plotting ROC curve " << endl;
-  TString nomeSig="../datafiles/JHUGenFiles/SMHiggs_125_JHU_wResolution_withDiscriminants.root";
-  TString nomeBkg="../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v2_wResolution_withDiscriminants.root";
+  TString nomeSig="../datafiles/JHUGenFiles/SMHiggs_125_JHU_wResolution_withDiscriminants_withCuts.root";
+  TString nomeBkg="../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v2_wResolution_withDiscriminants_withCuts.root";
   TFile* file_sig = new TFile(nomeSig,"read");
   TTree* tree_sig = (TTree*) file_sig->Get("angles");
   TH1F* h_LD_sig = new TH1F("h_LD_sig","h_LD_sig",101,0,1.01);
