@@ -27,24 +27,26 @@ public:
     
     statsFactory(RooArgSet* set, RooAbsPdf* pdf1, RooAbsPdf* pdf2, std::string outputFileName="test.root");
     ~statsFactory();
-
+    
     RooArgSet* observables; 
     RooAbsPdf* H0pdf;
     RooAbsPdf* H1pdf;
     RooRealVar* nsig;
     RooRealVar* nbkg;
     RooAddPdf* totalPdf;
-
+    
     TFile* fout;
-
+    
     
     void runSignificance(double nSig, double nBkg, int nToys);
-  void runSignificance(double nSig, double nBkg, int nToys,RooDataSet* sigPoolData,RooDataSet* bkgPoolData);
+    void runSignificance(double nSig, double nBkg, int nToys,RooDataSet* sigPoolData,RooDataSet* bkgPoolData);
     void runUpperLimit(double nSig, double nBkg, int nToys);
     
     double getNUL95( TH1F* histo );
-
-
+    
+    TNtuple* signifTuple;
+    TNtuple* signifTuple_em;
+    TNtuple* ulTuple;
     
 };
 
@@ -57,95 +59,109 @@ statsFactory::statsFactory(RooArgSet* set, RooAbsPdf* pdf1, RooAbsPdf* pdf2, std
     H0pdf = pdf1;
     H1pdf = pdf2;
     fout = new TFile( outputFileName.c_str(), "RECREATE");
-
+    
     nsig = new RooRealVar("nsig","number of signal events",0.,300) ;
     nbkg = new RooRealVar("nbkg","number of background events",0.,300) ;
     //Construct composite PDF
     totalPdf = new RooAddPdf("totalPdf","totalPdf",RooArgList(*H0pdf,*H1pdf),RooArgList(*nsig,*nbkg));
     
+    signifTuple = new TNtuple("signifTuple","signifTuple", "sig:nll0:nll1:nPoiss:nSigFit:nBkgFit"); 
+    signifTuple_em = new TNtuple("signifTuple_em","signifTuple_em", "sig:nll0:nll1:nPoiss:nSigFit:nBkgFit"); 
+    ulTuple = new TNtuple("ulTuple","ulTuple", "UL:nPoiss"); 
+
 }
 
 // DESTRUCTOR
 statsFactory::~statsFactory(){
-    
+
+    fout->cd();
+
+    // write out tuples
+    signifTuple->Write();
+    signifTuple_em->Write();
+    ulTuple->Write();
+
     fout->Close();
     
 }
 
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+
 // SIGNIFICANCE CALCULATION WITH EMBEDDED
 void statsFactory::runSignificance(double nSig, double nBkg, int nToys,
-				   RooDataSet* sigPoolData,RooDataSet* bkgPoolData){
+                                   RooDataSet* sigPoolData,RooDataSet* bkgPoolData){
     
-   //Extended Likelihood Formalism
+    //Extended Likelihood Formalism
     double nsignal=nSig;
     double nbackground=nBkg;
     double nPoissSig,nPoissBkg;
     int sigPlaceHolder=0;
     int bkgPlaceHolder=0;
-
+    
     nsig->setVal(nsignal);
     nbkg->setVal(nbackground);
-
+    
     // --- ntuple
-    TNtuple* signifTuple = new TNtuple("signifTuple","signifTuple", "sig:nll0:nll1:nPoiss:nSigFit:nBkgFit"); 
     TRandom rng;
-
+    
     // --- histogram
     TH1F* signifHisto = new TH1F("signifHisto","signifHisto",100,0.,10.);
     TH1F* pullHisto = new TH1F("pullHisto","pullHisto",100,-5.,5.);
     
     std::cout << "Performing " << nToys << " toys..." << std::endl;
     for (int i = 0; i < nToys; i++){
-
+        
         if(i%100==0) cout << "toy number " << i << endl;
-
+        
         nPoissSig = rng.Poisson(nsignal);
         nPoissBkg = rng.Poisson(nbackground);
         nsig->setVal(nsignal);
         nbkg->setVal(nbackground);
         //--------------------------------------------------------------------------------------------
         // generating dataset
-
+        
         RooDataSet* data = new RooDataSet("data","data",*observables);
-	RooArgSet *temp;
-	for(int iSig=0; iSig<nPoissSig; iSig++){
-
-	  if(sigPlaceHolder>=sigPoolData->sumEntries()){
-	    cout << "Sorry, we ran out of signal events.  Bye!" << endl;
-	    return;
-	  }else{
-	    temp = (RooArgSet*)(sigPoolData->get(sigPlaceHolder));
-	    sigPlaceHolder++;
-	  }
-
-	  data->add(*temp);
-	  
-	}
-
-	for(int iBkg=0; iBkg<nPoissBkg; iBkg++){
-
-	  if(bkgPlaceHolder>=bkgPoolData->sumEntries()){
-	    cout << "Sorry, we ran out of signal events.  Bye!" << endl;
-	    return;
-	  }else{
-	    temp = (RooArgSet*)(bkgPoolData->get(bkgPlaceHolder));
-	    bkgPlaceHolder++;
-	  }
-
-	  data->add(*temp);
-
-	}
-
-	//--------------------------------------------------------------------------------------------
-
-
+        RooArgSet *temp;
+        for(int iSig=0; iSig<nPoissSig; iSig++){
+            
+            if(sigPlaceHolder>=sigPoolData->sumEntries()){
+                cout << "Sorry, we ran out of signal events.  Bye!" << endl;
+                return;
+            }else{
+                temp = (RooArgSet*)(sigPoolData->get(sigPlaceHolder));
+                sigPlaceHolder++;
+            }
+            
+            data->add(*temp);
+            
+        }
+        
+        for(int iBkg=0; iBkg<nPoissBkg; iBkg++){
+            
+            if(bkgPlaceHolder>=bkgPoolData->sumEntries()){
+                cout << "Sorry, we ran out of signal events.  Bye!" << endl;
+                return;
+            }else{
+                temp = (RooArgSet*)(bkgPoolData->get(bkgPlaceHolder));
+                bkgPlaceHolder++;
+            }
+            
+            data->add(*temp);
+            
+        }
+        
+        //--------------------------------------------------------------------------------------------
+        
+        
         // fit full float
         nsig->setConstant(kFALSE); nbkg->setConstant(kFALSE);
         RooFitResult* r = totalPdf->fitTo(*data,Extended(kTRUE),Minos(kFALSE),Save(kTRUE),Verbose(kFALSE),PrintLevel(-1));
         /////r->Print();
         double nSigFit = nsig->getVal();
         double nBkgFit = nbkg->getVal();
-
+        
         // fit fix signal to zero
         nsig->setVal(0.); nsig->setConstant(kTRUE); nbkg->setConstant(kFALSE);
         RooFitResult* r0 = totalPdf->fitTo(*data,Extended(kTRUE),Minos(kFALSE),Save(kTRUE),Verbose(kFALSE), PrintLevel(-1));
@@ -155,10 +171,11 @@ void statsFactory::runSignificance(double nSig, double nBkg, int nToys,
         
         Double_t significance = sqrt(2*fabs(r->minNll() - r0->minNll()));
         std::cout << "significance: " << significance << std::endl;
-
-        signifTuple->Fill( significance,r->minNll(),r0->minNll(), nPoissSig+nPoissBkg, nSigFit, nBkgFit );
-	pullHisto->Fill( (nSigFit-nSig)/nsig->getError() );
-	signifHisto->Fill( significance );
+        
+        double nPoissToy = nPoissSig+nPoissBkg;
+        signifTuple_em->Fill( significance,r->minNll(),r0->minNll(), nPoissToy, nSigFit, nBkgFit );
+        pullHisto->Fill( (nSigFit-nSig)/nsig->getError() );
+        signifHisto->Fill( significance );
         
         delete data;
         delete r;  
@@ -168,10 +185,9 @@ void statsFactory::runSignificance(double nSig, double nBkg, int nToys,
     fout->cd();
     signifHisto->Write("h_significance");
     pullHisto->Write("h_pull");
-    signifTuple->Write();
     delete signifHisto;
     delete pullHisto;
-
+    
 }
 
 // SIGNIFICANCE CALCULATION
@@ -181,30 +197,29 @@ void statsFactory::runSignificance(double nSig, double nBkg, int nToys){
     double nsignal=nSig;
     double nbackground=nBkg;
     double nPoiss;
-
+    
     nsig->setVal(nsignal);
     nbkg->setVal(nbackground);
-
+    
     // --- ntuple
-    TNtuple* signifTuple = new TNtuple("signifTuple","signifTuple", "sig:nll0:nll1:nPoiss:nSigFit:nBkgFit"); 
     TRandom rng;
-
+    
     // --- histogram 
     TH1F* signifHisto = new TH1F("signifHisto","signifHisto",100,0.,10.);    
     TH1F* pullHisto = new TH1F("pullHisto","pullHisto",100,-5.,5.);    
     
     std::cout << "Performing " << nToys << " toys..." << std::endl;
     for (int i = 0; i < nToys; i++){
-
-      //if(i%100==0) cout << "toy number " << i << endl;
-      cout << "toy number " << i << endl;
-
+        
+        //if(i%100==0) cout << "toy number " << i << endl;
+        cout << "toy number " << i << endl;
+        
         nPoiss = rng.Poisson(nsignal+nbackground);
         nsig->setVal(nsignal);
         nbkg->setVal(nbackground);
         //--------------------------------------------------------------------------------------------
         // generating dataset
-        RooDataSet* data = totalPdf->generate(*observables, nPoiss);
+        RooDataSet* data = totalPdf->generate(*observables, (int) nPoiss);
         
         // fit full float
         nsig->setConstant(kFALSE); nbkg->setConstant(kFALSE);
@@ -212,7 +227,7 @@ void statsFactory::runSignificance(double nSig, double nBkg, int nToys){
         /////r->Print();
         double nSigFit = nsig->getVal();
         double nBkgFit = nbkg->getVal();
-
+        
         // fit fix signal to zero
         nsig->setVal(0.); nsig->setConstant(kTRUE); nbkg->setConstant(kFALSE);
         RooFitResult* r0 = totalPdf->fitTo(*data,Extended(kTRUE),Minos(kFALSE),Save(kTRUE),Verbose(kFALSE), PrintLevel(-1));
@@ -222,10 +237,12 @@ void statsFactory::runSignificance(double nSig, double nBkg, int nToys){
         
         Double_t significance = sqrt(2*fabs(r->minNll() - r0->minNll()));
         std::cout << "significance: " << significance << std::endl;
-	pullHisto->Fill( (nSigFit-nSig)/nsig->getError() );
+        pullHisto->Fill( (nSigFit-nSig)/nsig->getError() );
+        
+        std::cout << significance << ", " << r->minNll() << ", " << r0->minNll() << ", " << nPoiss << ", " << nSigFit << ", " << nBkgFit << std::endl;
         signifTuple->Fill( significance,r->minNll(),r0->minNll(), nPoiss, nSigFit, nBkgFit );
-	signifHisto->Fill( significance );
-
+        signifHisto->Fill( significance );
+        
         delete data;
         delete r;  
         delete r0;  
@@ -234,10 +251,13 @@ void statsFactory::runSignificance(double nSig, double nBkg, int nToys){
     fout->cd();
     signifHisto->Write("h_significance");
     pullHisto->Write("h_pull");
-    signifTuple->Write();
     delete signifHisto;
     delete pullHisto;
 }
+
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 
 // UPPER LIMIT CALCULATION
 void statsFactory::runUpperLimit(double nSig, double nBkg, int nToys){
@@ -250,28 +270,27 @@ void statsFactory::runUpperLimit(double nSig, double nBkg, int nToys){
     double nsignal=nSig;
     double nbackground=nBkg;
     double nPoiss;
-
+    
     nsig->setVal(nsignal);
     nbkg->setVal(nbackground);
-
+    
     double stepSize = nbackground*sclFactor/( (double) iLoopScans);
-    TNtuple* ulTuple = new TNtuple("ulTuple","ulTuple", "UL:nPoiss"); 
     TH1F* ulHisto = new TH1F("ulHisto","ulHisto",100,0,nSig*2);
     TRandom rng;
-
+    
     // start running toys
     for (int i = 0; i < nToys; i++) {
-
+        
         nPoiss = rng.Poisson( 0. + nbackground );  // fix number of signal events to 0
         
         nsig->setVal(0.);
         nbkg->setVal(nbackground);
-        RooDataSet* data = totalPdf->generate(*observables, nPoiss) ;
-
+        RooDataSet* data = totalPdf->generate(*observables, (int) nPoiss) ;
+        
         TH1F* h_chi2Scan = new TH1F( "h_chi2Scan","h_chi2Scan", iLoopScans, 0., nbackground*sclFactor );
         TH1F* h_chi2Scan_reScl = new TH1F( "h_chi2Scan_reScl","h_chi2Scan_reScl", iLoopScans, 0., nbackground*sclFactor );
         TH1F* h_likeliScan_reScl = new TH1F( "h_likeliScan_reScl","h_likeliScan_reScl", iLoopScans, 0., nbackground*sclFactor );
-
+        
         for (int j = 0; j < iLoopScans; j++){
             
             std::cout << "Experiment: " << i << ", Loop: " << j << std::endl;
@@ -304,20 +323,27 @@ void statsFactory::runUpperLimit(double nSig, double nBkg, int nToys){
         
         Double_t nUL = getNUL95( h_likeliScan_reScl );
         ulTuple->Fill( nUL, nPoiss );
-	ulHisto->Fill( nUL );
-
+        ulHisto->Fill( nUL );
+        
         delete data;
         delete h_likeliScan_reScl;
         delete h_chi2Scan;
         delete h_chi2Scan_reScl;
     }
-   
+    
     fout->cd();
     ulHisto->Write("h_nUL");
-    ulTuple->Write();
-
+    
 }
- 
+
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+
+// HYPOTHESIS TESTING
+
+
+
 // ------------------------------
 // ------------------------------
 // UTILITIES
@@ -346,8 +372,8 @@ double statsFactory::getNUL95( TH1F* histo ){
     return histo->GetBinCenter( stoppingBin );
     
 }
-    
-    
-    
-    
-    
+
+
+
+
+
