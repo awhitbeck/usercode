@@ -473,9 +473,13 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
 TH1F *h_mzz= (TH1F*)(f->Get("h_mzz"));
 
 vector<TH1F*> LDDistributionSignal(){
-  TFile* file = new TFile("../datafiles/SMHiggs_COMB_JHU_wResolution_withDiscriminants.root");
-  TTree* tree = (TTree*) file->Get("angles");
-  
+
+  TChain* tree = new TChain("angles");
+  tree->Add("../datafiles/PSHiggs_120_JHU_wResolution_withDiscriminants.root");
+  tree->Add("../datafiles/PSHiggs_125_JHU_v3_wResolution_withDiscriminants.root");
+  tree->Add("../datafiles/PSHiggs_130_JHU_wResolution_withDiscriminants.root");
+  tree->Add("../datafiles/PSHiggs_140_JHU_wResolution_withDiscriminants.root");
+
   double mZZ, m2, m1, costhetastar, costheta1, costheta2, phi, phi1;
   tree->SetBranchAddress("zzmass",&mZZ);
   tree->SetBranchAddress("z2mass",&m2);
@@ -656,7 +660,126 @@ double separationLikelihoodDiscriminant(double mzz,double m1,double m2,double h1
   return LD;
 
 }
+//=======================================================================
+vector<TH1F*> sepLDDistributionSignal0minus(){
+  TChain* tree = new TChain("angles");
+  tree->Add("../datafiles/PSHiggs_125_JHU_v3_wResolution_withDiscriminants.root");
+  tree->Add("../datafiles/PSHiggs_120_JHU_wResolution_withDiscriminants.root");
+  tree->Add("../datafiles/PSHiggs_130_JHU_wResolution_withDiscriminants.root");
+  tree->Add("../datafiles/PSHiggs_140_JHU_wResolution_withDiscriminants.root");
 
+  vector<TH1F*> LDhist;
+  for (int i=1; i<36; i++){
+    std::string s;
+    std::stringstream out;
+    out << i;
+    s = out.str();
+    TString name = "h_sepLDsignal0minus_"+s;
+    LDhist.push_back((new TH1F(name,name,100,0,1)));
+  }
+
+  double mzz, m1, m2, h1, h2, phi;
+  tree->SetBranchAddress("zzmass",&mzz);
+  tree->SetBranchAddress("z2mass",&m2);
+  tree->SetBranchAddress("z1mass",&m1);
+  tree->SetBranchAddress("phi",&phi);
+  tree->SetBranchAddress("costheta1",&h1);
+  tree->SetBranchAddress("costheta2",&h2);
+
+  for(int iEvt=0; iEvt<tree->GetEntries(); iEvt++){
+    if(iEvt%10000==0) cout << iEvt << endl;
+    tree->GetEntry(iEvt);
+    LDhist[(int)floor((mzz-110.0)/2.0)]->Fill( separationLikelihoodDiscriminant(mzz,m1,m2,h1,h2,phi) );
+  }
+  for(int iHist=0; iHist<35; iHist++){
+    if(LDhist[iHist]->Integral()>0)
+      LDhist[iHist]->Scale(1/LDhist[iHist]->Integral());
+  }
+
+  return LDhist;
+
+}
+//=======================================================================
+vector<TH1F*> sepLDDistributionSignal0plus(){
+  TChain* tree = new TChain("angles");
+  tree->Add("../datafiles/SMHiggs_125_JHU_v3_wResolution_withDiscriminants.root");
+  tree->Add("../datafiles/SMHiggs_120_JHU_wResolution_withDiscriminants.root");
+  tree->Add("../datafiles/SMHiggs_130_JHU_wResolution_withDiscriminants.root");
+  tree->Add("../datafiles/SMHiggs_140_JHU_wResolution_withDiscriminants.root");
+
+
+  vector<TH1F*> LDhist;
+  for (int i=1; i<36; i++){
+    std::string s;
+    std::stringstream out;
+    out << i;
+    s = out.str();
+    TString name = "h_sepLDsignal0plus_"+s;
+    LDhist.push_back((new TH1F(name,name,100,0,1)));
+  }
+
+  double mzz, m1, m2, h1, h2, phi;
+  tree->SetBranchAddress("zzmass",&mzz);
+  tree->SetBranchAddress("z2mass",&m2);
+  tree->SetBranchAddress("z1mass",&m1);
+  tree->SetBranchAddress("phi",&phi);
+  tree->SetBranchAddress("costheta1",&h1);
+  tree->SetBranchAddress("costheta2",&h2);
+
+  for(int iEvt=0; iEvt<tree->GetEntries(); iEvt++){
+    if(iEvt%10000==0) cout << iEvt << endl;
+    tree->GetEntry(iEvt);
+    LDhist[(int)floor((mzz-110.0)/2.0)]->Fill( separationLikelihoodDiscriminant(mzz,m1,m2,h1,h2,phi) );
+  }
+  for(int iHist=0; iHist<35; iHist++){
+    if(LDhist[iHist]->Integral()>0)
+      LDhist[iHist]->Scale(1/LDhist[iHist]->Integral());
+  }
+
+  return LDhist;
+
+}
+
+//=======================================================================
+vector<TH1F*> sepLDDistributionBackground(){
+
+  TChain* tree = new TChain("angles");
+  tree->Add("../datafiles/EWKZZ4l_Powheg_total_v5_wResolution_withDiscriminants.root");
+  tree->Add("../datafiles/EWKZZ4l_Powheg_total_v6_wResolution_withDiscriminants.root");
+  tree->Add("../datafiles/EWKZZ4l_Powheg_total_v7_wResolution_withDiscriminants.root");
+  tree->Add("../datafiles/EWKZZ4l_Powheg_total_v8_wResolution_withDiscriminants.root");
+
+  vector<TH1F*> LDhist;
+  for (int i=1; i<36; i++){
+    std::string s;
+    std::stringstream out;
+    out << i;
+    s = out.str();
+    TString name = "h_sepLDbackground_"+s;
+    LDhist.push_back((new TH1F(name,name,100,0,1)));
+  }
+
+  double mzz, m1, m2, h1, h2, phi;
+  tree->SetBranchAddress("zzmass",&mzz);
+  tree->SetBranchAddress("z2mass",&m2);
+  tree->SetBranchAddress("z1mass",&m1);
+  tree->SetBranchAddress("phi",&phi);
+  tree->SetBranchAddress("costheta1",&h1);
+  tree->SetBranchAddress("costheta2",&h2);
+
+  for(int iEvt=0; iEvt<tree->GetEntries(); iEvt++){
+    if(iEvt%10000==0) cout << iEvt << endl;
+    tree->GetEntry(iEvt);
+    LDhist[(int)floor((mzz-110.0)/2.0)]->Fill( separationLikelihoodDiscriminant(mzz,m1,m2,h1,h2,phi) );
+  }
+  for(int iHist=0; iHist<35; iHist++){
+    if(LDhist[iHist]->Integral()>0)
+      LDhist[iHist]->Scale(1/LDhist[iHist]->Integral());
+  }
+
+  return LDhist;
+
+}
 
 //=======================================================================
 void addDtoTree(char* inputFile){
@@ -763,7 +886,7 @@ void addDtoTree(char* inputFile){
     sort(pT.begin(),pT.end());
 
     if(mzz>110. && mzz<180. && m2>20. && 
-       pT[3]>17. && pT[2]>8. && pT[1]>7. && pT[0]>5. &&
+       pT[3]>20. && pT[2]>17. && pT[1]>7. && pT[0]>7. &&
        fabs(l1m_eta)<2.4 && fabs(l2m_eta)<2.4 && 
        fabs(l1p_eta)<2.4 && fabs(l2p_eta)<2.4 ){
 
@@ -928,6 +1051,42 @@ void plotLDDistribution(){
 
     vc_LD[i-1]->Print(nameC+".eps");
   }
+}
+
+void storeSepLDDistribution(int dataType){
+  //dataType: 0 background
+  //dataType: 1 0+
+  //dataType:-1 0-
+
+  vector<TH1F*> vh_LD;
+  TFile *file;
+  if(dataType==0){
+    vh_LD = sepLDDistributionBackground();
+    file = new TFile("sepDbackground.root","recreate");
+  }else if(dataType==1){
+    vh_LD = sepLDDistributionSignal0plus();
+    file = new TFile("sepDsignal0plus.root","recreate");
+  }else if(dataType==-1){
+    vh_LD = sepLDDistributionSignal0minus();
+    file = new TFile("sepDsignal0minus.root","recreate");
+  }else{
+    cout << "wrong identifier (dataType: 0 background dataType: 1 J^P=0+ dataType:-1 J^P=)0- " << endl;
+    return;
+  }
+
+  TH2F* h_mzzD = new TH2F("h_mzzD","h_mzzD",35,110,180,vh_LD[0]->GetNbinsX(),vh_LD[0]->GetXaxis()->GetXmin(),vh_LD[0]->GetXaxis()->GetXmax());
+
+  for (int i=1; i<36; i++){
+    for(int j=1; j<=vh_LD[0]->GetNbinsX(); j++){
+      //cout << vh_LD[i-1]->GetBinContent(j) << endl;
+      h_mzzD->SetBinContent(i,j,vh_LD[i-1]->GetBinContent(j));
+    }
+  }
+
+  file->cd();
+  h_mzzD->Write();
+  file->Close();
+
 }
 
 void storeLDDistribution(bool signal){
