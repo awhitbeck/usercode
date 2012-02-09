@@ -41,13 +41,14 @@ public:
     void runSignificance(double nSig, double nBkg, int nToys);
     void runSignificance(double nSig, double nBkg, int nToys,RooDataSet* sigPoolData,RooDataSet* bkgPoolData);
     void runUpperLimit(double nSig, double nBkg, int nToys);
+    void hypothesisSeparation(double nH0, double nH1, int nToys);
     
     double getNUL95( TH1F* histo );
     
     TNtuple* signifTuple;
     TNtuple* signifTuple_em;
     TNtuple* ulTuple;
-    
+    TNtuple* hypTuple;
 };
 
 
@@ -68,6 +69,7 @@ statsFactory::statsFactory(RooArgSet* set, RooAbsPdf* pdf1, RooAbsPdf* pdf2, std
     signifTuple = new TNtuple("signifTuple","signifTuple", "sig:nll0:nll1:nPoiss:nSigFit:nBkgFit"); 
     signifTuple_em = new TNtuple("signifTuple_em","signifTuple_em", "sig:nll0:nll1:nPoiss:nSigFit:nBkgFit"); 
     ulTuple = new TNtuple("ulTuple","ulTuple", "UL:nPoiss"); 
+    hypTuple = new TNtuple("hypTuple","hypTuple", "S_H0:S_H1"); 
 
 }
 
@@ -80,7 +82,8 @@ statsFactory::~statsFactory(){
     signifTuple->Write();
     signifTuple_em->Write();
     ulTuple->Write();
-
+    hypTuple->Write();
+    
     fout->Close();
     
 }
@@ -341,7 +344,64 @@ void statsFactory::runUpperLimit(double nSig, double nBkg, int nToys){
 // ----------------------------------------------------------------------
 
 // HYPOTHESIS TESTING
+void statsFactory::hypothesisSeparation(double nH0, double nH1, int nToys){
+    
+    //Extended Likelihood Formalism
+    double nH0_val=nH0;
+    double nH1_val=nH1;
+    double nPoiss1, nPoiss2;
+    
+    //nsig->setVal(nsignal);
+    //nbkg->setVal(nbackground);
+    
+    // --- ntuple
+    TRandom rng;
+    
+    std::cout << "Performing " << nToys << " toys..." << std::endl;
+    for (int i = 0; i < nToys; i++){
+        
+        cout << "toy number " << i << endl;
+        
+        nPoiss1 = rng.Poisson(nH0_val);
+        nPoiss2 = rng.Poisson(nH1_val);
 
+        //--------------------------------------------------------------------------------------------
+        // generating dataset
+        RooDataSet* data_H0 = H0pdf->generate(*observables, (int) nPoiss1);
+        // fit H0
+        RooFitResult* r_H0 = H0pdf->fitTo(*data_H0,Minos(kFALSE),Save(kTRUE),Verbose(kFALSE),PrintLevel(-1));
+        // fit H1
+        RooFitResult* r0_H0 = H1pdf->fitTo(*data_H0,Minos(kFALSE),Save(kTRUE),Verbose(kFALSE), PrintLevel(-1));
+        //std::cout << "FCN r: " << r->minNll() << std::endl;
+        //std::cout << "FCN r0: " << r0->minNll() << std::endl;
+        
+        double s_estimator_H0 = 2.*(r_H0->minNll() - r0_H0->minNll());
+        
+        //--------------------------------------------------------------------------------------------
+        // generating dataset
+        RooDataSet* data_H1 = H1pdf->generate(*observables, (int) nPoiss2);
+        // fit H0
+        RooFitResult* r_H1 = H0pdf->fitTo(*data_H1,Minos(kFALSE),Save(kTRUE),Verbose(kFALSE),PrintLevel(-1));
+        // fit H1
+        RooFitResult* r0_H1 = H1pdf->fitTo(*data_H1,Minos(kFALSE),Save(kTRUE),Verbose(kFALSE), PrintLevel(-1));
+        //std::cout << "FCN r: " << r->minNll() << std::endl;
+        //std::cout << "FCN r0: " << r0->minNll() << std::endl;
+        
+        double s_estimator_H1 = 2.*(r_H1->minNll() - r0_H1->minNll());
+
+        hypTuple->Fill( s_estimator_H0, s_estimator_H1 );
+
+        
+        delete data_H0;
+        delete data_H1;
+        delete r_H0;  
+        delete r0_H0;  
+        delete r_H1;  
+        delete r0_H1;  
+        
+    }
+    
+}
 
 
 // ------------------------------
