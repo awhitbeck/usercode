@@ -1143,7 +1143,6 @@ void plotROCcurve(){ //only in mZZ 124-126
   }
 
   cout<<"prova 1"<<endl;
-  TCanvas* ROCcanvas = new TCanvas("ROC_c","ROC curve for LD",600,600);
   /*double lineX[100],lineY[100];
   for(int i=0; i<100; i++){
     lineX[i]=(double)i/100;
@@ -1161,6 +1160,7 @@ void plotROCcurve(){ //only in mZZ 124-126
   TGraph* ROC_Andrew = plotSingleROCcurve(nomeSig,nomeBkg,"nasaLD");
   ROC_Andrew->SetMarkerStyle(2);
   ROC_Andrew->SetMarkerColor(kGreen);
+  TCanvas* ROCcanvas = new TCanvas("ROC_c","ROC curve for LD",600,600);
   ROC_Andrew->Draw("APL");
   cout<<"prova 2"<<endl;
   TGraph* ROC_costhetastar = new TGraph(25,sigEff_costhetastar,bkgEff_costhetastar);
@@ -1198,7 +1198,7 @@ void plotROCcurve(){ //only in mZZ 124-126
 
   leg->Draw("same");
   
-  ROCcanvas->Print("ROCcanvas.eps");
+  ROCcanvas->Print("allROCcanvas.eps");
 
 }
 
