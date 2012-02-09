@@ -38,8 +38,7 @@ To run the full analysis you sould do
 build8DTemplate()
 storeLDDistribution(1) //for signal
 storeLDDistribution(0) //for background
-storeLDInfo(1) //for signla
-storeLDInfo(0) // for background
+addDToTree(nomefile) //to do for all signal and background samples with and w/o resolution
 
 
 readOutAngles_LMH.C (converter.sh/converter_Powheg.sh)
@@ -52,11 +51,10 @@ To run:
 
 converter.sh fileName    
 
- - - - - - - 
-fileName should be the full path to the lhe file you want converted.  Be sure to 
-leave off the file extension. Current this script will automatically apply resolution.
+fileName should be the full path to the lhe file you want converted 
+Current this script will NOT apply resolution.
 If you want to change this switch the second argument of readOutAngles_LMH() in converter.sh
-to be false.
+to be true.
 
 All of the same applies to converter_Powheg.sh.  This must be run on Powheg only.  
 

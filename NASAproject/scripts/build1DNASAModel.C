@@ -28,8 +28,9 @@
 //hep.pha.jhu.edu:/scratch/hep/ntran/HZZ_materials
 //to setup root: source /scratch/hep/ntran/ROOTdistributions/myROOT528_fromSource/root/bin/thisroot.csh
 //be sure to compile/load everything:
-.L /scratch/hep/ntran/HZZ_materials/HZsZs_analysis/PDFs/RooXZsZs_5D.cxx+
-.L AngularPdfFactory.cc+
+ gSystem->AddIncludePath("-I/$ROOFITSYS/include/");
+.L ../PDFs/RooXZsZs_5D.cxx+
+.L ../src/AngularPdfFactory.cc+
 .L build1DNASAModel.C+
 */
 
@@ -37,53 +38,9 @@ using namespace RooFit ;
 
 void build8DTemplate(){
     TChain* chain = new TChain("angles");
-   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_1.root");
-   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_2.root");
-   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_3.root");
-   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_4.root");
-   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_5.root");
-   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_6.root");
-   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_7.root");
-   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_8.root");
-   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_9.root");
-   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_10.root");
-   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_11.root");
-   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_12.root");
-   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_13.root");
-   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_14.root");
-   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_15.root");
-   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_16.root");
-   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_17.root");
-   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_18.root");
-   chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_19.root");
-     
-   /*RooDataSet *data = new RooDataSet("data","data",chain,RooArgSet(*m1,*m2,*mZZ),"zzmass<180");
-   RooDataHist *dataHist = new RooDataHist("dataHist","dataHist",RooArgSet(*m1,*m2,*mZZ),*data);
-   RooHistPdf* m1m2mzz3DPdf = new RooHistPdf("m1m2mzz3DPdf","m1m2mzz3DPdf",RooArgSet(*m1,*m2,*mZZ),*dataHist);
-
-   RooPlot* mzzframe =  mZZ->frame(55);
-   data->plotOn(mzzframe);
-   m1m2mzz3DPdf->plotOn(mzzframe);
-
-   RooPlot* m1frame =  m1->frame(55);
-   data->plotOn(m1frame);
-   m1m2mzz3DPdf->plotOn(m1frame);
-
-   RooPlot* m2frame =  m2->frame(55);
-   data->plotOn(m2frame);
-   m1m2mzz3DPdf->plotOn(m2frame);
-
-   f->cd()
-   m1m2mzz3DPdf->Write();
-
-   TCanvas* cmasses = new TCanvas( "cmasses", "cmasses", 1000, 600 );
-   cmasses->Divide(3,1);
-   cmasses->cd(1);
-   m1frame->Draw();
-   cmasses->cd(2);
-   m2frame->Draw();
-   cmasses->cd(3);
-   mzzframe->Draw();*/
+   chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v5.root");
+   chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v6.root");
+   chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v7.root");
 
    TH1F *h_mzz = new TH1F("h_mzz","h_mzz",35,110,180);
    TH3F *h_mzzm1m2 = new TH3F("h_mzzm1m2","h_mzzm1m2",35,110.,180.,84,12.,180.,54,12.,120.);
@@ -237,9 +194,9 @@ vector<double> my8DTemplate(bool normalized,double mZZ, double m1, double m2, do
   // result of low statistics
 
   if(Pmzzm1m2==0){
-    cout<<mZZ<<" "<<m1<<" "<<m2<<" "<<costhetastar<<" "<<costheta1<<" "<<costheta2<<" "<<phi<<" "<<phi1<<endl;
-    cout << "my8DTemplate says ... " << endl;
-    cout<<"Pmzzm1m2: "<<Pmzzm1m2<<endl;
+    //cout<<mZZ<<" "<<m1<<" "<<m2<<" "<<costhetastar<<" "<<costheta1<<" "<<costheta2<<" "<<phi<<" "<<phi1<<endl;
+    //cout << "my8DTemplate says ... " << endl;
+    //cout<<"Pmzzm1m2: "<<Pmzzm1m2<<endl;
     Pmzzm1m2++;
     }
   // - - - - - - - - - - - - - - - 
@@ -308,25 +265,10 @@ vector<double> my8DTemplate(bool normalized,double mZZ, double m1, double m2, do
 
 void plotPBackground(){
  TChain* chain = new TChain("angles");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_1.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_2.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_3.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_4.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_5.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_6.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_7.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_8.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_9.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_10.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_11.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_12.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_13.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_14.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_15.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_16.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_17.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_18.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_19.root");
+
+   chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v5.root");
+   chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v6.root");
+   chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v7.root");
   
   double mZZ, m2, m1, costhetastar, costheta1, costheta2, phi, phi1;
   chain->SetBranchAddress("zzmass",&mZZ);
@@ -393,13 +335,6 @@ void plotPBackground(){
   
 }
 
-/*RooRealVar* z1mass_rrv = new RooRealVar("z1mass","m_{Z1}",0,180);
-RooRealVar* z2mass_rrv = new RooRealVar("z2mass","m_{Z2}",0,120);
-RooRealVar* costheta1_rrv = new RooRealVar("costheta1","cos#theta_{1}",-1,1);  
-RooRealVar* costheta2_rrv = new RooRealVar("costheta2","cos#theta_{2}",-1,1);
-RooRealVar* phi_rrv= new RooRealVar("phi","#Phi",-3.1415,3.1415);*/
-
-//AngularPdfFactory SMHiggs(z1mass_rrv,z2mass_rrv,costheta1_rrv,costheta2_rrv,phi_rrv);
 
 pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, double costhetastar, double costheta1, double costheta2, double phi, double phi1,double scaleFactor=5.0){
 
@@ -427,16 +362,6 @@ pair<double,double> likelihoodDiscriminant (double mZZ, double m1, double m2, do
   //double Psig = SMHiggs.PDF->getVal(ras);///SMHiggs.PDF->getNorm(ras);
   double Psig = SMHiggs->getVal(mZZ);
 
-  /*if(fabs(SMHiggs.PDF->getVal(ras) - 4.68449e-11)>1/pow(10,10) ){
-    cout<<"val "<<SMHiggs.PDF->getVal(ras)<<endl;
-    cout<<"norm "<<SMHiggs.PDF->getNorm(ras)<<endl;
-    cout<<"PDF from SM Higgs signal "<<Psig<<endl;
-    
-    cout<<m1<<" "<<m2<<" "<<costhetastar<<" "<<costheta1<<" "<<costheta2<<" "<<phi<<" "<<phi1<<endl;
-  }
-  else
-  cout<<"no "<<endl;*/
-  //double Psig=1;
   vector <double> P=my8DTemplate(1, mZZ,  m1,  m2,  costhetastar,  costheta1,  costheta2,  phi,  phi1);
   double Pbackg = P[0]*P[1]*P[2]*P[3]*P[4]*P[5]*scaleFactor;
 
@@ -474,12 +399,9 @@ TH1F *h_mzz= (TH1F*)(f->Get("h_mzz"));
 
 vector<TH1F*> LDDistributionSignal(){
 
-  TChain* tree = new TChain("angles");
-  tree->Add("../datafiles/PSHiggs_120_JHU_wResolution_withDiscriminants.root");
-  tree->Add("../datafiles/PSHiggs_125_JHU_v3_wResolution_withDiscriminants.root");
-  tree->Add("../datafiles/PSHiggs_130_JHU_wResolution_withDiscriminants.root");
-  tree->Add("../datafiles/PSHiggs_140_JHU_wResolution_withDiscriminants.root");
-
+  TFile* file = new TFile("../datafiles/JHUGenFiles/SMHiggs_125_JHU.root");
+  //TFile* file = new TFile("../datafiles/JHUGenFiles/SMHiggs_125_JHU_wResolution.root");
+  TTree* tree = (TTree*) file->Get("angles");
   double mZZ, m2, m1, costhetastar, costheta1, costheta2, phi, phi1;
   tree->SetBranchAddress("zzmass",&mZZ);
   tree->SetBranchAddress("z2mass",&m2);
@@ -513,15 +435,12 @@ vector<TH1F*> LDDistributionSignal(){
     h_Pbackground->Fill(P.second);
     h_LDsignal->Fill(P.first/(P.first+P.second));
     (vh_LDsignal[h_mzz->FindBin(mZZ)-1])->Fill(P.first/(P.first+P.second));
-
-    /*
+    
     //running on gen: all events have same mass!!! LD_signal does not depend on mZZ!!!
+    //sara: therefore I store the same LD for all the mass bins!!!
     for (int j=1; j<36; j++){
       (vh_LDsignal[j-1])->Fill(P.first/(P.first+P.second)); 
     }
-    */
-
-
   }
 
   TCanvas *LD = new TCanvas("LD_signal","LD_signal");
@@ -543,33 +462,10 @@ vector<TH1F*> LDDistributionBackground(){
 
   TChain* chain = new TChain("angles");
 
-  /*
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_1.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_2.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_3.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_4.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_5.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_6.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_7.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_8.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_9.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_10.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_11.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_12.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_13.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_14.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_15.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_16.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_17.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_18.root");
-  chain->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_19.root");
-  */
-
-  chain->Add("../datafiles/EWKZZ4l_Powheg_total_v5_wResolution_withDiscriminants.root");
-  chain->Add("../datafiles/EWKZZ4l_Powheg_total_v6_wResolution_withDiscriminants.root");
-  chain->Add("../datafiles/EWKZZ4l_Powheg_total_v7_wResolution_withDiscriminants.root");
-  chain->Add("../datafiles/EWKZZ4l_Powheg_total_v8_wResolution_withDiscriminants.root");
-
+  chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v8.root");
+  chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v9.root");
+  /*chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v8_wResolution.root");
+    chain->Add("../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v9_wResolution.root");*/
 
   double mZZ, m2, m1, costhetastar, costheta1, costheta2, phi, phi1;
   chain->SetBranchAddress("zzmass",&mZZ);
@@ -856,8 +752,8 @@ void addDtoTree(char* inputFile){
   reader->AddVariable( "costhetastar", &r_costhetastar );
   reader->AddVariable( "phistar1", &r_phistar1 );
   reader->AddSpectator( "zzmass",   &r_zzmass );
-  reader->BookMVA( "Likelihood method", "/scratch/hep/ntran/HZZ_materials/HZsZs_analysis/TMVAanalysis/weights/TMVA_zz4l_m125_Likelihood.weights.xml" ); 
-  reader->BookMVA( "BDT method", "/scratch/hep/ntran/HZZ_materials/HZsZs_analysis/TMVAanalysis/weights/TMVA_zz4l_m125_BDT.weights.xml" ); 
+  reader->BookMVA( "Likelihood method", "../datafiles/TMVA_zz4l_m125_Likelihood.weights_SigBkg.xml" ); 
+  reader->BookMVA( "BDT method", "../datafiles/TMVA_zz4l_m125_BDT.weights_SigBkg.xml" ); 
 
   reader_sigSep->AddVariable( "z1mass", &r_z1mass );
   reader_sigSep->AddVariable( "z2mass", &r_z2mass );
@@ -867,8 +763,8 @@ void addDtoTree(char* inputFile){
   reader_sigSep->AddVariable( "costhetastar", &r_costhetastar );
   reader_sigSep->AddVariable( "phistar1", &r_phistar1 );
   reader_sigSep->AddSpectator( "zzmass",   &r_zzmass );
-  reader_sigSep->BookMVA( "Likelihood method", "/home/whitbeck/4lHelicity/TMVAanalysis/weights/TMVA_zz4l_m125_Likelihood.weights.xml" ); 
-  reader_sigSep->BookMVA( "BDT method", "/home/whitbeck/4lHelicity/TMVAanalysis/weights/TMVA_zz4l_m125_BDT.weights.xml" ); 
+  reader_sigSep->BookMVA( "Likelihood method", "../datafiles/TMVA_zz4l_m125_Likelihood.weights_SMvsPS.xml" ); 
+  reader_sigSep->BookMVA( "BDT method", "../datafiles/TMVA_zz4l_m125_BDT.weights_SMvsPS.xml" ); 
 
   vector<double> pT;
   
@@ -885,10 +781,12 @@ void addDtoTree(char* inputFile){
 
     sort(pT.begin(),pT.end());
 
-    if(mzz>110. && mzz<180. && m2>20. && 
-       pT[3]>20. && pT[2]>17. && pT[1]>7. && pT[0]>7. &&
-       fabs(l1m_eta)<2.4 && fabs(l2m_eta)<2.4 && 
-       fabs(l1p_eta)<2.4 && fabs(l2p_eta)<2.4 ){
+    if(mzz>110. && mzz<180. && m2>20. 
+       //&& m1>50 && m2<120 && m1<120 &&
+       //pT[3]>20. && pT[2]>10. && pT[1]>7. && pT[0]>7. &&
+       //fabs(l1m_eta)<2.4 && fabs(l2m_eta)<2.4 && 
+       //fabs(l1p_eta)<2.4 && fabs(l2p_eta)<2.4 
+       ){
 
       //NASA LD
       pair<double,double> P = likelihoodDiscriminant(mzz, m1, m2, hs, h1, h2, phi, phi1);
@@ -927,7 +825,7 @@ void addDtoTree(char* inputFile){
 
 //========================================================================
 
-TGraph* plotSingleROCcurve(char* sigFileName,char* bkgFileName,char* var){
+TGraph* plotSingleROCcurve(TString sigFileName,TString bkgFileName,char* var){
 
   cout << "plotting ROC curve " << endl;
 
@@ -1044,8 +942,8 @@ void plotLDDistribution(){
 
     vc_LD[i-1]->cd();
     vh_LDsignal[i-1]->SetLineColor(2);
-    vh_LDsignal[i-1]->Draw();
-    vh_LDbackground[i-1]->Draw("same");
+    vh_LDbackground[i-1]->Draw();
+    vh_LDsignal[i-1]->Draw("same");
  
     leg->Draw("same");
 
@@ -1122,103 +1020,16 @@ void storeLDDistribution(bool signal){
   h_mzzD->Write();
 }
 
-void storeLDInfo(bool signal){
-  TFile* file ;
-  TChain* tree = new TChain("angles");
-  if(signal){
-    tree->Add("../datafiles/JHUGenFiles/SMHiggs_125_JHU_withCuts.root");
-  }
-
-  if(!signal){
-  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_1.root");
-  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_2.root");
-  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_3.root");
-  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_4.root");
-  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_5.root");
-  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_6.root");
-  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_7.root");
-  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_8.root");
-  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_9.root");
-  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_10.root");
-  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_11.root");
-  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_12.root");
-  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_13.root");
-  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_14.root");
-  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_15.root");
-  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_16.root");
-  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_17.root");
-  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_18.root");
-  tree->Add("/scratch/hep/ntran/HZZ_materials/datafiles/PowhegFiles/EWKZZ4l_Powheg_19.root");
- 
-
-  }
-  double mZZ, m2, m1, costhetastar, costheta1, costheta2, phi, phi1,sepLD;
-  tree->SetBranchAddress("zzmass",&mZZ);
-  tree->SetBranchAddress("z2mass",&m2);
-  tree->SetBranchAddress("z1mass",&m1);
-  tree->SetBranchAddress("costhetastar",&costhetastar);
-  tree->SetBranchAddress("phi",&phi);
-  tree->SetBranchAddress("costheta1",&costheta1);
-  tree->SetBranchAddress("costheta2",&costheta2);
-  tree->SetBranchAddress("phi1",&phi1);
-
-  TFile* fileOut; 
-  double mZZout, m2out, m1out, costhetastarout, costheta1out, costheta2out, phiout, phi1out, Psig, Pbkg, D;
-  if(signal)
-    fileOut = new TFile("../datafiles/JHUGenFiles/SMHiggs_125_JHU_withCuts_withD.root","RECREATE");
-  else if(!signal)
-    fileOut = new TFile("../datafiles/PowhegFiles/EWKZZ4l_Powheg_withCuts_withD.root","RECREATE");
-  TTree* treeOut = new TTree("eventInfo","angles, mzz, D");
-  treeOut->Branch("zzmass",&mZZout,"zzmass/D");
-  treeOut->Branch("z2mass",&m2out,"z2mass/D");
-  treeOut->Branch("z1mass",&m1out,"z1mass/D");
-  treeOut->Branch("costhetastar",&costhetastarout,"costhetastar/D");
-  treeOut->Branch("phi",&phiout,"phi/D");
-  treeOut->Branch("costheta1",&costheta1out,"costheta1/D");
-  treeOut->Branch("costheta2",&costheta2out,"costheta2/D");
-  treeOut->Branch("phi1",&phi1out,"phi1/D");
-  treeOut->Branch("Psig",&Psig,"Psig/D");
-  treeOut->Branch("Pbkg",&Pbkg,"Pbkg/D");
-  treeOut->Branch("D",&D,"D/D");
-  treeOut->Branch("sigSepLD",&sepLD,"sigSepLD/D");    
-
-  for (Int_t i=0; i<tree->GetEntries();i++) {
-    tree->GetEvent(i); 
-    if(mZZ>180 || mZZ<110)
-      continue;
-    //if(m1+m2>125)
-    //continue;
-    if((i%10000)==0)
-      cout<<"event "<<i<<endl;
-    pair<double,double> P =  likelihoodDiscriminant(mZZ, m1, m2, costhetastar, costheta1, costheta2, phi, phi1);
-    Psig=P.first;
-    Pbkg=P.second;
-    D= P.first/(P.first+P.second);
-    //sepLD=separationLikelihoodDiscriminant(mZZ,m1,m2,costheta1,costheta2,phi);
-
-    mZZout=mZZ;
-    m1out= m1;
-    m2out=m2;
-    costhetastarout=costhetastar;
-    costheta1out=costheta1;
-    costheta2out=costheta2;
-    phiout=phi;
-    phi1out=phi1;
-    treeOut->Fill();
- }
-
-  fileOut->cd();
-  treeOut->Write("angles");
-}
 
 //=======================================================================
 
 void plotROCcurve(){ //only in mZZ 124-126
 
   cout << "plotting ROC curve " << endl;
-
-  TFile* file_sig = new TFile("../datafiles/JHUGenFiles/SMHiggs_125_JHU_withCuts_withD.root","read");
-  TTree* tree_sig = (TTree*) file_sig->Get("eventInfo");
+  TString nomeSig="../datafiles/JHUGenFiles/SMHiggs_125_JHU_wResolution_withDiscriminants.root";
+  TString nomeBkg="../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v7_wResolution_withDiscriminants.root";
+  TFile* file_sig = new TFile(nomeSig,"read");
+  TTree* tree_sig = (TTree*) file_sig->Get("angles");
   TH1F* h_LD_sig = new TH1F("h_LD_sig","h_LD_sig",101,0,1.01);
   TH1F *h_costhetastar_sig = new TH1F("h_costhetastar_sig","h_costhetastar_sig",50,-1,1);
   TH1F *h_costheta1_sig = new TH1F("h_costheta1_sig","h_costheta1_sig",50,-1,1);
@@ -1227,8 +1038,8 @@ void plotROCcurve(){ //only in mZZ 124-126
   TH1F *h_phi1_sig = new TH1F("h_phi1_sig","h_phi1_sig",50,-3.14,3.14);
   TH1F* h_m2_sig = new TH1F("h_m2_sig","h_m2_sig",44,20,64);
  
-  TFile* file_bkg = new TFile("../datafiles/PowhegFiles/EWKZZ4l_Powheg_withCuts_withD.root","read");
-  TTree* tree_bkg = (TTree*) file_bkg->Get("eventInfo");
+  TFile* file_bkg = new TFile(nomeBkg,"read");
+  TTree* tree_bkg = (TTree*) file_bkg->Get("angles");
   TH1F* h_LD_bkg = new TH1F("h_LD_bkg","h_LD_bkg",101,0,1.01);
   TH1F *h_costhetastar_bkg = new TH1F("h_costhetastar_bkg","h_costhetastar_bkg",50,-1,1);
   TH1F *h_costheta1_bkg = new TH1F("h_costheta1_bkg","h_costheta1_bkg",50,-1,1);
@@ -1245,25 +1056,24 @@ void plotROCcurve(){ //only in mZZ 124-126
   double sigEff_m2[44],bkgEff_m2[44];
 
   double LD, costhetastar, costheta1, costheta2, phi, phi1,mZZ,m2;
-  //tree1->SetBranchAddress("nasaLD",&LD);  
-  //tree2->SetBranchAddress("nasaLD",&LD);
-  tree_sig->SetBranchAddress("D",&LD);  
+  tree_sig->SetBranchAddress("nasaLD",&LD);  
   tree_sig->SetBranchAddress("costhetastar",&costhetastar);
   tree_sig->SetBranchAddress("phi",&phi);
   tree_sig->SetBranchAddress("costheta1",&costheta1);
   tree_sig->SetBranchAddress("costheta2",&costheta2);
-  tree_sig->SetBranchAddress("phi1",&phi1);
+  tree_sig->SetBranchAddress("phistar1",&phi1);
   tree_sig->SetBranchAddress("zzmass",&mZZ);
   tree_sig->SetBranchAddress("z2mass",&m2);
 
-  tree_bkg->SetBranchAddress("D",&LD);
+  tree_bkg->SetBranchAddress("nasaLD",&LD);
   tree_bkg->SetBranchAddress("costhetastar",&costhetastar);
   tree_bkg->SetBranchAddress("phi",&phi);
   tree_bkg->SetBranchAddress("costheta1",&costheta1);
   tree_bkg->SetBranchAddress("costheta2",&costheta2);
-  tree_bkg->SetBranchAddress("phi1",&phi1);
+  tree_bkg->SetBranchAddress("phistar1",&phi1);
   tree_bkg->SetBranchAddress("zzmass",&mZZ);
   tree_bkg->SetBranchAddress("z2mass",&m2);
+  cout<<"prova 0"<<endl;
 
   //Get Histos for LD
   for(int iEvt=0; iEvt<tree_sig->GetEntries(); iEvt++){
@@ -1309,7 +1119,8 @@ void plotROCcurve(){ //only in mZZ 124-126
   for(int iCut=0; iCut<100; iCut++){
     sigEff_LD[iCut]=h_LD_sig->Integral(iCut,100);
     bkgEff_LD[iCut]=1-h_LD_bkg->Integral(iCut,100);
-  }
+   cout<<sigEff_LD[iCut]<<" "<<bkgEff_LD[iCut]<<endl;
+   }
   for(int iCut=0; iCut<25; iCut++){
     sigEff_costhetastar[iCut]=h_costhetastar_sig->Integral(0+iCut,50-iCut);
     bkgEff_costhetastar[iCut]=1-h_costhetastar_bkg->Integral(0+iCut,50-iCut);
@@ -1331,7 +1142,8 @@ void plotROCcurve(){ //only in mZZ 124-126
     bkgEff_m2[iCut]=1-h_m2_bkg->Integral(iCut,44);
   }
 
-  TCanvas* ROCcanvas = new TCanvas("ROCcanvas","ROC curve for LD",600,600);
+  cout<<"prova 1"<<endl;
+  TCanvas* ROCcanvas = new TCanvas("ROC_c","ROC curve for LD",600,600);
   /*double lineX[100],lineY[100];
   for(int i=0; i<100; i++){
     lineX[i]=(double)i/100;
@@ -1341,11 +1153,16 @@ void plotROCcurve(){ //only in mZZ 124-126
   line->SetLineColor(2);*/
   TF1* f= new TF1("f","1-x",0,1.2);
   f->SetLineColor(2);
-  TGraph* ROC_LD = new TGraph(100,sigEff_LD,bkgEff_LD);
+  /*TGraph* ROC_LD = new TGraph(100,sigEff_LD,bkgEff_LD);
   ROC_LD->GetXaxis()->SetTitle("#epsilon_{signal}");
   ROC_LD->GetYaxis()->SetTitle("#epsilon_{background}");
   ROC_LD->SetMarkerStyle(8);
-  ROC_LD->Draw("APL");
+  ROC_LD->Draw("APL");*/
+  TGraph* ROC_Andrew = plotSingleROCcurve(nomeSig,nomeBkg,"nasaLD");
+  ROC_Andrew->SetMarkerStyle(2);
+  ROC_Andrew->SetMarkerColor(kGreen);
+  ROC_Andrew->Draw("APL");
+  cout<<"prova 2"<<endl;
   TGraph* ROC_costhetastar = new TGraph(25,sigEff_costhetastar,bkgEff_costhetastar);
   ROC_costhetastar->SetMarkerStyle(24);
   ROC_costhetastar->SetMarkerColor(2);
@@ -1371,7 +1188,8 @@ void plotROCcurve(){ //only in mZZ 124-126
   f->Draw("same");
   
   TLegend *leg = new TLegend(0.5,0.6,0.7,0.8);
-  leg->AddEntry(ROC_LD,"NASA LD","LP");
+  //leg->AddEntry(ROC_LD,"NASA LD","LP");
+  leg->AddEntry(ROC_Andrew,"MELA LD","LP");
   leg->AddEntry(ROC_costhetastar,"|costhetastar|<cut(1-0)","LP");
   leg->AddEntry(ROC_costheta1,"|costheta1|<cut(1-0)","LP");
   leg->AddEntry(ROC_costheta2,"|costheta2|<cut(1-0)","LP");
@@ -1379,8 +1197,8 @@ void plotROCcurve(){ //only in mZZ 124-126
   leg->AddEntry(ROC_m2,"m2>cut(20-64)","LP");
 
   leg->Draw("same");
-  ROCcanvas->Print("ROCcanvas.eps");
-
+  
+  //ROCcanvas->Print("ROCcanvas.eps");
 
 }
 
