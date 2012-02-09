@@ -3,6 +3,7 @@
 #include <fstream>
 #include "TH2F.h"
 #include <sstream>
+#include <iostream>
 
 using namespace std;
 
@@ -36,7 +37,7 @@ void genTemplate(bool isSig=true){
     for(int j=0; j<100; j++){
       integral[i]+=mzzDTemplate->GetBinContent(i+1,j+1);
     }
-    cout << "integral (" << i << "): " << integral[i] << endl;
+    std::cout << "integral (" << i << "): " << integral[i] << endl;
   }
 
   //=====================================
@@ -56,7 +57,7 @@ void genTemplate(bool isSig=true){
       convert.str("");
       if(integral[i]>0){
 	convert << (double)mzzDTemplate->GetBinContent(i+1,j+1);
-	checkInt[i]+=(double)mzzDTemplate->GetBinContent(i+1,j+1)/integral[i];
+	checkInt+=(double)mzzDTemplate->GetBinContent(i+1,j+1)/integral[i];
       }
       else
 	convert << 0.00;
@@ -67,7 +68,7 @@ void genTemplate(bool isSig=true){
 	lines+="\n";
 
     }
-    cout << "checkInt: " << checkInt << endl;
+    std::cout << "checkInt: " << checkInt << endl;
   }
   
   ifstream templateFile;
