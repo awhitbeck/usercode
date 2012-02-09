@@ -437,10 +437,10 @@ vector<TH1F*> LDDistributionSignal(){
     (vh_LDsignal[h_mzz->FindBin(mZZ)-1])->Fill(P.first/(P.first+P.second));
     
     //running on gen: all events have same mass!!! LD_signal does not depend on mZZ!!!
-    //sara: therefore I store the same LD for all the mass bins!!!
-    for (int j=1; j<36; j++){
-      (vh_LDsignal[j-1])->Fill(P.first/(P.first+P.second)); 
-    }
+    //therefore I store the same LD for all the mass bins!!!
+    //for (int j=1; j<36; j++){
+    //  (vh_LDsignal[j-1])->Fill(P.first/(P.first+P.second)); 
+    //}
   }
 
   TCanvas *LD = new TCanvas("LD_signal","LD_signal");
