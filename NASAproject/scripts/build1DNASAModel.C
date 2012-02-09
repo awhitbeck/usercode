@@ -782,10 +782,10 @@ void addDtoTree(char* inputFile){
     sort(pT.begin(),pT.end());
 
     if(mzz>110. && mzz<180. && m2>20. 
-       //&& m1>50 && m2<120 && m1<120 &&
-       //pT[3]>20. && pT[2]>10. && pT[1]>7. && pT[0]>7. &&
-       //fabs(l1m_eta)<2.4 && fabs(l2m_eta)<2.4 && 
-       //fabs(l1p_eta)<2.4 && fabs(l2p_eta)<2.4 
+       && m1>50 && m2<120 && m1<120 &&
+       pT[3]>20. && pT[2]>10. && pT[1]>7. && pT[0]>7. &&
+       fabs(l1m_eta)<2.4 && fabs(l2m_eta)<2.4 && 
+       fabs(l1p_eta)<2.4 && fabs(l2p_eta)<2.4 
        ){
 
       //NASA LD
@@ -1027,7 +1027,7 @@ void plotROCcurve(){ //only in mZZ 124-126
 
   cout << "plotting ROC curve " << endl;
   TString nomeSig="../datafiles/JHUGenFiles/SMHiggs_125_JHU_wResolution_withDiscriminants.root";
-  TString nomeBkg="../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v7_wResolution_withDiscriminants.root";
+  TString nomeBkg="../datafiles/PowhegFiles/EWKZZ4l_Powheg_total_v2_wResolution_withDiscriminants.root";
   TFile* file_sig = new TFile(nomeSig,"read");
   TTree* tree_sig = (TTree*) file_sig->Get("angles");
   TH1F* h_LD_sig = new TH1F("h_LD_sig","h_LD_sig",101,0,1.01);
@@ -1198,7 +1198,7 @@ void plotROCcurve(){ //only in mZZ 124-126
 
   leg->Draw("same");
   
-  //ROCcanvas->Print("ROCcanvas.eps");
+  ROCcanvas->Print("ROCcanvas.eps");
 
 }
 
