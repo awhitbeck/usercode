@@ -39,12 +39,12 @@ root -l -n plotFigure2.C
 
 #generate signal models:
 
-./runJHUGen SMHiggs  0 100 #100 jobs, generating SM Higgs
-./runJHUGen psScalar 0 100 #100 jobs, generating 0-
-./runJHUGen 0hPlus   0 100 #100 jobs, generating 0h+
-./runJHUGen vector   0 100 #100 jobs, generating 1+
-./runJHUGen psVector 0 100 #100 jobs, generating 1-
-./runJHUGen minGrav  0 100 #100 jobs, generating 2m+
-./runJHUGen 2hPlus   0 100 #100 jobs, generating 2h+
-./runJHUGen 2hMinus  0 100 #100 jobs, generating 2h-
+./runJHUGen SMHiggs_125GeV  0 100 #100 jobs generating SM Higgs
+./runJHUGen psScalar_125GeV 0 100 #100 jobs generating 0-
+./runJHUGen 0hPlus_125GeV   0 100 #100 jobs generating 0h+
+./runJHUGen vector_125GeV   0 100 #100 jobs generating 1+
+./runJHUGen psVector_125GeV 0 100 #100 jobs generating 1-
+./runJHUGen minGrav_125GeV  0 100 #100 jobs generating 2m+
+./runJHUGen 2hPlus_125GeV   0 100 #100 jobs generating 2h+
+./runJHUGen 2hMinus_125GeV  0 100 #100 jobs generating 2h-
 
