@@ -1,0 +1,50 @@
+#Install:
+
+root -l -n 
+
+.L ../PDFs/RooXZsZs_5D.cxx+
+.L ../PDFs/RooSpinOne_7D.cxx+
+.L ../PDFs/RooSpinTwo_7D.cxx+
+.L ../src/AngularPdfFactory.cc+
+.L ../src/ScalarPdfFactory.cc+
+.L ../src/VectorPdfFactory.cc+
+.L ../src/TensorPdfFactory.cc+
+.L ../PDFs/RooqqZZ_JHU.cxx+
+.L MELA.C+
+
+#Projection Plots:
+
+./makePlots.sh 0  #spin-0 plots
+./makePlots.sh 1  #spin-1 plots
+./makePlots.sh 2  #spin-2 plots
+./makePlots.sh -1 #bkg plots
+
+#Figure 2 Plot:
+
+root -l -n plotFigure2.C
+
+#run toys 
+
+./makePlots.sh toys 100 
+#submit 100 jobs with 1000 toys for each hypoth (7 total)
+
+#plot separation, calculate significances
+
+./makePlots.sh hypsep  
+# may need to tune the binning and range (3rd and 4th argument of drawhypsep.C)
+
+#plots for Figure 4
+
+./makePlots.sh kin
+
+#generate signal models:
+
+./runJHUGen SMHiggs  0 100 #100 jobs, generating SM Higgs
+./runJHUGen psScalar 0 100 #100 jobs, generating 0-
+./runJHUGen 0hPlus   0 100 #100 jobs, generating 0h+
+./runJHUGen vector   0 100 #100 jobs, generating 1+
+./runJHUGen psVector 0 100 #100 jobs, generating 1-
+./runJHUGen minGrav  0 100 #100 jobs, generating 2m+
+./runJHUGen 2hPlus   0 100 #100 jobs, generating 2h+
+./runJHUGen 2hMinus  0 100 #100 jobs, generating 2h-
+
