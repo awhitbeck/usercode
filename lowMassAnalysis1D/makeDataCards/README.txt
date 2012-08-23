@@ -4,6 +4,22 @@
 ####   for low mass HZZ2l2q analysis
 ############################################   
 
+Installation:
+
+#=========================
+
+cmsrel CMSSW_5_2_4
+cd CMSSW_5_2_4/src
+cmsenv
+cvs co -r V02-02-03 HiggsAnalysis/CombinedLimit
+scram b -j4
+
+cd HiggsAnalysis/CombinedLimit/test
+
+cvs co -d makeDataCards UserCode/Whitbeck/lowMassAnalysis1D/makeDataCards
+
+#=========================
+
 This code is a modification of the high mass anlaysis scripts.  
 The mechanics are very much the same.  To run you will need to 
 first set up a working directory:
