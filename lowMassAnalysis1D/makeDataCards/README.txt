@@ -54,10 +54,22 @@ From here you should be all set.  Just do the following to run the code:
 
 root -l -n -b -q generateDataCards.C
 
+#======================
+
+to test the card which you just created:
+
+cd MYdirNAME
+./doCombineCards
+./runAsymptoticLimits.sh
+root -l -n plot_asymptoticLimits.C
+
+This will run the 0 b-tag, 1 b-tag, 2 b-tag, and 6 channel
+limit.  
+
 ======================
 Refer questions to either
 ----------------------
-whitbeck.andrew@gmail.com
+whitbeck@cern.ch
 sara.bolognesi@cern.ch
 ----------------------
 
