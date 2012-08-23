@@ -1,0 +1,1 @@
+for M in $( cat masses.txt ); do ./mergeCombinationFiles.sh $M ; done

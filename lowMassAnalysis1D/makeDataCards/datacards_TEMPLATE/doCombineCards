@@ -1,0 +1,1 @@
+for M in $( cat mass.txt ); do ./myCombineCards.sh $M ; done
