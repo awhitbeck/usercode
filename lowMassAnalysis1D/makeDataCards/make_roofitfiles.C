@@ -166,17 +166,23 @@ void make_roofitfiles(int btag, int chan, double massH, double sigmaH, double &o
   string sigp4name="CMS_hzz2l2q_sig_"+str_btag+"_p4"; //n1
   string sigp5name="CMS_hzz2l2q_sig_"+str_btag+"_p5"; //alpha2
   string sigp6name="CMS_hzz2l2q_sig_"+str_btag+"_p6"; //n2
-  RooRealVar CB_mean(sigp1name.c_str(),sigp1name.c_str(),cb_pars[0],0.,100.);
+  if(cb_pars[0]>1000.||cb_pars[0]<0.) assert(0);
+  RooRealVar CB_mean(sigp1name.c_str(),sigp1name.c_str(),cb_pars[0],0.,1000.);
   CB_mean.setConstant(kTRUE);
-  RooRealVar CB_sigma(sigp2name.c_str(),sigp2name.c_str(),cb_pars[1],0.,100.);
+  if(cb_pars[1]>1000.||cb_pars[1]<0.) assert(0);
+  RooRealVar CB_sigma(sigp2name.c_str(),sigp2name.c_str(),cb_pars[1],0.,1000.);
   CB_sigma.setConstant(kTRUE);
-  RooRealVar CB_alpha1(sigp3name.c_str(),sigp3name.c_str(),cb_pars[2],0.,100.);
+  if(cb_pars[2]>1000.||cb_pars[2]<0.) assert(0);
+  RooRealVar CB_alpha1(sigp3name.c_str(),sigp3name.c_str(),cb_pars[2],0.,1000.);
   CB_alpha1.setConstant(kTRUE);
-  RooRealVar CB_n1(sigp4name.c_str(),sigp4name.c_str(),cb_pars[3],0.,100.);
+  if(cb_pars[3]>1000.||cb_pars[3]<0.) assert(0);
+  RooRealVar CB_n1(sigp4name.c_str(),sigp4name.c_str(),cb_pars[3],0.,1000.);
   CB_n1.setConstant(kTRUE);
-  RooRealVar CB_alpha2(sigp5name.c_str(),sigp5name.c_str(),cb_pars[4],0.,100.);
+  if(cb_pars[4]>1000.||cb_pars[4]<0.) assert(0);
+  RooRealVar CB_alpha2(sigp5name.c_str(),sigp5name.c_str(),cb_pars[4],0.,1000.);
   CB_alpha2.setConstant(kTRUE);
-  RooRealVar CB_n2(sigp6name.c_str(),sigp6name.c_str(),cb_pars[5],0.,100.);
+  if(cb_pars[5]>1000.||cb_pars[5]<0.) assert(0);
+  RooRealVar CB_n2(sigp6name.c_str(),sigp6name.c_str(),cb_pars[5],0.,1000.);
   CB_n2.setConstant(kTRUE);
 
   RooDoubleCB CB_SIG("CB_SIG","Crystal Ball",CMS_hzz2l2q_mZZ,CB_mean,CB_sigma,CB_alpha1,CB_n1,CB_alpha2,CB_n2);
@@ -187,10 +193,14 @@ void make_roofitfiles(int btag, int chan, double massH, double sigmaH, double &o
   string sigp7name="CMS_hzz2l2q_sig_"+str_btag+"_p7"; //unmatched mean
   string sigp8name="CMS_hzz2l2q_sig_"+str_btag+"_p8"; //unmatched width
 
+  if(cb_pars[6]>1000.||cb_pars[6]<0.) assert(0);
   RooRealVar Gauss_mean(sigp7name.c_str(),sigp7name.c_str(),cb_pars[6],0,1000.);
   Gauss_mean.setConstant(kTRUE);
+  if(cb_pars[7]>1000.||cb_pars[7]<0.) assert(0);
   RooRealVar Gauss_width(sigp8name.c_str(),sigp8name.c_str(),cb_pars[7],0,1000.);
   Gauss_width.setConstant(kTRUE);
+
+
 
   RooGaussian Gauss_SIG("Gauss_SIG","Gauss_SIG",CMS_hzz2l2q_mZZ,Gauss_mean,Gauss_width);
   
@@ -301,7 +311,7 @@ void make_roofitfiles(int btag, int chan, double massH, double sigmaH, double &o
   cout << "char_btag: " << char_btag << endl;
 
   char outFileName[150];
-  sprintf(outFileName,"datacards_SM4_Aug21_2012/%s/hzz2l2q_%s%s.input.root",char_massH,char_chan,char_btag);
+  sprintf(outFileName,"datacards_testJHEPresults/%s/hzz2l2q_%s%s.input.root",char_massH,char_chan,char_btag);
   
   cout<<"OUTFILENAME "<<outFileName<<endl;
 

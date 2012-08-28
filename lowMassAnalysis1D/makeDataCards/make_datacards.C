@@ -24,7 +24,7 @@ const int nchan=2;//2e2j and 2m2j
 const float lumiee=4.6;  //4.86; //fb^-1, NEW!
 const float lumimm=4.6;  //4.88; //fb^-1, NEW!
 const int nmass=5;
-const bool isSM4=true;  // if true add .15 to CSgg and CSvbf errors 
+const bool isSM4=false;  // if true add .15 to CSgg and CSvbf errors 
 const bool isXSBr=false; // if true don't write signal yield errors from theory/pdf's 
 const bool isFF=false;    // if true use fermiophobic text file, don't use gg->H channel, add 5% to scale errors.  
 const float mass[nmass]={130,140,150,160,170};
@@ -88,7 +88,7 @@ int make_datacards(){
   float mH, CSgg, CSgg_p, CSgg_m, CSpdfgg_p,CSpdfgg_m,CSvbf, CSvbf_p, CSvbf_m,CSpdfvbf_p,CSpdfvbf_m, 
     Gamma, BRHZZ, gamma_Hff, gamma_HVV, gamma_Hgg, BRZZ2l2q;
 
-  string outDir="datacards_SM4_Aug21_2012/";
+  string outDir="datacards_testJHEPresults/";
 
   //calculate expected yields
   get_gen_yields();
@@ -1059,21 +1059,19 @@ void extract_exp_sig_yields(float mymass,float mywidth){
 
   //signal file
   // fixed by hand.... all files are now summer 11
-  int spring11_summer11 = 0;//get_signal_gen(mymass);
+  int spring11_summer11 = get_signal_gen(mymass);
 
   string prefix;
   string suffix;
 
-  /*
   if(spring11_summer11){
     prefix="spring11_SMHiggs_";
     suffix="GeV_lowmass_last.root";
   }
   else{
-  */
   prefix="summer11_SMHiggs_";
   suffix="GeV_lowmass_last.root";
-  //}
+  }
   std::ostringstream ossm;
   ossm<<mass[im];
   string filename=myDir+prefix+ossm.str()+suffix;
@@ -1083,20 +1081,18 @@ void extract_exp_sig_yields(float mymass,float mywidth){
 
   
   string baseline_sel;
-  /*
+
   if(spring11_summer11)
     baseline_sel="(mJJ>75 && mJJ<105 && mZZ>125.0 && mZZ<170)";
   else 
-  */
-  baseline_sel="(mJJ>75 && mJJ<105 && mZZ>125.0 && mZZ<170)";
+    baseline_sel="(mJJ>75 && mJJ<105 && mZZ>125.0 && mZZ<170)";
  
   for(int ib=0;ib<nbtag;ib++){
     string sel="dumm";
     if(ib==0)sel=baseline_sel+"&&nBTags==0";
     else if(ib==1)sel=baseline_sel+"&&nBTags==1";
-    else if(ib==2)sel=baseline_sel+"&&nBTags==2&&met<50";
-    //else if(ib==2 && spring11_summer11==1)sel=baseline_sel+"&&nBTags==2&&met<50";
-    //else if(ib==2 && spring11_summer11==0)sel=baseline_sel+"&&nBTags==2&&met<60";
+    else if(ib==2 && spring11_summer11==1)sel=baseline_sel+"&&nBTags==2&&met<50";
+    else if(ib==2 && spring11_summer11==0)sel=baseline_sel+"&&nBTags==2&&met<60";
     string sel2="dumsel2";
     for(int ich=0;ich<nchan;ich++){
       cout << "CUTSTRING - " << sel << endl;
