@@ -21,19 +21,32 @@ cvs co -d SignalSeparation UserCode/HZZ4L_Combination/CombinationPy/SignalSepara
 
 ./buildPackage.sh
 
-## to test results from Alessio, copy his SM inputs and templates:
-
-scp -r lxplus.cern.ch:~bonato/public/cards_HypTest_Combine_HCPlumi_SMD_20121023b_GOOD/templates2D_smd_7TeV_20121023b_GOODvarbin .
-scp -r lxplus.cern.ch:~bonato/public/cards_HypTest_Combine_HCPlumi_SMD_20121023b_GOOD/templates2D_smd_7TeV_20121023b_GOODvarbin .
-
-scp -r lxplus.cern.ch:~bonato/public/SM_inputs_7TeV/ .
-scp -r lxplus.cern.ch:~bonato/public/SM_inputs_8TeV/ .
-
-
 ## running standard limits and significance
 ## to run code:
 
 python makeDCsandWSs.py -i <input directory> -a <output name> -b > output.txt
+
+## reproduce the HCP pvalues for 125
+
+python makeDCsandWSs.py -i SM_inputs_8TeV/ -a test_pvals_8TeV -b > test_pvals_8TeV.txt
+python makeDCsandWSs.py -i SM_inputs_7TeV/ -a test_pvals_7TeV -b > test_pvals_7TeV.txt
+
+cp cards_test_pvals_7TeV/HCG/125/* cards_test_pvals_8TeV/HCG/125/.
+
+cd cards_test_pvals_8TeV/HCG/125/
+
+combineCards.py *.txt > hzz4l.txt
+
+combine -M ProfileLikelihood hzz4l.txt -m 125 --expectSignal=1 --signif -t -1
+
+## to test results from Alessio, copy his SM inputs and templates:
+## From HZZ4Lcombination/CreateDatacards/
+
+scp -r lxplus.cern.ch:~bonato/public/cards_HypTest_Combine_HCPlumi_SMD_20121023b_GOOD/templates2D_smd_7TeV_20121023b_GOODvarbin .
+scp -r lxplus.cern.ch:~bonato/public/cards_HypTest_Combine_HCPlumi_SMD_20121023b_GOOD/templates2D_smd_8TeV_20121023b_GOODvarbin .
+
+scp -r lxplus.cern.ch:~bonato/public/SM_inputs_7TeV/ .
+scp -r lxplus.cern.ch:~bonato/public/SM_inputs_8TeV/ .
 
 ##############################
 ## hypothesis separation    ##
