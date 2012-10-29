@@ -10,6 +10,7 @@ from array import array
 from systematicsClass import *
 from inputReader import *
 from mela2Dtemplate import *
+from superMela2Dtemplate import *
 
 ## ------------------------------------
 ##  card and workspace class
@@ -107,6 +108,9 @@ class datacardClass:
     def makeCardsWorkspaces(self, theMH, theis2D, theOutputDir, theInputs,theTemplateDir="templates2D", theIncludingError=False, theMEKD=False):
 
         ## --------------- SETTINGS AND DECLARATIONS --------------- ##
+
+        theInputs['is2D'] = theis2D
+        
         DEBUG = False
         self.mH = theMH
         self.lumi = theInputs['lumi']
@@ -183,7 +187,7 @@ class datacardClass:
         if self.isAltSig and not self.all_chan :
             raise RuntimeError, "You asked to prepare DC and WS for Hyp Test but you did not want to sum over all signal channels. This is forbidden. Check inputs ! (it should have already send you this error message, strange that  you are here...)"
 
-        if (self.isAltSig and not (self.is2D==1)):
+        if (self.isAltSig and not (self.is2D==1 or self.is2D==3)):
             raise RunTimeError, "Cannot perform hypothesis testing without a 2D analysis, feature not supported yet. Exiting."
         
 
@@ -472,20 +476,23 @@ class datacardClass:
 
         discVarName = "melaLD"
         D = ROOT.RooRealVar(discVarName,discVarName,0,1)
-    
-        templateSigName = "{0}/Dsignal_{1}.root".format(self.templateDir ,self.appendName)
-        ggHtemplate = mela2Dtemplate(templateSigName,D,CMS_zz4l_mass,self.channel,self.sqrts,"ggH",self.sigMorph,"sig")
-        VBFtemplate = mela2Dtemplate(templateSigName,D,CMS_zz4l_mass,self.channel,self.sqrts,"VBF",self.sigMorph,"sig")
-        WHtemplate = mela2Dtemplate(templateSigName,D,CMS_zz4l_mass,self.channel,self.sqrts,"WH",self.sigMorph,"sig")
-        ZHtemplate = mela2Dtemplate(templateSigName,D,CMS_zz4l_mass,self.channel,self.sqrts,"ZH",self.sigMorph,"sig")
-        ttHtemplate = mela2Dtemplate(templateSigName,D,CMS_zz4l_mass,self.channel,self.sqrts,"ttH",self.sigMorph,"sig")
-        
-        if(self.isAltSig):
-            #only ggH because if we do hypothesis testing we sum up over the channels in any case
-              templateSigName = "{0}/Dsignal{2}_{1}.root".format(self.templateDir,self.appendName, self.appendHypType)
-              print 'Taking 2D template for ALT signal from ',templateSigName
+            
+        if (self.is2D == 1):
+            
+            templateSigName = "{0}/Dsignal_{1}.root".format(self.templateDir ,self.appendName)
+            ggHtemplate = mela2Dtemplate(templateSigName,D,CMS_zz4l_mass,self.channel,self.sqrts,"ggH",self.sigMorph,"sig")
+            VBFtemplate = mela2Dtemplate(templateSigName,D,CMS_zz4l_mass,self.channel,self.sqrts,"VBF",self.sigMorph,"sig")
+            WHtemplate = mela2Dtemplate(templateSigName,D,CMS_zz4l_mass,self.channel,self.sqrts,"WH",self.sigMorph,"sig")
+            ZHtemplate = mela2Dtemplate(templateSigName,D,CMS_zz4l_mass,self.channel,self.sqrts,"ZH",self.sigMorph,"sig")
+            ttHtemplate = mela2Dtemplate(templateSigName,D,CMS_zz4l_mass,self.channel,self.sqrts,"ttH",self.sigMorph,"sig")
+            
+            if(self.isAltSig):
+                
+                #only ggH because if we do hypothesis testing we sum up over the channels in any case
+                templateSigName = "{0}/Dsignal{2}_{1}.root".format(self.templateDir,self.appendName, self.appendHypType)
+                print 'Taking 2D template for ALT signal from ',templateSigName
 
-              ggHaltTemplate = mela2Dtemplate(templateSigName,D,CMS_zz4l_mass,self.channel,self.sqrts,"ggH{0}".format(self.appendHypType),self.sigMorph,"sig")
+                ggHaltTemplate = mela2Dtemplate(templateSigName,D,CMS_zz4l_mass,self.channel,self.sqrts,"ggH{0}".format(self.appendHypType),self.sigMorph,"sig")
 
         ## ------------------------ mekd parametrized double gaussian stuff ---------------
 
@@ -502,51 +509,67 @@ class datacardClass:
         
         # -------------------------- build 2D pdfs ------------------------------------------------
 
-        sig2d_ggH = ROOT.RooProdPdf("sig2d_ggH","sig2d_ggH",ROOT.RooArgSet(self.getVariable(sig_ggH_HM,sig_ggH,self.isHighMass)),ROOT.RooFit.Conditional(ROOT.RooArgSet(ggHtemplate.Pdf),ROOT.RooArgSet(D)))
-        sig2d_VBF = ROOT.RooProdPdf("sig2d_VBF","sig2d_VBF",ROOT.RooArgSet(self.getVariable(sig_VBF_HM,sig_VBF,self.isHighMass)),ROOT.RooFit.Conditional(ROOT.RooArgSet(VBFtemplate.Pdf),ROOT.RooArgSet(D)))
-        sig2d_WH = ROOT.RooProdPdf("sig2d_WH","sig2d_WH",ROOT.RooArgSet(self.getVariable(sig_WH_HM,sig_WH,self.isHighMass)),ROOT.RooFit.Conditional(ROOT.RooArgSet(WHtemplate.Pdf),ROOT.RooArgSet(D)))
-        sig2d_ZH = ROOT.RooProdPdf("sig2d_ZH","sig2d_ZH",ROOT.RooArgSet(self.getVariable(sig_ZH_HM,sig_ZH,self.isHighMass)),ROOT.RooFit.Conditional(ROOT.RooArgSet(ZHtemplate.Pdf),ROOT.RooArgSet(D)))
-        sig2d_ttH = ROOT.RooProdPdf("sig2d_ttH","sig2d_ttH",ROOT.RooArgSet(self.getVariable(sig_ttH_HM,sig_ttH,self.isHighMass)),ROOT.RooFit.Conditional(ROOT.RooArgSet(ttHtemplate.Pdf),ROOT.RooArgSet(D)))
-                
-        sigCB2d_ggH = ROOT.RooProdPdf("sigCB2d_ggH","sigCB2d_ggH",ROOT.RooArgSet(self.getVariable(sig_ggHErr,signalCB_ggH,self.bIncludingError)),ROOT.RooFit.Conditional(ROOT.RooArgSet(ggHtemplate.Pdf),ROOT.RooArgSet(D)))
-        sigCB2d_VBF = ROOT.RooProdPdf("sigCB2d_VBF","sigCB2d_VBF",ROOT.RooArgSet(self.getVariable(sig_VBFErr,signalCB_VBF,self.bIncludingError)),ROOT.RooFit.Conditional(ROOT.RooArgSet(VBFtemplate.Pdf),ROOT.RooArgSet(D)))
-        sigCB2d_WH = ROOT.RooProdPdf("sigCB2d_WH","sigCB2d_WH",ROOT.RooArgSet(self.getVariable(sig_WHErr,signalCB_WH,self.bIncludingError)),ROOT.RooFit.Conditional(ROOT.RooArgSet(WHtemplate.Pdf),ROOT.RooArgSet(D)))
-        sigCB2d_ZH = ROOT.RooProdPdf("sigCB2d_ZH","sigCB2d_ZH",ROOT.RooArgSet(self.getVariable(sig_ZHErr,signalCB_ZH,self.bIncludingError)),ROOT.RooFit.Conditional(ROOT.RooArgSet(ZHtemplate.Pdf),ROOT.RooArgSet(D)))
-        sigCB2d_ttH = ROOT.RooProdPdf("sigCB2d_ttH","sigCB2d_ttH",ROOT.RooArgSet(self.getVariable(sig_ttHErr,signalCB_ttH,self.bIncludingError)),ROOT.RooFit.Conditional(ROOT.RooArgSet(ttHtemplate.Pdf),ROOT.RooArgSet(D)))
-        
-        if(self.isAltSig):
-            sig2d_ggH_ALT = ROOT.RooProdPdf("sig2d_ggH{0}".format(self.appendHypType),"sig2d_ggH{0}".format(self.appendHypType),ROOT.RooArgSet(sig_ggH),ROOT.RooFit.Conditional(ROOT.RooArgSet(ggHaltTemplate.TemplateMorphPdf),ROOT.RooArgSet(D)))
-            sigCB2d_ggH_ALT = ROOT.RooProdPdf("sigCB2d_ggH{0}".format(self.appendHypType),"sigCB2d_ggH{0}".format(self.appendHypType),ROOT.RooArgSet(signalCB_ggH),ROOT.RooFit.Conditional(ROOT.RooArgSet(ggHaltTemplate.TemplateMorphPdf),ROOT.RooArgSet(D)))            
+        if (self.is2D == 1):
+            sig2d_ggH = ROOT.RooProdPdf("sig2d_ggH","sig2d_ggH",ROOT.RooArgSet(self.getVariable(sig_ggH_HM,sig_ggH,self.isHighMass)),ROOT.RooFit.Conditional(ROOT.RooArgSet(ggHtemplate.Pdf),ROOT.RooArgSet(D)))
+            sig2d_VBF = ROOT.RooProdPdf("sig2d_VBF","sig2d_VBF",ROOT.RooArgSet(self.getVariable(sig_VBF_HM,sig_VBF,self.isHighMass)),ROOT.RooFit.Conditional(ROOT.RooArgSet(VBFtemplate.Pdf),ROOT.RooArgSet(D)))
+            sig2d_WH = ROOT.RooProdPdf("sig2d_WH","sig2d_WH",ROOT.RooArgSet(self.getVariable(sig_WH_HM,sig_WH,self.isHighMass)),ROOT.RooFit.Conditional(ROOT.RooArgSet(WHtemplate.Pdf),ROOT.RooArgSet(D)))
+            sig2d_ZH = ROOT.RooProdPdf("sig2d_ZH","sig2d_ZH",ROOT.RooArgSet(self.getVariable(sig_ZH_HM,sig_ZH,self.isHighMass)),ROOT.RooFit.Conditional(ROOT.RooArgSet(ZHtemplate.Pdf),ROOT.RooArgSet(D)))
+            sig2d_ttH = ROOT.RooProdPdf("sig2d_ttH","sig2d_ttH",ROOT.RooArgSet(self.getVariable(sig_ttH_HM,sig_ttH,self.isHighMass)),ROOT.RooFit.Conditional(ROOT.RooArgSet(ttHtemplate.Pdf),ROOT.RooArgSet(D)))
+            
+            sigCB2d_ggH = ROOT.RooProdPdf("sigCB2d_ggH","sigCB2d_ggH",ROOT.RooArgSet(self.getVariable(sig_ggHErr,signalCB_ggH,self.bIncludingError)),ROOT.RooFit.Conditional(ROOT.RooArgSet(ggHtemplate.Pdf),ROOT.RooArgSet(D)))
+            sigCB2d_VBF = ROOT.RooProdPdf("sigCB2d_VBF","sigCB2d_VBF",ROOT.RooArgSet(self.getVariable(sig_VBFErr,signalCB_VBF,self.bIncludingError)),ROOT.RooFit.Conditional(ROOT.RooArgSet(VBFtemplate.Pdf),ROOT.RooArgSet(D)))
+            sigCB2d_WH = ROOT.RooProdPdf("sigCB2d_WH","sigCB2d_WH",ROOT.RooArgSet(self.getVariable(sig_WHErr,signalCB_WH,self.bIncludingError)),ROOT.RooFit.Conditional(ROOT.RooArgSet(WHtemplate.Pdf),ROOT.RooArgSet(D)))
+            sigCB2d_ZH = ROOT.RooProdPdf("sigCB2d_ZH","sigCB2d_ZH",ROOT.RooArgSet(self.getVariable(sig_ZHErr,signalCB_ZH,self.bIncludingError)),ROOT.RooFit.Conditional(ROOT.RooArgSet(ZHtemplate.Pdf),ROOT.RooArgSet(D)))
+            sigCB2d_ttH = ROOT.RooProdPdf("sigCB2d_ttH","sigCB2d_ttH",ROOT.RooArgSet(self.getVariable(sig_ttHErr,signalCB_ttH,self.bIncludingError)),ROOT.RooFit.Conditional(ROOT.RooArgSet(ttHtemplate.Pdf),ROOT.RooArgSet(D)))
+            
+            if(self.isAltSig):
+                sig2d_ggH_ALT = ROOT.RooProdPdf("sig2d_ggH{0}".format(self.appendHypType),"sig2d_ggH{0}".format(self.appendHypType),ROOT.RooArgSet(sig_ggH),ROOT.RooFit.Conditional(ROOT.RooArgSet(ggHaltTemplate.TemplateMorphPdf),ROOT.RooArgSet(D)))
+                sigCB2d_ggH_ALT = ROOT.RooProdPdf("sigCB2d_ggH{0}".format(self.appendHypType),"sigCB2d_ggH{0}".format(self.appendHypType),ROOT.RooArgSet(signalCB_ggH),ROOT.RooFit.Conditional(ROOT.RooArgSet(ggHaltTemplate.TemplateMorphPdf),ROOT.RooArgSet(D)))            
 
         ## --------------------------- superMELA 1D PDFS ------------------------- ##
 
-        superDiscVarName = "supermelaLD"
-        SD = ROOT.RooRealVar(superDiscVarName,superDiscVarName,0,1)
-    
-        templateSDSigName = "{0}/Dsignal_superMELA_{1}.root".format(self.templateDir ,self.appendName)
-        sigTempSDFile = ROOT.TFile(templateSDSigName)
-        sigTemplateSD = sigTempSDFile.Get("hSuperD_sig") 
-        
-        TemplateSDName = "sigTempSDDataHist_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)
-        sigTempSDDataHist = ROOT.RooDataHist(TemplateSDName,TemplateSDName,ROOT.RooArgList(SD),sigTemplateSD)
-        
-        TemplateSDName = "sigTemplateSDPdf_ggH_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)
-        sigTemplateSDPdf_ggH = ROOT.RooHistPdf(TemplateSDName,TemplateSDName,ROOT.RooArgSet(SD),sigTempSDDataHist)
-        
-        TemplateSDName = "sigTemplateSDPdf_VBF_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)
-        sigTemplateSDPdf_VBF = ROOT.RooHistPdf(TemplateSDName,TemplateSDName,RooArgSet(SD),sigTempSDDataHist)
-        
-        TemplateSDName = "sigTemplateSDPdf_WH_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)
-        sigTemplateSDPdf_WH = ROOT.RooHistPdf(TemplateSDName,TemplateSDName,ROOT.RooArgSet(SD),sigTempSDDataHist)
-        
-        TemplateSDName = "sigTemplateSDPdf_ZH_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)
-        sigTemplateSDPdf_ZH = ROOT.RooHistPdf(TemplateSDName,TemplateSDName,ROOT.RooArgSet(SD),sigTempSDDataHist)
-        
-        TemplateSDName = "sigTemplateSDPdf_ZH_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)
-        sigTemplateSDPdf_ttH = ROOT.RooHistPdf(TemplateSDName,TemplateSDName,ROOT.RooArgSet(SD),sigTempSDDataHist)
-        print sigTemplateSDPdf_ttH
+        if ( self.is2D == 2 ):
 
-        ##--------------##
+            superDiscVarName = "supermelaLD"
+            SD = ROOT.RooRealVar(superDiscVarName,superDiscVarName,0,1)
+            
+            templateSDSigName = "{0}/Dsignal_superMELA_{1}.root".format(self.templateDir ,self.appendName)
+            sigTempSDFile = ROOT.TFile(templateSDSigName)
+            sigTemplateSD = sigTempSDFile.Get("hSuperD_sig") 
+        
+            TemplateSDName = "sigTempSDDataHist_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)
+            sigTempSDDataHist = ROOT.RooDataHist(TemplateSDName,TemplateSDName,ROOT.RooArgList(SD),sigTemplateSD)
+            
+            TemplateSDName = "sigTemplateSDPdf_ggH_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)
+            sigTemplateSDPdf_ggH = ROOT.RooHistPdf(TemplateSDName,TemplateSDName,ROOT.RooArgSet(SD),sigTempSDDataHist)
+            
+            TemplateSDName = "sigTemplateSDPdf_VBF_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)
+            sigTemplateSDPdf_VBF = ROOT.RooHistPdf(TemplateSDName,TemplateSDName,RooArgSet(SD),sigTempSDDataHist)
+            
+            TemplateSDName = "sigTemplateSDPdf_WH_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)
+            sigTemplateSDPdf_WH = ROOT.RooHistPdf(TemplateSDName,TemplateSDName,ROOT.RooArgSet(SD),sigTempSDDataHist)
+            
+            TemplateSDName = "sigTemplateSDPdf_ZH_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)
+            sigTemplateSDPdf_ZH = ROOT.RooHistPdf(TemplateSDName,TemplateSDName,ROOT.RooArgSet(SD),sigTempSDDataHist)
+            
+            TemplateSDName = "sigTemplateSDPdf_ZH_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)
+            sigTemplateSDPdf_ttH = ROOT.RooHistPdf(TemplateSDName,TemplateSDName,ROOT.RooArgSet(SD),sigTempSDDataHist)
+            print sigTemplateSDPdf_ttH
+
+        ##----------------------- super MELA 2D PDF -------------------------------------##
+
+        if(self.is2D == 3):
+            
+            superDiscVarName = "CMS_zz4l_smd"
+            SD = ROOT.RooRealVar(superDiscVarName,superDiscVarName,0.0,1.0)
+            
+            templateSigName = "{0}/Dsignal_{1}.root".format(self.templateDir ,self.appendName)
+            ggHtemplate_SMD_2D = superMela2Dtemplate(templateSigName,D,SD,self.channel,self.sqrts,"ggH",True,"sig")
+            
+            if(self.isAltSig):
+                templateSigName = "{0}/Dsignal{2}_{1}.root".format(self.templateDir,self.appendName, self.appendHypType)
+                ggHaltTemplate_SMD_2D = superMela2Dtemplate(templateSigName,D,SD,self.channel,self.sqrts,"ggH{0}".format(self.appendHypType),True,"sig")
+
 
         ## -------------------------- BACKGROUND SHAPES ---------------------------------- ##
     
@@ -706,13 +729,15 @@ class datacardClass:
 	bkg_zjetsErr = ROOT.RooProdPdf("bkg_zjetsErr","bkg_zjetsErr", ROOT.RooArgSet(bkg_zjets), ROOT.RooFit.Conditional(ROOT.RooArgSet(pdfErrB), ROOT.RooArgSet(CMS_zz4l_massErr)));
 
       ## ----------------- 2D BACKGROUND SHAPES --------------- ##
+
+        if( self.is2D == 1):
         
-        templateBkgName = "{0}/Dbackground_qqZZ_{1}.root".format(self.templateDir ,self.appendName)
-        qqZZtemplate = mela2Dtemplate(templateBkgName,D,CMS_zz4l_mass,self.channel,self.sqrts,"qqzz",False,"bkg")
-        zjetsTemplate = mela2Dtemplate(templateBkgName,D,CMS_zz4l_mass,self.channel,self.sqrts,"zjets",self.bkgMorph,"bkg")
-        
-        templateggBkgName = "{0}/Dbackground_ggZZ_{1}.root".format(self.templateDir ,self.appendName)
-        ggZZtemplate = mela2Dtemplate(templateggBkgName,D,CMS_zz4l_mass,self.channel,self.sqrts,"ggzz",False,"bkg")
+            templateBkgName = "{0}/Dbackground_qqZZ_{1}.root".format(self.templateDir ,self.appendName)
+            qqZZtemplate = mela2Dtemplate(templateBkgName,D,CMS_zz4l_mass,self.channel,self.sqrts,"qqzz",False,"bkg")
+            zjetsTemplate = mela2Dtemplate(templateBkgName,D,CMS_zz4l_mass,self.channel,self.sqrts,"zjets",self.bkgMorph,"bkg")
+            
+            templateggBkgName = "{0}/Dbackground_ggZZ_{1}.root".format(self.templateDir ,self.appendName)
+            ggZZtemplate = mela2Dtemplate(templateggBkgName,D,CMS_zz4l_mass,self.channel,self.sqrts,"ggzz",False,"bkg")
 
         ## -------------- MEKD parametrized double gaussian stuff --------------------------
 
@@ -723,28 +748,42 @@ class datacardClass:
             zjetsTempalte= MEKDshape(self.theInputs,self.channel,self.sqrts,MEKD,CMS_zz4l_mass,False,"zjets")
                     
 	####  ----------------------- build 2D background shapes ---------------------------------
-        bkg2d_qqzz = ROOT.RooProdPdf("bkg2d_qqzz","bkg2d_qqzz",ROOT.RooArgSet(self.getVariable(bkg_qqzzErr,bkg_qqzz,self.bIncludingError)),ROOT.RooFit.Conditional(ROOT.RooArgSet(qqZZtemplate.Pdf),ROOT.RooArgSet(D)))
-        bkg2d_ggzz = ROOT.RooProdPdf("bkg2d_ggzz","bkg2d_ggzz",ROOT.RooArgSet(self.getVariable(bkg_ggzzErr,bkg_ggzz,self.bIncludingError)),ROOT.RooFit.Conditional(ROOT.RooArgSet(ggZZtemplate.Pdf),ROOT.RooArgSet(D)))
-        bkg2d_zjets = ROOT.RooProdPdf("bkg2d_zjets","bkg2d_zjets",ROOT.RooArgSet(self.getVariable(bkg_zjetsErr,bkg_zjets,self.bIncludingError)),ROOT.RooFit.Conditional(ROOT.RooArgSet(zjetsTemplate.Pdf),ROOT.RooArgSet(D)))
 
-        ## ----------------- SUPERMELA BACKGROUND SHAPES --------------- ##
-        
-        templateSDBkgName = "{0}/Dbackground_qqZZ_superMELA_{1}.root".format(self.templateDir ,self.appendName) 
-        bkgTempSDFile = ROOT.TFile(templateSDBkgName)
-        bkgTemplateSD = bkgTempSDFile.Get("hSuperD_bkg") 
-        
-        TemplateSDName = "bkgTempSDDataHist_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)    
-        bkgTempSDDataHist = ROOT.RooDataHist(TemplateSDName,TemplateSDName,ROOT.RooArgList(SD),bkgTemplateSD)
-        
-        TemplateSDName = "bkgTemplateSDPdf_qqzz_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)    
-        bkgTemplateSDPdf_qqzz = ROOT.RooHistPdf(TemplateSDName,TemplateSDName,ROOT.RooArgSet(SD),bkgTempSDDataHist)
+        if( self.is2D == 1 ):
+            bkg2d_qqzz = ROOT.RooProdPdf("bkg2d_qqzz","bkg2d_qqzz",ROOT.RooArgSet(self.getVariable(bkg_qqzzErr,bkg_qqzz,self.bIncludingError)),ROOT.RooFit.Conditional(ROOT.RooArgSet(qqZZtemplate.Pdf),ROOT.RooArgSet(D)))
+            bkg2d_ggzz = ROOT.RooProdPdf("bkg2d_ggzz","bkg2d_ggzz",ROOT.RooArgSet(self.getVariable(bkg_ggzzErr,bkg_ggzz,self.bIncludingError)),ROOT.RooFit.Conditional(ROOT.RooArgSet(ggZZtemplate.Pdf),ROOT.RooArgSet(D)))
+            bkg2d_zjets = ROOT.RooProdPdf("bkg2d_zjets","bkg2d_zjets",ROOT.RooArgSet(self.getVariable(bkg_zjetsErr,bkg_zjets,self.bIncludingError)),ROOT.RooFit.Conditional(ROOT.RooArgSet(zjetsTemplate.Pdf),ROOT.RooArgSet(D)))
+            
+        ## ----------------- SUPERMELA BACKGROUND SHAPES (1D) --------------- ##
 
-        TemplateSDName = "bkgTemplateSDPdf_ggzz_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)    
-        bkgTemplateSDPdf_ggzz = ROOT.RooHistPdf(TemplateSDName,TemplateSDName,ROOT.RooArgSet(SD),bkgTempSDDataHist)
-        TemplateSDName = "bkgTemplateSDPdf_zjets_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)    
-        bkgTemplateSDPdf_zjets = ROOT.RooHistPdf(TemplateSDName,TemplateSDName,ROOT.RooArgSet(SD),bkgTempSDDataHist)
-        
+        if ( self.is2D == 2 ):
+            
+            templateSDBkgName = "{0}/Dbackground_qqZZ_superMELA_{1}.root".format(self.templateDir ,self.appendName) 
+            bkgTempSDFile = ROOT.TFile(templateSDBkgName)
+            bkgTemplateSD = bkgTempSDFile.Get("hSuperD_bkg") 
+            
+            TemplateSDName = "bkgTempSDDataHist_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)    
+            bkgTempSDDataHist = ROOT.RooDataHist(TemplateSDName,TemplateSDName,ROOT.RooArgList(SD),bkgTemplateSD)
+            
+            TemplateSDName = "bkgTemplateSDPdf_qqzz_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)    
+            bkgTemplateSDPdf_qqzz = ROOT.RooHistPdf(TemplateSDName,TemplateSDName,ROOT.RooArgSet(SD),bkgTempSDDataHist)
+            
+            TemplateSDName = "bkgTemplateSDPdf_ggzz_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)    
+            bkgTemplateSDPdf_ggzz = ROOT.RooHistPdf(TemplateSDName,TemplateSDName,ROOT.RooArgSet(SD),bkgTempSDDataHist)
+            TemplateSDName = "bkgTemplateSDPdf_zjets_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)    
+            bkgTemplateSDPdf_zjets = ROOT.RooHistPdf(TemplateSDName,TemplateSDName,ROOT.RooArgSet(SD),bkgTempSDDataHist)
+            
+        ## ----------------- SUPERMELA BACKGROUND SHAPES (2D) --------------- ##
 
+        if( self.is2D == 3):
+            
+            templateBkgName = "{0}/Dbackground_qqZZ_{1}.root".format(self.templateDir ,self.appendName)
+            qqZZtemplate_SMD_2D = superMela2Dtemplate(templateBkgName,SD,D,self.channel,self.sqrts,"qqZZ",False,"bkg_qqZZ")
+            templateggBkgName = "{0}/Dbackground_ggZZ_{1}.root".format(self.templateDir ,self.appendName)
+            ggZZtemplate_SMD_2D = superMela2Dtemplate(templateggBkgName,SD,D,self.channel,self.sqrts,"ggZZ",False,"bkg_ggZZ")
+            templateBkgName = "{0}/Dbackground_ZJetsCR_AllChans.root".format(self.templateDir)
+            zjetsTemplate_SMD_2D = superMela2Dtemplate(templateBkgName,SD,D,self.channel,self.sqrts,"zjets",False,"bkg_zjets")
+        
         ## ----------------------- PLOTS FOR SANITY CHECKS -------------------------- ##
         
         czz = ROOT.TCanvas( "czz", "czz", 750, 700 )
@@ -1011,7 +1050,9 @@ class datacardClass:
 
         if (self.is2D == 2):
             data_obs = ROOT.RooDataSet(datasetName,datasetName,data_obs_tree,ROOT.RooArgSet(SD))
-            
+
+        if (self.is2D == 3):
+            data_obs = ROOT.RooDataSet(datasetName,datasetName,data_obs_tree,ROOT.RooArgSet(SD,D))
         ## --------------------------- WORKSPACE -------------------------- ##
 
         endsInP5 = False
@@ -1118,6 +1159,14 @@ class datacardClass:
                 getattr(w,'import')(sigTemplateSDPdf_ZH, ROOT.RooFit.RecycleConflictNodes())
                 getattr(w,'import')(sigTemplateSDPdf_ttH, ROOT.RooFit.RecycleConflictNodes())
 
+            if (self.is2D == 3):
+                ggHtemplate_SMD_2D.Pdf.SetNameTitle("ggH","ggH")
+                getattr(w,'import')(ggHtemplate_SMD_2D.Pdf, ROOT.RooFit.RecycleConflictNodes())
+                if(self.isAltSig):
+                    ggHaltTemplate_SMD_2D.Pdf.SetNameTitle("ggH{0}".format(self.appendHypType),"ggH{0}".format(self.appendHypType))
+                    getattr(w,'import')(ggHaltTemplate_SMD_2D.Pdf, ROOT.RooFit.RecycleConflictNodes())
+
+
         else:
                 
             if (self.is2D == 0):
@@ -1178,6 +1227,13 @@ class datacardClass:
                 getattr(w,'import')(sigTemplateSDPdf_ZH, ROOT.RooFit.RecycleConflictNodes())
                 getattr(w,'import')(sigTemplateSDPdf_ttH, ROOT.RooFit.RecycleConflictNodes())
 
+            if (self.is2D == 3):
+                ggHtemplate_SMD_2D.Pdf.SetNameTitle("ggH","ggH")
+                getattr(w,'import')(ggHtemplate_SMD_2D.Pdf, ROOT.RooFit.RecycleConflictNodes())
+                if(self.isAltSig):
+                    ggHaltTemplate_SMD_2D.Pdf.SetNameTitle("ggH{0}".format(self.appendHypType),"ggH{0}".format(self.appendHypType))
+                    getattr(w,'import')(ggHaltTemplate_SMD_2D.Pdf, ROOT.RooFit.RecycleConflictNodes())                
+
  
         if (self.is2D == 0):
 		if not self.bIncludingError:
@@ -1208,6 +1264,15 @@ class datacardClass:
             getattr(w,'import')(bkgTemplateSDPdf_qqzz, ROOT.RooFit.RecycleConflictNodes())
             getattr(w,'import')(bkgTemplateSDPdf_zjets, ROOT.RooFit.RecycleConflictNodes())
 
+
+        if (self.is2D == 3):
+            qqZZtemplate_SMD_2D.Pdf.SetNameTitle("bkg2d_qqzz","bkg2d_qqzz")
+            ggZZtemplate_SMD_2D.Pdf.SetNameTitle("bkg2d_ggzz","bkg2d_ggzz")
+            zjetsTemplate_SMD_2D.Pdf.SetNameTitle("bkg2d_zjets","bkg2d_zjets")
+            getattr(w,'import')(qqZZtemplate_SMD_2D.Pdf, ROOT.RooFit.RecycleConflictNodes())
+            getattr(w,'import')(ggZZtemplate_SMD_2D.Pdf, ROOT.RooFit.RecycleConflictNodes())
+            getattr(w,'import')(zjetsTemplate_SMD_2D.Pdf, ROOT.RooFit.RecycleConflictNodes())
+            
         
         getattr(w,'import')(rfvSigRate_ggH, ROOT.RooFit.RecycleConflictNodes())
         getattr(w,'import')(rfvSigRate_VBF, ROOT.RooFit.RecycleConflictNodes())
@@ -1260,6 +1325,9 @@ class datacardClass:
         fo.close()
 
         if(self.isAltSig):
+            
+            print "--------------------- writing datacard with alt sig ---------------------"
+            
             if (endsInP5): name_Shape = "{0}/HCG/{1:.1f}/hzz4l_{2}S_{3:.0f}TeV{4}.txt".format(self.outputDir,self.mH,self.appendName,self.sqrts,self.appendHypType)
             else: name_Shape = "{0}/HCG/{1:.0f}/hzz4l_{2}S_{3:.0f}TeV{4}.txt".format(self.outputDir,self.mH,self.appendName,self.sqrts,self.appendHypType)
             fo = open( name_Shape, "wb")
@@ -1309,7 +1377,7 @@ class datacardClass:
         file.write("## mass window [{0},{1}] \n".format(self.low_M,self.high_M))
         file.write("bin ")        
 
-        channelList=['ggH','qqH','WH','ZH','ttH','qqZZ','ggZZ','zjets','ttbar','zbb']
+        channelList=['ggH','ggH','qqH','WH','ZH','ttH','qqZZ','ggZZ','zjets','ttbar','zbb']
 
         channelName1D=['ggH','qqH','WH','ZH','ttH','bkg_qqzz','bkg_ggzz','bkg_zjets','bkg_ttbar','bkg_zbb']
         channelName2D=['ggH','qqH','WH','ZH','ttH','bkg2d_qqzz','bkg2d_ggzz','bkg2d_zjets','bkg2d_ttbar','bkg2d_zbb']
@@ -1317,9 +1385,9 @@ class datacardClass:
 #            channelList=['ggH{0}'.format(AltLabel),'qqZZ','ggZZ','zjets','ttbar','zbb']
 
         if theInputs["all"]:
-            channelList=['ggH','qqZZ','ggZZ','zjets','ttbar','zbb']
+            channelList=['ggH','ggH','qqZZ','ggZZ','zjets','ttbar','zbb']
             if isAltCard :
-                channelName2D=['ggH{0}'.format(AltLabel),'bkg2d_qqzz','bkg2d_ggzz','bkg2d_zjets','bkg2d_ttbar','bkg2d_zbb']
+                channelName2D=['ggH','ggH{0}'.format(AltLabel),'bkg2d_qqzz','bkg2d_ggzz','bkg2d_zjets','bkg2d_ttbar','bkg2d_zbb']
             else:
                 channelName2D=['ggH','bkg2d_qqzz','bkg2d_ggzz','bkg2d_zjets','bkg2d_ttbar','bkg2d_zbb']
           
@@ -1335,22 +1403,26 @@ class datacardClass:
         file.write("process ")
 
         i=0
-        if not (self.is2D == 1):
+        if not (self.is2D == 1 or self.is2D == 3):
             for chan in channelList:
                 if theInputs[chan]:
                     file.write("{0} ".format(channelName1D[i]))
                 i+=1
         else:
             for chan in channelList:
-#                print 'checking if ',chan,' is in the list of to-do'
+                print 'checking if ',chan,' is in the list of to-do'
                 if theInputs[chan]:
+                    print "---------------"
+                    print chan, theInputs[chan], channelName2D[i]
                     file.write("{0} ".format(channelName2D[i]))
-#                    print 'writing in card index=',i,'  chan=',chan
+                    print 'writing in card index=',i,'  chan=',chan
                     i+=1
                 else:
                     if chan.startswith("ggH") and theInputs["all"] :
+                        print "---------------"
+                        print chan, theInputs[chan], channelName2D[i]
                         file.write("{0} ".format(channelName2D[i]))
-#                        print 'writing in card TOTAL SUM, index=',i,'  chan=',chan,'  ',channelName2D[i]
+                        print 'writing in card TOTAL SUM, index=',i,'  chan=',chan,'  ',channelName2D[i]
                         i+=1
         
         file.write("\n")
@@ -1368,7 +1440,7 @@ class datacardClass:
             
         file.write("rate ")
         for chan in channelList:
-            if theInputs[chan] or (chan.startswith("ggH") and theInputs["all"]):
+            if theInputs[chan] or (chan.startswith("ggH") and theInputs["all"]) or (chan.startswith("ggH{0}".format(AltLabel)) and theInputs["all"]):
                 file.write("{0:.4f} ".format(theRates[chan]))
         file.write("\n")
         file.write("------------\n")
@@ -1384,7 +1456,7 @@ class datacardClass:
         if inputs['WH']:  counter+=1
         if inputs['ZH']:  counter+=1
         if inputs['ttH']: counter+=1
-        if inputs['all']: counter+=1
+        if inputs['all']: counter+=2
         
         return counter
 

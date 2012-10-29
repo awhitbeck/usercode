@@ -135,7 +135,7 @@ class systematicsClass:
         print "~~~~~~~~~~~~~~~~~"
         channelList=['ggH','qqH','WH','ZH','ttH','qqZZ','ggZZ','zjets','ttbar','zbb']
         if theInputs["all"]:
-            channelList=['ggH','qqZZ','ggZZ','zjets','ttbar','zbb']
+            channelList=['ggH','ggH','qqZZ','ggZZ','zjets','ttbar','zbb']
         
         for chan in channelList:
             if theInputs[chan] or (chan.startswith("ggH") and theInputs["all"]):
@@ -545,11 +545,17 @@ class systematicsClass:
         self.Write_Systematics_Line(systLine,theFile,theInputs)
 
     def Write_CMS_zz4l_bkgMELA(self,theFile,theInputs):
-        theFile.write("CMS_zz4l_bkgMELA param 0  1  [-3,3]\n")
+
+        if theInputs['is2D'] == 1:
+            theFile.write("CMS_zz4l_bkgMELA param 0  1  [-3,3]\n")
+        if theInputs['is2D'] == 3:
+            theFile.write("CMS_zz4l_smd_zjets_bkg_{0:.0f} param 0  1  [-3,3]\n".format(self.channel))
 
     def Write_CMS_zz4l_sigMELA(self,theFile,theInputs):
-        theFile.write("CMS_zz4l_sigMELA param 0  1  [-3,3]\n")
-
+        if theInputs['is2D'] == 1:
+            theFile.write("CMS_zz4l_sigMELA param 0  1  [-3,3]\n")
+        if theInputs['is2D'] == 3:
+            theFile.write("CMS_zz4l_smd_leptScale_sig_{0:.0f} param 0  1  [-3,3]\n".format(self.channel))
     
     def WriteSystematics(self,theFile,theInputs):
 

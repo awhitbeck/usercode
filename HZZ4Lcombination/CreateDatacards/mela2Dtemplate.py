@@ -34,6 +34,7 @@ class mela2Dtemplate:
 
     def __init__(self,inputFileName,discVar,m4lVar,channel,sqrts,tag,morph,morphTag):
 
+        self.inputFileName = inputFileName
         self.TempFile = ROOT.TFile(inputFileName)
         self.discVar  = discVar 
         self.m4lVar   = m4lVar  
@@ -53,6 +54,17 @@ class mela2Dtemplate:
         self.Template_Up   = self.TempFile.Get("h_mzzD_up")
         self.Template_Down = self.TempFile.Get("h_mzzD_dn")
 
+        if (self.Template == None):
+            print "mela2Dtemplate::loadTemplate - ERROR"
+            print self.inputFileName, "h_mzzD"
+
+        if (self.Template_Up == None):
+            print "mela2Dtemplate::loadTemplate - ERROR"
+            print self.inputFileName, "h_mzzD_dn"
+        if (self.Template_Down == None):
+            print "mela2Dtemplate::loadTemplate - ERROR"
+            print self.inputFileName, "h_mzzD_up"
+            
     def initRooDataHist(self):
     
         TemplateName = "TempDataHist_{2}_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts,self.tag)
@@ -61,7 +73,7 @@ class mela2Dtemplate:
         self.TempDataHist_Up = ROOT.RooDataHist(TemplateName,TemplateName,ROOT.RooArgList(self.m4lVar,self.discVar),self.Template_Up)
         TemplateName = "TempDataHist_Down_{2}_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts,self.tag)
         self.TempDataHist_Down = ROOT.RooDataHist(TemplateName,TemplateName,ROOT.RooArgList(self.m4lVar,self.discVar),self.Template_Down)
-        
+
     def initRooHistPdf(self):
         
         TemplateName = "TemplatePdf_{2}_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts,self.tag)

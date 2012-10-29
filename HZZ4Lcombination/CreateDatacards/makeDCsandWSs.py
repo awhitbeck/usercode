@@ -32,8 +32,8 @@ def parseOptions():
     global opt, args
     (opt, args) = parser.parse_args()
 
-    if (opt.is2D != 0 and opt.is2D != 1):
-        print 'The input '+opt.is2D+' is unkown for is2D.  Please choose 0 or 1. Exiting...'
+    if (opt.is2D != 0 and opt.is2D != 1 and opt.is2D !=2 and opt.is2D !=3 ):
+        print 'The input '+opt.is2D+' is unkown for is2D.  Please choose 0,1,2,3. Exiting...'
         sys.exit()
 
     if (opt.appendName == ''):
