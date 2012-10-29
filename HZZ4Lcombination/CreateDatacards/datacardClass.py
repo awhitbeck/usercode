@@ -524,8 +524,8 @@ class datacardClass:
             sigCB2d_ttH = ROOT.RooProdPdf("sigCB2d_ttH","sigCB2d_ttH",ROOT.RooArgSet(self.getVariable(sig_ttHErr,signalCB_ttH,self.bIncludingError)),ROOT.RooFit.Conditional(ROOT.RooArgSet(ttHtemplate.Pdf),ROOT.RooArgSet(D)))
             
             if(self.isAltSig):
-                sig2d_ggH_ALT = ROOT.RooProdPdf("sig2d_ggH{0}".format(self.appendHypType),"sig2d_ggH{0}".format(self.appendHypType),ROOT.RooArgSet(sig_ggH),ROOT.RooFit.Conditional(ROOT.RooArgSet(ggHaltTemplate.TemplateMorphPdf),ROOT.RooArgSet(D)))
-                sigCB2d_ggH_ALT = ROOT.RooProdPdf("sigCB2d_ggH{0}".format(self.appendHypType),"sigCB2d_ggH{0}".format(self.appendHypType),ROOT.RooArgSet(signalCB_ggH),ROOT.RooFit.Conditional(ROOT.RooArgSet(ggHaltTemplate.TemplateMorphPdf),ROOT.RooArgSet(D)))            
+                sig2d_ggH_ALT = ROOT.RooProdPdf("sig2d_ggH{0}".format(self.appendHypType),"sig2d_ggH{0}".format(self.appendHypType),ROOT.RooArgSet(sig_ggH),ROOT.RooFit.Conditional(ROOT.RooArgSet(ggHaltTemplate.Pdf),ROOT.RooArgSet(D)))
+                sigCB2d_ggH_ALT = ROOT.RooProdPdf("sigCB2d_ggH{0}".format(self.appendHypType),"sigCB2d_ggH{0}".format(self.appendHypType),ROOT.RooArgSet(signalCB_ggH),ROOT.RooFit.Conditional(ROOT.RooArgSet(ggHaltTemplate.Pdf),ROOT.RooArgSet(D)))            
 
         ## --------------------------- superMELA 1D PDFS ------------------------- ##
 
@@ -779,11 +779,11 @@ class datacardClass:
         if( self.is2D == 3):
             
             templateBkgName = "{0}/Dbackground_qqZZ_{1}.root".format(self.templateDir ,self.appendName)
-            qqZZtemplate_SMD_2D = superMela2Dtemplate(templateBkgName,SD,D,self.channel,self.sqrts,"qqZZ",False,"bkg_qqZZ")
+            qqZZtemplate_SMD_2D = superMela2Dtemplate(templateBkgName,D,SD,self.channel,self.sqrts,"qqZZ",False,"bkg_qqZZ")
             templateggBkgName = "{0}/Dbackground_ggZZ_{1}.root".format(self.templateDir ,self.appendName)
-            ggZZtemplate_SMD_2D = superMela2Dtemplate(templateggBkgName,SD,D,self.channel,self.sqrts,"ggZZ",False,"bkg_ggZZ")
+            ggZZtemplate_SMD_2D = superMela2Dtemplate(templateggBkgName,D,SD,self.channel,self.sqrts,"ggZZ",False,"bkg_ggZZ")
             templatezjetsBkgName = "{0}/Dbackground_ZJetsCR_AllChans.root".format(self.templateDir)
-            zjetsTemplate_SMD_2D = superMela2Dtemplate_zjets(templatezjetsBkgName,templateBkgName,SD,D,self.channel,self.sqrts,"zjets",True,"bkg_zjets")
+            zjetsTemplate_SMD_2D = superMela2Dtemplate_zjets(templatezjetsBkgName,templateBkgName,D,SD,self.channel,self.sqrts,"zjets",True,"bkg_zjets")
         
         ## ----------------------- PLOTS FOR SANITY CHECKS -------------------------- ##
         
@@ -1053,7 +1053,7 @@ class datacardClass:
             data_obs = ROOT.RooDataSet(datasetName,datasetName,data_obs_tree,ROOT.RooArgSet(SD))
 
         if (self.is2D == 3):
-            data_obs = ROOT.RooDataSet(datasetName,datasetName,data_obs_tree,ROOT.RooArgSet(SD,D))
+            data_obs = ROOT.RooDataSet(datasetName,datasetName,data_obs_tree,ROOT.RooArgSet(D,SD))
         ## --------------------------- WORKSPACE -------------------------- ##
 
         endsInP5 = False
@@ -1378,7 +1378,7 @@ class datacardClass:
         file.write("## mass window [{0},{1}] \n".format(self.low_M,self.high_M))
         file.write("bin ")        
 
-        channelList=['ggH','ggH','qqH','WH','ZH','ttH','qqZZ','ggZZ','zjets','ttbar','zbb']
+        channelList=['ggH','qqH','WH','ZH','ttH','qqZZ','ggZZ','zjets','ttbar','zbb']
 
         channelName1D=['ggH','qqH','WH','ZH','ttH','bkg_qqzz','bkg_ggzz','bkg_zjets','bkg_ttbar','bkg_zbb']
         channelName2D=['ggH','qqH','WH','ZH','ttH','bkg2d_qqzz','bkg2d_ggzz','bkg2d_zjets','bkg2d_ttbar','bkg2d_zbb']
