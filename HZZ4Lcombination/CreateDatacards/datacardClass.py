@@ -11,6 +11,7 @@ from systematicsClass import *
 from inputReader import *
 from mela2Dtemplate import *
 from superMela2Dtemplate import *
+from superMela2Dtemplate_zjets import *
 
 ## ------------------------------------
 ##  card and workspace class
@@ -781,8 +782,8 @@ class datacardClass:
             qqZZtemplate_SMD_2D = superMela2Dtemplate(templateBkgName,SD,D,self.channel,self.sqrts,"qqZZ",False,"bkg_qqZZ")
             templateggBkgName = "{0}/Dbackground_ggZZ_{1}.root".format(self.templateDir ,self.appendName)
             ggZZtemplate_SMD_2D = superMela2Dtemplate(templateggBkgName,SD,D,self.channel,self.sqrts,"ggZZ",False,"bkg_ggZZ")
-            templateBkgName = "{0}/Dbackground_ZJetsCR_AllChans.root".format(self.templateDir)
-            zjetsTemplate_SMD_2D = superMela2Dtemplate(templateBkgName,SD,D,self.channel,self.sqrts,"zjets",False,"bkg_zjets")
+            templatezjetsBkgName = "{0}/Dbackground_ZJetsCR_AllChans.root".format(self.templateDir)
+            zjetsTemplate_SMD_2D = superMela2Dtemplate_zjets(templatezjetsBkgName,templateBkgName,SD,D,self.channel,self.sqrts,"zjets",True,"bkg_zjets")
         
         ## ----------------------- PLOTS FOR SANITY CHECKS -------------------------- ##
         
