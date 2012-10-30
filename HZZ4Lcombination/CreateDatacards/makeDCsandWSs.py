@@ -26,6 +26,7 @@ def parseOptions():
     parser.add_option('-t', '--templateDir', type='string', dest='templateDir', default="templates2D" ,help='directory with 2D template histos')
     parser.add_option('-e', '--massError',   dest='massError',       type='int',    default=0,     help='massError (default:0)')
     parser.add_option('-u', '--mekd',   dest='mekd',       type='int',    default=0,     help='mekd double gaussian inputs (default:0)')
+    parser.add_option('-r', '--hackRange', action='store_true', dest='hackRange', default=False, help='use mH+/-5 GeV for m4l range if true (default:False)')
 
     
     # store options and arguments as global variables
@@ -92,15 +93,17 @@ def creationLoop(directory):
     myReader4e = inputReader(opt.inputDir+"/inputs_4e.txt")
     myReader4e.readInputs()
     theInputs4e = myReader4e.getInputs()
+    theInputs4e['hackRange']=opt.hackRange
 
     myReader4mu = inputReader(opt.inputDir+"/inputs_4mu.txt")
     myReader4mu.readInputs()
     theInputs4mu = myReader4mu.getInputs()
-
+    theInputs4mu['hackRange']=opt.hackRange
+    
     myReader2e2mu = inputReader(opt.inputDir+"/inputs_2e2mu.txt")
     myReader2e2mu.readInputs()
     theInputs2e2mu = myReader2e2mu.getInputs()
-
+    theInputs2e2mu['hackRange']=opt.hackRange
     
     a=0
     while (a < len(startMass) ):

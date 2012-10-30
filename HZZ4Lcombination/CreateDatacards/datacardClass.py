@@ -807,8 +807,16 @@ class datacardClass:
         
         ## ----------------------- SIGNAL RATES ----------------------- ##
         
+        if theInputs['hackRange']:
+            self.low_M=self.mH-5.
+            # ensure the boundry corresponds to template bin edge
+            self.low_M= self.low_M-self.low_M%2.0 
+            self.high_M=self.mH+6.
+            # ensure the boundry corresponds to template bin edge
+            self.high_M= self.high_M-self.high_M%2.0+2.0 
+
         CMS_zz4l_mass.setRange("shape",self.low_M,self.high_M)
-        
+            
         fr_low_M = self.low_M
         fr_high_M = self.high_M        
         if (self.mH >= 450): 
