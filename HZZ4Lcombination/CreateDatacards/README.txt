@@ -63,20 +63,19 @@ doHypTest True
 #####################################
 ## this can be done automatically by:
 #####################################
+sed -i 's|systematic CMS_hzz4l_Zjets True|systematic CMS_hzz4l_Zjets False|' SM_inputs_*TeV/inputs_*.txt    
+sed -i 's|systematic CMS_zz4l_bkgMELA True|systematic CMS_zz4l_bkgMELA False|' SM_inputs_*TeV/inputs_*.txt    
+sed -i 's|systematic CMS_zz4l_sigMELA True|systematic CMS_zz4l_sigMELA False|' SM_inputs_*TeV/inputs_*.txt    
+sed -i 's|systematic CMS_zz4l_mean True|systematic CMS_zz4l_mean False|' SM_inputs_*TeV/inputs_*.txt    
+sed -i 's|systematic CMS_zz4l_sigma True|systematic CMS_zz4l_sigma False|' SM_inputs_*TeV/inputs_*.txt    
+sed -i 's|systematic CMS_zz4l_mean True|systematic CMS_zz4l_mean False|' SM_inputs_*TeV/inputs_*.txt    
+sed -i 's|systematic CMS_zz4l_sigma True|systematic CMS_zz4l_sigma False|' SM_inputs_*TeV/inputs_*.txt    
+sed -i 's|systematic CMS_zz4l_n True|systematic CMS_zz4l_n False|' SM_inputs_*TeV/inputs_*.txt    
+sed -i 's|systematic CMS_zz4l_gamma True|systematic CMS_zz4l_gamma False|' SM_inputs_*TeV/inputs_*.txt    
 
-sed -i 's|ggH qqH WH ZH ttH|all|' SM_inputs_8TeV/inputs_4mu.txt
-sed -i 's|ggH qqH WH ZH ttH|all|' SM_inputs_8TeV/inputs_4e.txt
-sed -i 's|ggH qqH WH ZH ttH|all|' SM_inputs_8TeV/inputs_2e2mu.txt
-sed -i 's|ggH qqH WH ZH ttH|all|' SM_inputs_7TeV/inputs_4mu.txt
-sed -i 's|ggH qqH WH ZH ttH|all|' SM_inputs_7TeV/inputs_4e.txt
-sed -i 's|ggH qqH WH ZH ttH|all|' SM_inputs_7TeV/inputs_2e2mu.txt
+sed -i 's|ggH qqH WH ZH ttH|all|' SM_inputs_*TeV/inputs_*.txt
+sed -i 's|doHypTest False|doHypTest True|' SM_inputs_*TeV/inputs_*.txt
 
-sed -i 's|doHypTest False|doHypTest True|' SM_inputs_8TeV/inputs_4mu.txt
-sed -i 's|doHypTest False|doHypTest True|' SM_inputs_8TeV/inputs_4e.txt
-sed -i 's|doHypTest False|doHypTest True|' SM_inputs_8TeV/inputs_2e2mu.txt
-sed -i 's|doHypTest False|doHypTest True|' SM_inputs_7TeV/inputs_4mu.txt
-sed -i 's|doHypTest False|doHypTest True|' SM_inputs_7TeV/inputs_4e.txt
-sed -i 's|doHypTest False|doHypTest True|' SM_inputs_7TeV/inputs_2e2mu.txt
 
 ############################
 ## generate cards
