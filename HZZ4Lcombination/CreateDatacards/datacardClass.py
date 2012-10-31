@@ -475,7 +475,7 @@ class datacardClass:
 
         ## --------------------------- MELA 2D templates ------------------------- ##
 
-        discVarName = "melaLD"
+        discVarName = "CMS_zz4l_KD"
         D = ROOT.RooRealVar(discVarName,discVarName,0,1)
             
         if (self.is2D == 1):
@@ -1061,7 +1061,8 @@ class datacardClass:
             data_obs = ROOT.RooDataSet(datasetName,datasetName,data_obs_tree,ROOT.RooArgSet(SD))
 
         if (self.is2D == 3):
-            data_obs = ROOT.RooDataSet(datasetName,datasetName,data_obs_tree,ROOT.RooArgSet(D,SD))
+            data_obs = ROOT.RooDataSet(datasetName,datasetName,data_obs_tree,ROOT.RooArgSet(SD,D,CMS_zz4l_mass),"CMS_zz4l_mass>{0}&&CMS_zz4l_mass<{1}".format(self.low_M,self.high_M))
+            data_obs = data_obs.reduce(RooArgSet(SD,D))
         ## --------------------------- WORKSPACE -------------------------- ##
 
         endsInP5 = False
@@ -1169,8 +1170,25 @@ class datacardClass:
                 getattr(w,'import')(sigTemplateSDPdf_ttH, ROOT.RooFit.RecycleConflictNodes())
 
             if (self.is2D == 3):
-                ggHtemplate_SMD_2D.Pdf.SetNameTitle("ggH","ggH")
-                getattr(w,'import')(ggHtemplate_SMD_2D.Pdf, ROOT.RooFit.RecycleConflictNodes())
+                if theInputs['ggH'] or theInputs['all']:
+                    ggHtemplate_SMD_2D.Pdf.SetNameTitle("ggH","ggH")
+                    getattr(w,'import')(ggHtemplate_SMD_2D.Pdf, ROOT.RooFit.RecycleConflictNodes())
+                if theInputs['qqH']:
+                    VBFtemplate_SMD_2D = ggHtemplate_SMD_2D
+                    VBFtemplate_SMD_2D.Pdf.SetNameTitle("qqH","qqH")
+                    getattr(w,'import')(VBFtemplate_SMD_2D.Pdf, ROOT.RooFit.RecycleConflictNodes())
+                if theInputs['WH']:
+                    WHtemplate_SMD_2D = ggHtemplate_SMD_2D
+                    WHtemplate_SMD_2D.Pdf.SetNameTitle("WH","WH")
+                    getattr(w,'import')(WHtemplate_SMD_2D.Pdf, ROOT.RooFit.RecycleConflictNodes())
+                if theInputs['ZH']:
+                    ZHtemplate_SMD_2D = ggHtemplate_SMD_2D
+                    ZHtemplate_SMD_2D.Pdf.SetNameTitle("ZH","ZH")
+                    getattr(w,'import')(ZHtemplate_SMD_2D.Pdf, ROOT.RooFit.RecycleConflictNodes())
+                if theInputs['ttH']:
+                    ttHtemplate_SMD_2D = ggHtemplate_SMD_2D
+                    ttHtemplate_SMD_2D.Pdf.SetNameTitle("ttH","ttH")
+                    getattr(w,'import')(ttHtemplate_SMD_2D.Pdf, ROOT.RooFit.RecycleConflictNodes())
                 if(self.isAltSig):
                     ggHaltTemplate_SMD_2D.Pdf.SetNameTitle("ggH{0}".format(self.appendHypType),"ggH{0}".format(self.appendHypType))
                     getattr(w,'import')(ggHaltTemplate_SMD_2D.Pdf, ROOT.RooFit.RecycleConflictNodes())

@@ -56,27 +56,27 @@ class superMela2Dtemplate_zjets:
         
     def loadTemplates(self):
 
-        self.Template      = self.TempFile_zjets.Get("h_superDpsD")
+        self.Template      = self.TempFile_qqZZ.Get("h_superDpsD")
 
         if (self.morph):
-            self.Template_Up   = self.TempFile_qqZZ.Get("h_superDpsD")
-            self.Template_Down = self.TempFile_zjets.Get("h_superDpsD")
+            self.Template_Up   = self.TempFile_zjets.Get("h_superDpsD")
+            self.Template_Down = self.TempFile_qqZZ.Get("h_superDpsD")
             
         # Catch if there was an error getting TH2
 
         if ( self.Template == None):
             print "superMELA2Dtemplate::loadTemplates - ERROR"
-            print self.inputFileName_zjets, "h_superDpsD"
+            print self.inputFileName_qqZZ, "h_superDpsD"
 
         if ( self.morph ):
             
             if ( self.Template_Up == None ):
                 print "superMELA2Dtemplate::loadTemplates - ERROR"
-                print self.inputFileName_qqZZ, "h_superDpsD"
+                print self.inputFileName_zjets, "h_superDpsD"
                 
             if ( self.Template_Down == None):
                 print "superMELA2Dtemplate::loadTemplates - ERROR"
-                print self.inputFileName_zjets, "h_superDpsD"
+                print self.inputFileName_qqZZ, "h_superDpsD"
                     
     def initRooDataHist(self):
     

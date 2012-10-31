@@ -556,6 +556,7 @@ class systematicsClass:
             theFile.write("CMS_zz4l_sigMELA param 0  1  [-3,3]\n")
         if theInputs['is2D'] == 3:
             theFile.write("CMS_zz4l_smd_leptScale_sig_{0:.0f} param 0  1  [-3,3]\n".format(self.channel))
+            theFile.write("CMS_zz4l_smd_leptResol_sig_{0:.0f} param 0  1  [-3,3]\n".format(self.channel))
     
     def WriteSystematics(self,theFile,theInputs):
 
