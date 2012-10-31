@@ -2,10 +2,7 @@
 double ZXnorm = 1.0268 + 1.9260 + 0.5210 + 1.1377 + 0.3423 + 0.5697;
 TString inputDir="/scratch0/hep/whitbeck/4lHelicity/datafiles/Trees_261012/";
 
-void plotPseudoMelaProjections(){
-
-  TString drawString="pseudoLD";
-  TString cutString="ZZMass>105.&&ZZMass<140.&&superLD>.4";
+void plotSuperMelaProjections(TString drawString="superLD", TString cutString="ZZMass>105.&&ZZMass<140."){
 
   gROOT->ProcessLine(".L ~/tdrstyle.C");
   setTDRStyle();
@@ -76,13 +73,8 @@ void plotPseudoMelaProjections(){
   qqZZhisto->SetLineWidth(2);
   qqZZhisto->SetFillColor(kCyan+1);
 
-  double with =(double) qqZZ_8->Draw("ZZMass","ZZMass>105.&&ZZMass<140.&&superLD>.4");
-  double without = (double) qqZZ_8->Draw("ZZMass","ZZMass>105.&&ZZMass<140.");
-
-  cout << " efficiency of superMELA cut: " << with/without << endl;
-
   TH1F* ZXhisto = new TH1F(*qqZZhisto);
-  ZXhisto->Scale(ZXnorm/ZXhisto->Integral()*with/without);
+  ZXhisto->Scale(ZXnorm/ZXhisto->Integral());
   ZXhisto->SetLineColor(1);
   ZXhisto->SetLineWidth(2);
   ZXhisto->SetFillColor(kGreen+1);
@@ -98,26 +90,18 @@ void plotPseudoMelaProjections(){
   PShisto->SetLineColor(kMagenta+1);
   PShisto->SetLineWidth(2);
   PShisto->SetFillColor(0);
-  PShisto->Scale(SMhisto->Integral()/PShisto->Integral());
-
   //==========================
 
-  datahisto->GetXaxis()->SetTitle("pseudo-MELA");
+  datahisto->GetXaxis()->SetTitle("super-MELA");
   datahisto->GetYaxis()->SetTitle("Events");
 
-  THStack* stackSM = new THStack("stackSM","stackSM");
-  stackSM->Add(ZXhisto);
-  stackSM->Add(qqZZhisto);
-  stackSM->Add(SMhisto);
-
-  THStack* stackPS = new THStack("stackPS","stackPS");
-  stackPS->Add(ZXhisto);
-  stackPS->Add(qqZZhisto);
-  stackPS->Add(PShisto);
+  THStack* stack = new THStack("stack","stack");
+  stack->Add(ZXhisto);
+  stack->Add(qqZZhisto);
+  stack->Add(SMhisto);
 
   datahisto->Draw("E1");
-  stackSM->Draw("SAME");
-  stackPS->Draw("SAME");
+  stack->Draw("SAME");
   datahisto->Draw("E1same");
   datahisto->Draw("SAMEp");
 
@@ -129,7 +113,6 @@ void plotPseudoMelaProjections(){
 
   leg->AddEntry(data,"data","p");
   leg->AddEntry(SMhisto,"0^{+}, m_{H}=125 GeV","l");
-  leg->AddEntry(PShisto,"0^{-}, m_{H}=125 GeV","l");
   leg->AddEntry(qqZZhisto,"ZZ/Z#gamma^{*}","f");
   leg->AddEntry(ZXhisto,"l^{+}l^{-}+X","f");
 
