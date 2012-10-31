@@ -475,7 +475,12 @@ class datacardClass:
 
         ## --------------------------- MELA 2D templates ------------------------- ##
 
-        discVarName = "CMS_zz4l_KD"
+        cutVarName = "melaLD"
+        Dcut = ROOT.RooRealVar(cutVarName,cutVarName,0,1)
+        if(self.isAltSig)
+           discVarName = "pseudoMelaLD"
+        else
+           discVarName = "melaLD"
         D = ROOT.RooRealVar(discVarName,discVarName,0,1)
             
         if (self.is2D == 1):
@@ -1053,9 +1058,13 @@ class datacardClass:
             if(self.bIncludingError): data_obs = ROOT.RooDataSet(datasetName,datasetName,data_obs_tree,ROOT.RooArgSet(CMS_zz4l_mass, CMS_zz4l_massErr))
             else: data_obs = ROOT.RooDataSet(datasetName,datasetName,data_obs_tree,ROOT.RooArgSet(CMS_zz4l_mass))
 		
-        if (self.is2D == 1):
+        if (self.is2D == 1 && !(self.isAltSig)):
             if(self.bIncludingError): data_obs = ROOT.RooDataSet(datasetName,datasetName,data_obs_tree,ROOT.RooArgSet(CMS_zz4l_mass,D), CMS_zz4l_massErr)
             else: data_obs = ROOT.RooDataSet(datasetName,datasetName,data_obs_tree,ROOT.RooArgSet(CMS_zz4l_mass,D))
+
+        if (self.is2D == 1 && self.isAltSig):
+            data_obs = ROOT.RooDataSet(datasetName,datasetName,data_obs_tree,ROOT.RooArgSet(CMS_zz4l_mass,D,Dcut),"melaLD>0.5")
+            data_obs = data_obs.reduce(RooArgSet(CMS_zz4l_mass,D))
 
         if (self.is2D == 2):
             data_obs = ROOT.RooDataSet(datasetName,datasetName,data_obs_tree,ROOT.RooArgSet(SD))
