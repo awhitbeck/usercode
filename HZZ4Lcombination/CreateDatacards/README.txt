@@ -42,27 +42,52 @@ combine -M ProfileLikelihood hzz4l.txt -m 125 --expectSignal=1 --signif -t -1
 ## to test results from Alessio, copy his SM inputs and templates:
 ## From HZZ4Lcombination/CreateDatacards/
 
-scp -r lxplus.cern.ch:~bonato/public/cards_HypTest_Combine_HCPlumi_SMD_20121023b_GOOD/templates2D_smd_7TeV_20121023b_GOODvarbin .
-scp -r lxplus.cern.ch:~bonato/public/cards_HypTest_Combine_HCPlumi_SMD_20121023b_GOOD/templates2D_smd_8TeV_20121023b_GOODvarbin .
+scp -r lxplus.cern.ch:/afs/cern.ch/user/b/bonato/public/cards_HypTest_Combine_HCPlumi_SMD_20121029/templates2D_smd_7TeV_20121023b_GOODvarbin .
+scp -r lxplus.cern.ch:/afs/cern.ch/user/b/bonato/public/cards_HypTest_Combine_HCPlumi_SMD_20121029/templates2D_smd_8TeV_20121023b_GOODvarbin .
 
-scp -r lxplus.cern.ch:~bonato/public/SM_inputs_7TeV/ SM_inputs_7TeV_alessio
-scp -r lxplus.cern.ch:~bonato/public/SM_inputs_8TeV/ SM_inputs_8TeV_alessio
+scp -r lxplus.cern.ch:/afs/cern.ch/user/b/bonato/public/cards_HypTest_Combine_HCPlumi_SMD_20121029/CMSdata .
+
+##############################
+## check signal significance
+##############################
+
+## remove unused nuisance parameters:
+
+sed -i 's|systematic CMS_zz4l_mean True|systematic CMS_zz4l_mean False|' SM_inputs_*TeV/inputs_*.txt    
+sed -i 's|systematic CMS_zz4l_sigma True|systematic CMS_zz4l_sigma False|' SM_inputs_*TeV/inputs_*.txt    
+sed -i 's|systematic CMS_zz4l_mean True|systematic CMS_zz4l_mean False|' SM_inputs_*TeV/inputs_*.txt    
+sed -i 's|systematic CMS_zz4l_sigma True|systematic CMS_zz4l_sigma False|' SM_inputs_*TeV/inputs_*.txt    
+sed -i 's|systematic CMS_zz4l_n True|systematic CMS_zz4l_n False|' SM_inputs_*TeV/inputs_*.txt    
+sed -i 's|systematic CMS_zz4l_gamma True|systematic CMS_zz4l_gamma False|' SM_inputs_*TeV/inputs_*.txt    
+
+python makeDCsandWSs.py -i SM_inputs_8TeV/ -a test_signif_8TeV -b -t templates2D_smd_8TeV_20121023b_GOODvarbin/ -d 3 > test_signif_8TeV.txt
+
+python makeDCsandWSs.py -i SM_inputs_7TeV/ -a test_signif_7TeV -b -t templates2D_smd_7TeV_20121023b_GOODvarbin/ -d 3 > test_signif_7TeV.txt
+
+## combine cards and calculate significance
+
+
+cp cards_test_signif_7TeV/HCG/125/* cards_test_signif_8TeV/HCG/125/.
+cd cards_test_signif_8TeV/HCG/125/
+combineCards.py hzz4l_2e2muS_8TeV.txt hzz4l_4eS_8TeV.txt hzz4l_4muS_8TeV.txt hzz4l_2e2muS_7TeV.txt hzz4l_4eS_7TeV.txt hzz4l_4muS_7TeV.txt > hzz4l_4lS.txt
+
+#Expected
+combine -M ProfileLikelihood hzz4l_4lS.txt -m 125 --signif -t -1 expectSignal=1
+#Observed
+combine -M ProfileLikelihood hzz4l_4lS.txt -m 125 --signif
 
 ##############################
 ## hypothesis separation    ##
 ##############################
 
-##############################
 ## modify input files so that 
-##############################
 
 channels all qqZZ ggZZ zjets
 
 doHypTest True
 
-#####################################
 ## this can be done automatically by:
-#####################################
+
 sed -i 's|systematic CMS_hzz4l_Zjets True|systematic CMS_hzz4l_Zjets False|' SM_inputs_*TeV/inputs_*.txt    
 sed -i 's|systematic CMS_zz4l_bkgMELA True|systematic CMS_zz4l_bkgMELA False|' SM_inputs_*TeV/inputs_*.txt    
 sed -i 's|systematic CMS_zz4l_sigMELA True|systematic CMS_zz4l_sigMELA False|' SM_inputs_*TeV/inputs_*.txt    
@@ -81,18 +106,16 @@ sed -i 's|doHypTest False|doHypTest True|' SM_inputs_*TeV/inputs_*.txt
 ## generate cards
 ############################
 
-python makeDCsandWSs.py -i SM_inputs_8TeV_alessio/ -a test_alessio_8TeV -b -t templates2D_smd_8TeV_20121023b_GOODvarbin/ -d 3 > test_alessio_8TeV.txt
+python makeDCsandWSs.py -i SM_inputs_8TeV/ -a test_HypSep_8TeV -b -t templates2D_smd_8TeV_20121023b_GOODvarbin/ -d 3 > test_HypSep_8TeV.txt
 
-python makeDCsandWSs.py -i SM_inputs_7TeV_alessio/ -a test_alessio_7TeV -b -t templates2D_smd_7TeV_20121023b_GOODvarbin/ -d 3 > test_alessio_7TeV.txt
+python makeDCsandWSs.py -i SM_inputs_7TeV/ -a test_HypSep_7TeV -b -t templates2D_smd_7TeV_20121023b_GOODvarbin/ -d 3 > test_HypSep_7TeV.txt
 
 #############################
 ## run hypothesis sep
 #############################
 
-cp cards_test_alessio_7TeV/HCG/125/* cards_test_alessio_8TeV/HCG/125/.
-cd cards_test_alessio_8TeV/HCG/125/
-combineCards.py hzz4l_2e2muS_8TeV_ALT.txt hzz4l_4eS_8TeV_ALT.txt hzz4l_4muS_8TeV_ALT.txt > hzz4l_4lS_8TeV_ALT.txt
-combineCards.py hzz4l_2e2muS_7TeV_ALT.txt hzz4l_4eS_7TeV_ALT.txt hzz4l_4muS_7TeV_ALT.txt > hzz4l_4lS_7TeV_ALT.txt
+cp cards_test_HypSep_7TeV/HCG/125/* cards_test_HypSep_8TeV/HCG/125/.
+cd cards_test_HypSep_8TeV/HCG/125/
 combineCards.py hzz4l_2e2muS_8TeV_ALT.txt hzz4l_4eS_8TeV_ALT.txt hzz4l_4muS_8TeV_ALT.txt hzz4l_2e2muS_7TeV_ALT.txt hzz4l_4eS_7TeV_ALT.txt hzz4l_4muS_7TeV_ALT.txt > hzz4l_4lS_ALT.txt
 
 cp ../../../SignalSeparation/execute_SignalSeparationCombine.sh .
