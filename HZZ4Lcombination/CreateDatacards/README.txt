@@ -9,15 +9,15 @@ cmsenv
 cvs co HiggsAnalysis/CombinedLimit
 scram b -j4
 
-cvs co -d HZZ4Lcombination/CreateDatacards UserCode/Whitbeck/HZZ4Lcombination/CreateDatacards
+cvs co -d HZZ4Lcombination/CreateDatacards -r superMELAresultsHCP UserCode/Whitbeck/HZZ4Lcombination/CreateDatacards
 cd HZZ4Lcombination/CreateDatacards
-cvs co -d SM_inputs_7TeV UserCode/HZZ4L_Combination/CombinationPy/CreateDatacards/SM_inputs_7TeV
-cvs co -d SM_inputs_8TeV UserCode/HZZ4L_Combination/CombinationPy/CreateDatacards/SM_inputs_8TeV
-cvs co -d include UserCode/HZZ4L_Combination/CombinationPy/CreateDatacards/include
-cvs co -d templates2D UserCode/HZZ4L_Combination/CombinationPy/CreateDatacards/templates2D
-cvs co -d CMSdata UserCode/HZZ4L_Combination/CombinationPy/CreateDatacards/CMSdata
+cvs co -d SM_inputs_7TeV -r superMELAresultsHCP UserCode/HZZ4L_Combination/CombinationPy/CreateDatacards/SM_inputs_7TeV
+cvs co -d SM_inputs_8TeV -r superMELAresultsHCP UserCode/HZZ4L_Combination/CombinationPy/CreateDatacards/SM_inputs_8TeV
+cvs co -d include -r superMELAresultsHCP UserCode/HZZ4L_Combination/CombinationPy/CreateDatacards/include
+cvs co -d templates2D -r superMELAresultsHCP UserCode/HZZ4L_Combination/CombinationPy/CreateDatacards/templates2D
+cvs co -d CMSdata -r superMELAresultsHCP UserCode/HZZ4L_Combination/CombinationPy/CreateDatacards/CMSdata
 
-cvs co -d SignalSeparation UserCode/HZZ4L_Combination/CombinationPy/SignalSeparation
+cvs co -d SignalSeparation -r superMELAresultsHCP UserCode/HZZ4L_Combination/CombinationPy/SignalSeparation
 
 ./buildPackage.sh
 
