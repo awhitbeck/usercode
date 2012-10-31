@@ -831,9 +831,9 @@ class datacardClass:
             fr_low_M = 100
             fr_high_M = 1400
             
-
         CMS_zz4l_mass.setRange("fullrangesignal",fr_low_M,fr_high_M)
-        CMS_zz4l_mass.setRange("fullrange",100,1400)
+        #CMS_zz4l_mass.setRange("fullrange",100,1400)
+        CMS_zz4l_mass.setRange("fullrange",100,150)
         
         rfvCsFilter = RooFormulaVar()
         filterName = "cmshzz4l_csFilter_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)
