@@ -192,9 +192,8 @@ class datacardClass:
             raise RunTimeError, "Cannot perform hypothesis testing without a 2D analysis, feature not supported yet. Exiting."
         
 
-        self.appendHypType = theInputs['altHypLabel']
-        if self.isAltSig and self.appendHypType=="" :
-            self.appendHypType = "_ALT"
+        self.hypType = theInputs['altHypLabel']
+        self.appendHypType = "_ALT"
             
         
         ## ------------------------- SYSTEMATICS CLASSES ----------------------------- ##
@@ -477,10 +476,15 @@ class datacardClass:
 
         cutVarName = "melaLD"
         Dcut = ROOT.RooRealVar(cutVarName,cutVarName,0,1)
+        discVarName = "melaLD"
         if(self.isAltSig):
-           discVarName = "graviMelaLD"
-        else :
-           discVarName = "melaLD"
+           if(self.hypType == "gravi"):
+              discVarName = "graviMelaLD"
+           if(self.hypType == "pseudo"):
+              discVarName = "pseudoMelaLD"
+        if(self.isAltSig and discVarName == "melaLD"):
+          raise RuntimeError, "you asked to test alternative hypothesi but you are using mela as discriminat: you should set the label in the inputs as gravi or pseudo"
+     
         D = ROOT.RooRealVar(discVarName,discVarName,0,1)
             
         if (self.is2D == 1):
@@ -1369,7 +1373,7 @@ class datacardClass:
             else: name_Shape = "{0}/HCG/{1:.0f}/hzz4l_{2}S_{3:.0f}TeV{4}.txt".format(self.outputDir,self.mH,self.appendName,self.sqrts,self.appendHypType)
             fo = open( name_Shape, "wb")
             self.WriteDatacard(fo,theInputs, name_ShapeWS2, rates, data_obs.numEntries(), self.is2D,True,self.appendHypType )
-            systematics.WriteSystematics(fo, theInputs)
+            systematics.WriteSystematics(fo, theInputs, self.isAltSig)
             systematics.WriteShapeSystematics(fo,theInputs)
             fo.close()
 
@@ -1396,7 +1400,7 @@ class datacardClass:
 
     def WriteDatacard(self,file,theInputs,nameWS,theRates,obsEvents,is2D,isAltCard=False,AltLabel=""):
 
-        numberSig = self.numberOfSigChan(theInputs)
+        numberSig = self.numberOfSigChan(theInputs, isAltCard)
         numberBg  = self.numberOfBgChan(theInputs)
 
         file.write("imax 1\n")
@@ -1422,8 +1426,9 @@ class datacardClass:
 #            channelList=['ggH{0}'.format(AltLabel),'qqZZ','ggZZ','zjets','ttbar','zbb']
 
         if theInputs["all"]:
-            channelList=['ggH','ggH','qqZZ','ggZZ','zjets','ttbar','zbb']
+            channelList=['ggH','qqZZ','ggZZ','zjets','ttbar','zbb']
             if isAltCard :
+                channelList=['ggH','ggH','qqZZ','ggZZ','zjets','ttbar','zbb']
                 channelName2D=['ggH','ggH{0}'.format(AltLabel),'bkg2d_qqzz','bkg2d_ggzz','bkg2d_zjets','bkg2d_ttbar','bkg2d_zbb']
             else:
                 channelName2D=['ggH','bkg2d_qqzz','bkg2d_ggzz','bkg2d_zjets','bkg2d_ttbar','bkg2d_zbb']
@@ -1484,7 +1489,7 @@ class datacardClass:
 
 
         
-    def numberOfSigChan(self,inputs):
+    def numberOfSigChan(self,inputs,isAltCard):
 
         counter=0
 
@@ -1493,8 +1498,11 @@ class datacardClass:
         if inputs['WH']:  counter+=1
         if inputs['ZH']:  counter+=1
         if inputs['ttH']: counter+=1
-        if inputs['all']: counter+=2
-        
+        if(isAltCard):
+           if inputs['all']: counter+=2
+        else:
+           if inputs['all']: counter+=1
+           
         return counter
 
     def numberOfBgChan(self,inputs):

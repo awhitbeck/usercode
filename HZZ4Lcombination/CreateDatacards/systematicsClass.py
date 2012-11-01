@@ -26,7 +26,6 @@ class systematicsClass:
         self.isFSR = theisFSR
         self.model = theInputs['model']
 
-
         self.muSelError = 0.0
         self.eSelError = 0.0
         self.muSelError2e2mu = 0.0
@@ -135,7 +134,10 @@ class systematicsClass:
         print "~~~~~~~~~~~~~~~~~"
         channelList=['ggH','qqH','WH','ZH','ttH','qqZZ','ggZZ','zjets','ttbar','zbb']
         if theInputs["all"]:
-            channelList=['ggH','ggH','qqZZ','ggZZ','zjets','ttbar','zbb']
+            if(self.isAltCard):
+               channelList=['ggH','ggH','qqZZ','ggZZ','zjets','ttbar','zbb']
+            else:
+               channelList=['ggH','qqZZ','ggZZ','zjets','ttbar','zbb']
         
         for chan in channelList:
             if theInputs[chan] or (chan.startswith("ggH") and theInputs["all"]):
@@ -558,7 +560,8 @@ class systematicsClass:
             theFile.write("CMS_zz4l_smd_leptScale_sig_{0:.0f} param 0  1  [-3,3]\n".format(self.channel))
             theFile.write("CMS_zz4l_smd_leptResol_sig_{0:.0f} param 0  1  [-3,3]\n".format(self.channel))
     
-    def WriteSystematics(self,theFile,theInputs):
+    def WriteSystematics(self,theFile,theInputs,isAltHyp=false):
+        self.isAltCard = isAltHyp
 
         if theInputs['useLumiUnc']:
             self.Build_lumi(theFile,theInputs)

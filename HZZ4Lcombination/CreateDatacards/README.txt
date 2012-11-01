@@ -72,7 +72,7 @@ cd cards_test_signif_8TeV/HCG/125/
 combineCards.py hzz4l_2e2muS_8TeV.txt hzz4l_4eS_8TeV.txt hzz4l_4muS_8TeV.txt hzz4l_2e2muS_7TeV.txt hzz4l_4eS_7TeV.txt hzz4l_4muS_7TeV.txt > hzz4l_4lS.txt
 
 #Expected
-combine -M ProfileLikelihood hzz4l_4lS.txt -m 125 --signif -t -1 expectSignal=1
+combine -M ProfileLikelihood hzz4l_4lS.txt -m 125 --signif -t -1 --expectSignal=1
 #Observed
 combine -M ProfileLikelihood hzz4l_4lS.txt -m 125 --signif
 
@@ -100,7 +100,11 @@ sed -i 's|systematic CMS_zz4l_gamma True|systematic CMS_zz4l_gamma False|' SM_in
 
 sed -i 's|ggH qqH WH ZH ttH|all|' SM_inputs_*TeV/inputs_*.txt
 sed -i 's|doHypTest False|doHypTest True|' SM_inputs_*TeV/inputs_*.txt
-
+To test spin2 hyp:
+sed -i 's|#altHypLabel _ALT|altHypLabel gravi|' SM_inputs_*TeV/inputs_*.txt
+or to test 0- hyp:
+sed -i 's|#altHypLabel _ALT|altHypLabel pseudo|' SM_inputs_*TeV/inputs_*.txt
+   
 
 ############################
 ## generate cards
