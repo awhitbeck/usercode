@@ -550,15 +550,15 @@ class systematicsClass:
 
         if theInputs['is2D'] == 1:
             theFile.write("CMS_zz4l_bkgMELA param 0  1  [-3,3]\n")
-        if theInputs['is2D'] == 3:
-            theFile.write("CMS_zz4l_smd_zjets_bkg_{0:.0f} param 0  1  [-3,3]\n".format(self.channel))
+#        if theInputs['is2D'] == 3:
+ #           theFile.write("CMS_zz4l_smd_zjets_bkg_{0:.0f} param 0  1  [-3,3]\n".format(self.channel))
 
     def Write_CMS_zz4l_sigMELA(self,theFile,theInputs):
         if theInputs['is2D'] == 1:
             theFile.write("CMS_zz4l_sigMELA param 0  1  [-3,3]\n")
-        if theInputs['is2D'] == 3:
-            theFile.write("CMS_zz4l_smd_leptScale_sig_{0:.0f} param 0  1  [-3,3]\n".format(self.channel))
-            theFile.write("CMS_zz4l_smd_leptResol_sig_{0:.0f} param 0  1  [-3,3]\n".format(self.channel))
+#        if theInputs['is2D'] == 3:
+#            theFile.write("CMS_zz4l_smd_leptScale_sig_{0:.0f} param 0  1  [-3,3]\n".format(self.channel))
+#            theFile.write("CMS_zz4l_smd_leptResol_sig_{0:.0f} param 0  1  [-3,3]\n".format(self.channel))
     
     def WriteSystematics(self,theFile,theInputs,isAltHyp=false):
         self.isAltCard = isAltHyp
@@ -621,6 +621,13 @@ class systematicsClass:
         
 	if (self.channel == self.ID_2e2mu) and theInputs['useCMS_hzz4l_Zjets']:
             self.Write_CMS_hzz2e2mu_Zjets(theFile,theInputs)
+
+        if theInputs['is2D'] == 3:
+            theFile.write("CMS_zz4l_smd_leptScale_sig_{0:.0f} param 0  1  [-3,3]\n".format(self.channel))
+            theFile.write("CMS_zz4l_smd_leptResol_sig_{0:.0f} param 0  1  [-3,3]\n".format(self.channel))
+
+        if theInputs['is2D'] == 3:
+            theFile.write("CMS_zz4l_smd_zjets_bkg_{0:.0f} param 0  1  [-3,3]\n".format(self.channel))
 
         if theInputs['useCMS_zz4l_bkgMELA']:
             self.Write_CMS_zz4l_bkgMELA(theFile,theInputs)
