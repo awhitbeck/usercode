@@ -540,7 +540,7 @@ class datacardClass:
 
         if ( self.is2D == 2 ):
 
-            superDiscVarName = "supermelaLD"
+            superDiscVarName = "superMelaLD"
             SD = ROOT.RooRealVar(superDiscVarName,superDiscVarName,0,1)
             
             templateSDSigName = "{0}/Dsignal_superMELA_{1}.root".format(self.templateDir ,self.appendName)
@@ -570,7 +570,7 @@ class datacardClass:
 
         if(self.is2D == 3):
             
-            superDiscVarName = "CMS_zz4l_smd"
+            superDiscVarName = "superMelaLD"
             SD = ROOT.RooRealVar(superDiscVarName,superDiscVarName,0.0,1.0)
             
             templateSigName = "{0}/Dsignal_{1}.root".format(self.templateDir ,self.appendName)
@@ -836,8 +836,8 @@ class datacardClass:
             fr_high_M = 1400
             
         CMS_zz4l_mass.setRange("fullrangesignal",fr_low_M,fr_high_M)
-        #CMS_zz4l_mass.setRange("fullrange",100,1400)
-        CMS_zz4l_mass.setRange("fullrange",100,150)
+        CMS_zz4l_mass.setRange("fullrange",100,1400)
+        ##CMS_zz4l_mass.setRange("fullrange",100,150)
         
         rfvCsFilter = RooFormulaVar()
         filterName = "cmshzz4l_csFilter_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)
@@ -1364,7 +1364,7 @@ class datacardClass:
         systematics.WriteSystematics(fo, theInputs)
         systematics.WriteShapeSystematics(fo,theInputs)
         fo.close()
-
+        
         if(self.isAltSig):
             
             print "--------------------- writing datacard with alt sig ---------------------"
