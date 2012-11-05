@@ -102,5 +102,5 @@ def testSuperMela(useSuperMela=True):
 
     os.system("combineCards.py test_4mu_7TeV.txt test_4mu_8TeV.txt > test1.txt")
     os.system("combineCards.py test_4mu_8TeV.txt test_4mu_7TeV.txt > test2.txt")
-    os.system("combine -M ProfileLikelihood test1.txt")
-    os.system("combine -M ProfileLikelihood test2.txt")
+    os.system("combine -M ProfileLikelihood test1.txt -m 125 --signif -t -1 --expectSignal=1")
+    os.system("combine -M ProfileLikelihood test2.txt -m 125 --signif -t -1 --expectSignal=1")
