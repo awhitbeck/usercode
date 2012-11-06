@@ -9,7 +9,7 @@ cmsenv
 cvs co HiggsAnalysis/CombinedLimit
 scram b -j4
 
-cvs co -d HZZ4Lcombination/CreateDatacards -r superMELAresultsHCP UserCode/Whitbeck/HZZ4Lcombination/CreateDatacards
+cvs co -A -d HZZ4Lcombination/CreateDatacards UserCode/Whitbeck/HZZ4Lcombination/CreateDatacards
 cd HZZ4Lcombination/CreateDatacards
 cvs co -d SM_inputs_7TeV -r superMELAresultsHCP UserCode/HZZ4L_Combination/CombinationPy/CreateDatacards/SM_inputs_7TeV
 cvs co -d SM_inputs_8TeV -r superMELAresultsHCP UserCode/HZZ4L_Combination/CombinationPy/CreateDatacards/SM_inputs_8TeV
