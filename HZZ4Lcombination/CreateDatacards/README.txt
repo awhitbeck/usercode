@@ -73,9 +73,9 @@ or to test 0- hyp:
 sed -i 's|#altHypLabel _ALT|altHypLabel pseudo|' inputs_*.txt
    
 
-###############################################
-## generate cards and run signals separation 
-###############################################
+##########################################################
+## generate cards and run signal/background significance 
+##########################################################
 
 python makeDCsandWSs.py -i SM_inputs_8TeV/ -a test_HypSep_8TeV -b -t templates2D_8TeV_pseudoMELA/ -d 3 > test_HypSep_8TeV.txt
 
