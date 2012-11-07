@@ -54,8 +54,6 @@ scp -r lxplus.cern.ch:/afs/cern.ch/user/b/bonato/public/cards_HypTest_Combine_HC
 
 sed -i 's|systematic CMS_zz4l_mean True|systematic CMS_zz4l_mean False|' inputs_*.txt    
 sed -i 's|systematic CMS_zz4l_sigma True|systematic CMS_zz4l_sigma False|' inputs_*.txt    
-sed -i 's|systematic CMS_zz4l_mean True|systematic CMS_zz4l_mean False|' inputs_*.txt    
-sed -i 's|systematic CMS_zz4l_sigma True|systematic CMS_zz4l_sigma False|' inputs_*.txt    
 sed -i 's|systematic CMS_zz4l_n True|systematic CMS_zz4l_n False|' inputs_*.txt    
 sed -i 's|systematic CMS_zz4l_gamma True|systematic CMS_zz4l_gamma False|' inputs_*.txt    
 
@@ -87,10 +85,6 @@ doHypTest True
 
 ## this can be done automatically inside SM_inputs* by:
 
-sed -i 's|systematic CMS_zz4l_bkgMELA True|systematic CMS_zz4l_bkgMELA False|' inputs_*.txt    
-sed -i 's|systematic CMS_zz4l_sigMELA True|systematic CMS_zz4l_sigMELA False|' inputs_*.txt    
-sed -i 's|systematic CMS_zz4l_mean True|systematic CMS_zz4l_mean False|' inputs_*.txt    
-sed -i 's|systematic CMS_zz4l_sigma True|systematic CMS_zz4l_sigma False|' inputs_*.txt    
 sed -i 's|systematic CMS_zz4l_mean True|systematic CMS_zz4l_mean False|' inputs_*.txt    
 sed -i 's|systematic CMS_zz4l_sigma True|systematic CMS_zz4l_sigma False|' inputs_*.txt    
 sed -i 's|systematic CMS_zz4l_n True|systematic CMS_zz4l_n False|' inputs_*.txt    
