@@ -17,7 +17,7 @@ cvs co -d include -r superMELAresultsHCP UserCode/HZZ4L_Combination/CombinationP
 cvs co -d templates2D -r superMELAresultsHCP UserCode/HZZ4L_Combination/CombinationPy/CreateDatacards/templates2D
 cvs co -d CMSdata -r superMELAresultsHCP UserCode/HZZ4L_Combination/CombinationPy/CreateDatacards/CMSdata
 
-cvs co -d SignalSeparation -r superMELAresultsHCP UserCode/HZZ4L_Combination/CombinationPy/SignalSeparation
+cvs co -d SignalSeparation UserCode/HZZ4L_Combination/CombinationPy/SignalSeparation
 
 ./buildPackage.sh
 
@@ -59,7 +59,8 @@ channels all qqZZ ggZZ zjets
 doHypTest True
 
 ## this can be done automatically inside SM_inputs* by:
-
+cp -r SM_inputs_7TeV SM_inputs_7TeV_hyptest
+cd SM_inputs_7TeV_hyptest
 sed -i 's|systematic CMS_zz4l_mean True|systematic CMS_zz4l_mean False|' inputs_*.txt    
 sed -i 's|systematic CMS_zz4l_sigma True|systematic CMS_zz4l_sigma False|' inputs_*.txt    
 sed -i 's|systematic CMS_zz4l_n True|systematic CMS_zz4l_n False|' inputs_*.txt    
@@ -71,15 +72,19 @@ To test spin2 hyp:
 sed -i 's|#altHypLabel _ALT|altHypLabel gravi|' inputs_*.txt
 or to test 0- hyp:
 sed -i 's|#altHypLabel _ALT|altHypLabel pseudo|' inputs_*.txt
-   
+
+cd ..
+cp -r SM_inputs_8TeV SM_inputs_8TeV_hyptest
+cd SM_inputs_8TeV_hyptest
+and redo all the sed commands
 
 ##########################################################
 ## generate cards and run signal/background significance 
 ##########################################################
 
-python makeDCsandWSs.py -i SM_inputs_8TeV/ -a test_HypSep_8TeV -b -t templates2D_8TeV_pseudoMELA/ -d 3 > test_HypSep_8TeV.txt
+python makeDCsandWSs.py -i SM_inputs_8TeV_hyptest/ -a test_HypSep_8TeV -b -t templates2D_8TeV_pseudoMELA/ -d 3 > test_HypSep_8TeV.txt
 
-python makeDCsandWSs.py -i SM_inputs_7TeV/ -a test_HypSep_7TeV -b -t templates2D_7TeV_pseudoMELA/ -d 3 > test_HypSep_7TeV.txt
+python makeDCsandWSs.py -i SM_inputs_7TeV_hyptest/ -a test_HypSep_7TeV -b -t templates2D_7TeV_pseudoMELA/ -d 3 > test_HypSep_7TeV.txt
 
 cp cards_test_HypSep_7TeV/HCG/125/* cards_test_HypSep_8TeV/HCG/125/.
 cd cards_test_HypSep_8TeV/HCG/125/
