@@ -87,7 +87,6 @@ doHypTest True
 
 ## this can be done automatically inside SM_inputs* by:
 
-sed -i 's|systematic CMS_hzz4l_Zjets True|systematic CMS_hzz4l_Zjets False|' inputs_*.txt    
 sed -i 's|systematic CMS_zz4l_bkgMELA True|systematic CMS_zz4l_bkgMELA False|' inputs_*.txt    
 sed -i 's|systematic CMS_zz4l_sigMELA True|systematic CMS_zz4l_sigMELA False|' inputs_*.txt    
 sed -i 's|systematic CMS_zz4l_mean True|systematic CMS_zz4l_mean False|' inputs_*.txt    
