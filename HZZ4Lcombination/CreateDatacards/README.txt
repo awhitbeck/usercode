@@ -21,10 +21,9 @@ cvs co -d SignalSeparation -r superMELAresultsHCP UserCode/HZZ4L_Combination/Com
 
 ./buildPackage.sh
 
-## running standard limits and significance
-## to run code:
-
-python makeDCsandWSs.py -i <input directory> -a <output name> -b > output.txt
+#####################################################################
+## check signal significance as in standard analysis (mela vs m4l) ##
+#####################################################################
 
 ## reproduce the HCP pvalues for 125
 
@@ -37,30 +36,6 @@ cd cards_test_pvals_8TeV/HCG/125/
 
 combineCards.py hzz4l_2e2muS_8TeV.txt hzz4l_4muS_8TeV.txt hzz4l_4eS_8TeV.txt hzz4l_2e2muS_7TeV.txt hzz4l_4muS_7TeV.txt hzz4l_4eS_7TeV.txt > hzz4l.txt
 
-combine -M ProfileLikelihood hzz4l.txt -m 125 --expectSignal=1 --signif -t -1
-
-## to test results from Alessio, copy his SM inputs and templates:
-## From HZZ4Lcombination/CreateDatacards/
-
-scp -r hep.pha.jhu.edu:/scratch0/hep/whitbeck/4lHelicity/HCPanalysis/superMELA_withInterference/CMSSW_5_2_5/src/HiggsAnalysis/HZZ4L_CombinationPy/CreateDatacards/templates2D_8TeV_pseudoMELA .
-scp -r hep.pha.jhu.edu:/scratch0/hep/whitbeck/4lHelicity/HCPanalysis/superMELA_withInterference/CMSSW_5_2_5/src/HiggsAnalysis/HZZ4L_CombinationPy/CreateDatacards/templates2D_7TeV_pseudoMELA .
-scp -r lxplus.cern.ch:/afs/cern.ch/user/b/bonato/public/cards_HypTest_Combine_HCPlumi_SMD_20121029/CMSdata .
-
-#####################################################################
-## check signal significance as in standard analysis (mela vs m4l) ##
-#####################################################################
-
-
-python makeDCsandWSs.py -i SM_inputs_8TeV/ -a test_signif_8TeV -b -t templates2D/ -d 3 > test_signif_8TeV.txt
-
-python makeDCsandWSs.py -i SM_inputs_7TeV/ -a test_signif_7TeV -b -t templates2D/ -d 3 > test_signif_7TeV.txt
-
-## combine cards and calculate significance
-
-
-cp cards_test_signif_7TeV/HCG/125/* cards_test_signif_8TeV/HCG/125/.
-cd cards_test_signif_8TeV/HCG/125/
-
 #Expected
 combine -M ProfileLikelihood hzz4l_4lS.txt -m 125 --signif -t -1 --expectSignal=1
 #Observed
@@ -70,6 +45,12 @@ combine -M ProfileLikelihood hzz4l_4lS.txt -m 125 --signif
 #########################################################################################
 ## hypothesis separation and signal singificance with supermela vs pseudo/gravi mela   ##
 #########################################################################################
+
+## From HZZ4Lcombination/CreateDatacards/
+
+scp -r hep.pha.jhu.edu:/scratch0/hep/whitbeck/4lHelicity/HCPanalysis/superMELA_withInterference/CMSSW_5_2_5/src/HiggsAnalysis/HZZ4L_CombinationPy/CreateDatacards/templates2D_8TeV_pseudoMELA .
+scp -r hep.pha.jhu.edu:/scratch0/hep/whitbeck/4lHelicity/HCPanalysis/superMELA_withInterference/CMSSW_5_2_5/src/HiggsAnalysis/HZZ4L_CombinationPy/CreateDatacards/templates2D_7TeV_pseudoMELA .
+scp -r lxplus.cern.ch:/afs/cern.ch/user/b/bonato/public/cards_HypTest_Combine_HCPlumi_SMD_20121029/CMSdata .
 
 ## modify input files so that 
 
