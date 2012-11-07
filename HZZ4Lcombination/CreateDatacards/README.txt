@@ -50,22 +50,21 @@ scp -r lxplus.cern.ch:/afs/cern.ch/user/b/bonato/public/cards_HypTest_Combine_HC
 ## check signal significance as in standard analysis (mela vs m4l) ##
 #####################################################################
 
-## remove unused nuisance parameters from inside SM_inputs*:
 
-sed -i 's|systematic CMS_zz4l_mean True|systematic CMS_zz4l_mean False|' inputs_*.txt    
-sed -i 's|systematic CMS_zz4l_sigma True|systematic CMS_zz4l_sigma False|' inputs_*.txt    
-sed -i 's|systematic CMS_zz4l_n True|systematic CMS_zz4l_n False|' inputs_*.txt    
-sed -i 's|systematic CMS_zz4l_gamma True|systematic CMS_zz4l_gamma False|' inputs_*.txt    
+python makeDCsandWSs.py -i SM_inputs_8TeV/ -a test_signif_8TeV -b -t templates2D/ -d 3 > test_signif_8TeV.txt
 
-python makeDCsandWSs.py -i SM_inputs_8TeV/ -a test_signif_8TeV -b -t templates2D_8TeV_pseudoMELA/ -d 3 > test_signif_8TeV.txt
-
-python makeDCsandWSs.py -i SM_inputs_7TeV/ -a test_signif_7TeV -b -t templates2D_7TeV_pseudoMELA/ -d 3 > test_signif_7TeV.txt
+python makeDCsandWSs.py -i SM_inputs_7TeV/ -a test_signif_7TeV -b -t templates2D/ -d 3 > test_signif_7TeV.txt
 
 ## combine cards and calculate significance
 
 
 cp cards_test_signif_7TeV/HCG/125/* cards_test_signif_8TeV/HCG/125/.
 cd cards_test_signif_8TeV/HCG/125/
+
+#Expected
+combine -M ProfileLikelihood hzz4l_4lS.txt -m 125 --signif -t -1 --expectSignal=1
+#Observed
+combine -M ProfileLikelihood hzz4l_4lS.txt -m 125 --signif
 
 
 #########################################################################################
@@ -93,9 +92,9 @@ or to test 0- hyp:
 sed -i 's|#altHypLabel _ALT|altHypLabel pseudo|' inputs_*.txt
    
 
-############################
-## generate cards
-############################
+###############################################
+## generate cards and run signals separation 
+###############################################
 
 python makeDCsandWSs.py -i SM_inputs_8TeV/ -a test_HypSep_8TeV -b -t templates2D_8TeV_pseudoMELA/ -d 3 > test_HypSep_8TeV.txt
 
