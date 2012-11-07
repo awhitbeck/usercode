@@ -68,15 +68,17 @@ sed -i 's|systematic CMS_zz4l_gamma True|systematic CMS_zz4l_gamma False|' input
 
 sed -i 's|ggH qqH WH ZH ttH|all|' inputs_*.txt
 sed -i 's|doHypTest False|doHypTest True|' inputs_*.txt
-To test spin2 hyp:
+## To test spin2 hyp:
 sed -i 's|#altHypLabel _ALT|altHypLabel gravi|' inputs_*.txt
-or to test 0- hyp:
+## or to test 0- hyp:
 sed -i 's|#altHypLabel _ALT|altHypLabel pseudo|' inputs_*.txt
 
 cd ..
 cp -r SM_inputs_8TeV SM_inputs_8TeV_hyptest
 cd SM_inputs_8TeV_hyptest
-and redo all the sed commands
+## and redo all the sed commands as above
+
+cd ..
 
 ##########################################################
 ## generate cards and run signal/background significance 
