@@ -132,4 +132,11 @@ void plotSuperMelaProjections(TString drawString="superLD", TString cutString="Z
   TText *text = pt->AddText(0.01,0.5,"CMS preliminary");
   text = pt->AddText(0.3,0.6,"#sqrt{s} = 7 TeV, L = 5.1 fb^{-1}  #sqrt{s} = 8 TeV, L = 12.2 fb^{-1}");
   pt->Draw();   
+
+  // ---------- save ----------
+  
+  can->SaveAs("superMELAproj.png");
+  can->SaveAs("superMELAproj.eps");
+  can->SaveAs("superMELAproj.root");
+
 }
