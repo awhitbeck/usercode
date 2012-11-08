@@ -74,7 +74,7 @@ void plotPseudoMelaProjections(){
   qqZZhisto->Add(qqZZ_8histo);
   qqZZhisto->SetLineColor(1);
   qqZZhisto->SetLineWidth(2);
-  qqZZhisto->SetFillColor(kCyan+1);
+  qqZZhisto->SetFillColor(kAzure-9);
 
   double with =(double) qqZZ_8->Draw("ZZMass","ZZMass>105.&&ZZMass<140.&&superLD>.4");
   double without = (double) qqZZ_8->Draw("ZZMass","ZZMass>105.&&ZZMass<140.");
@@ -85,17 +85,17 @@ void plotPseudoMelaProjections(){
   ZXhisto->Scale(ZXnorm/ZXhisto->Integral()*with/without);
   ZXhisto->SetLineColor(1);
   ZXhisto->SetLineWidth(2);
-  ZXhisto->SetFillColor(kGreen+1);
+  ZXhisto->SetFillColor(kGreen-5);
 
   TH1F* SMhisto = new TH1F(*SM_7histo);
   SMhisto->Add(SM_8histo);
-  SMhisto->SetLineColor(2);
+  SMhisto->SetLineColor(kOrange+10);
   SMhisto->SetLineWidth(2);
   SMhisto->SetFillColor(0);
 
   TH1F* PShisto = new TH1F(*PS_7histo);
   PShisto->Add(PS_8histo);
-  PShisto->SetLineColor(kMagenta+1);
+  PShisto->SetLineColor(kRed+1);
   PShisto->SetLineWidth(2);
   PShisto->SetFillColor(0);
   PShisto->Scale(SMhisto->Integral()/PShisto->Integral());
@@ -115,15 +115,18 @@ void plotPseudoMelaProjections(){
   stackPS->Add(qqZZhisto);
   stackPS->Add(PShisto);
 
+  
+  // ------------ draw ----------------
+
   datahisto->Draw("E1");
   stackSM->Draw("SAME");
   stackPS->Draw("SAME");
   datahisto->Draw("E1same");
   datahisto->Draw("SAMEp");
 
-  gPad->RedrawAxis();
+  // ------------ legend ---------------
 
-  TLegend* leg = new TLegend(.3,.5,.8,.9);
+  TLegend* leg = new TLegend(.2,.65,.45,.9);
   leg->SetFillColor(0);
   leg->SetBorderSize(0);
 
@@ -131,8 +134,30 @@ void plotPseudoMelaProjections(){
   leg->AddEntry(SMhisto,"0^{+}, m_{H}=125 GeV","l");
   leg->AddEntry(PShisto,"0^{-}, m_{H}=125 GeV","l");
   leg->AddEntry(qqZZhisto,"ZZ/Z#gamma^{*}","f");
-  leg->AddEntry(ZXhisto,"l^{+}l^{-}+X","f");
+  leg->AddEntry(ZXhisto,"Z+X","f");
 
   leg->Draw();
 
+  datahisto->Draw("E1same");
+  gPad->RedrawAxis();
+
+  // -------- plot header --------------
+
+  TPaveText *pt = new TPaveText(0.1577181,0.9562937,0.9580537,0.9947552,"brNDC");
+  pt->SetBorderSize(0);
+  pt->SetTextAlign(12);
+  pt->SetFillStyle(0);
+  pt->SetTextFont(42);
+  pt->SetTextSize(0.03);
+  TText *text = pt->AddText(0.01,0.5,"CMS preliminary");
+  text = pt->AddText(0.3,0.6,"#sqrt{s} = 7 TeV, L = 5.1 fb^{-1}  #sqrt{s} = 8 TeV, L = 12.2 fb^{-1}");
+  pt->Draw();   
+  
+
+  // ------------ save 
+
+  can->SaveAs("pseudoMELAproj_superMELA_p5.png");
+  can->SaveAs("pseudoMELAproj_superMELA_p5.eps");
+  can->SaveAs("pseudoMELAproj_superMELA_p5.root");
+  
 }

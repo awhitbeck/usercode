@@ -2,7 +2,10 @@
 double ZXnorm = 1.0268 + 1.9260 + 0.5210 + 1.1377 + 0.3423 + 0.5697;
 TString inputDir="/scratch0/hep/whitbeck/4lHelicity/datafiles/Trees_261012/";
 
-void plotSuperMelaProjections(TString drawString="superLD", TString cutString="ZZMass>105.&&ZZMass<140."){
+void plotGraviMelaProjections(){
+
+  TString drawString="graviLD";
+  TString cutString="ZZMass>105.&&ZZMass<140.&&superLD>.5";
 
   gROOT->ProcessLine(".L ~/tdrstyle.C");
   setTDRStyle();
@@ -73,8 +76,13 @@ void plotSuperMelaProjections(TString drawString="superLD", TString cutString="Z
   qqZZhisto->SetLineWidth(2);
   qqZZhisto->SetFillColor(kAzure-9);
 
+  double with =(double) qqZZ_8->Draw("ZZMass","ZZMass>105.&&ZZMass<140.&&superLD>.5");
+  double without = (double) qqZZ_8->Draw("ZZMass","ZZMass>105.&&ZZMass<140.");
+
+  cout << " efficiency of superMELA cut: " << with/without << endl;
+
   TH1F* ZXhisto = new TH1F(*qqZZhisto);
-  ZXhisto->Scale(ZXnorm/ZXhisto->Integral());
+  ZXhisto->Scale(ZXnorm/ZXhisto->Integral()*with/without);
   ZXhisto->SetLineColor(1);
   ZXhisto->SetLineWidth(2);
   ZXhisto->SetFillColor(kGreen-5);
@@ -90,31 +98,43 @@ void plotSuperMelaProjections(TString drawString="superLD", TString cutString="Z
   PShisto->SetLineColor(kRed+1);
   PShisto->SetLineWidth(2);
   PShisto->SetFillColor(0);
+  PShisto->Scale(SMhisto->Integral()/PShisto->Integral());
+
   //==========================
 
-  datahisto->GetXaxis()->SetTitle("super-MELA");
+  datahisto->GetXaxis()->SetTitle("pseudo-MELA");
   datahisto->GetYaxis()->SetTitle("Events");
 
-  THStack* stack = new THStack("stack","stack");
-  stack->Add(ZXhisto);
-  stack->Add(qqZZhisto);
-  stack->Add(SMhisto);
+  THStack* stackSM = new THStack("stackSM","stackSM");
+  stackSM->Add(ZXhisto);
+  stackSM->Add(qqZZhisto);
+  stackSM->Add(SMhisto);
+
+  THStack* stackPS = new THStack("stackPS","stackPS");
+  stackPS->Add(ZXhisto);
+  stackPS->Add(qqZZhisto);
+  stackPS->Add(PShisto);
+
+  
+  // ------------ draw ----------------
 
   datahisto->Draw("E1");
-  stack->Draw("SAME");
+  stackSM->Draw("SAME");
+  stackPS->Draw("SAME");
   datahisto->Draw("E1same");
   datahisto->Draw("SAMEp");
 
-  // --------------- legend ----------------
+  // ------------ legend ---------------
 
-  TLegend* leg = new TLegend(.3,.65,.65,.9);
+  TLegend* leg = new TLegend(.5,.65,.85,.9);
   leg->SetFillColor(0);
   leg->SetBorderSize(0);
 
   leg->AddEntry(data,"data","p");
   leg->AddEntry(SMhisto,"0^{+}, m_{H}=125 GeV","l");
+  leg->AddEntry(PShisto,"2^{+}_{min}, m_{H}=125 GeV","l");
   leg->AddEntry(qqZZhisto,"ZZ/Z#gamma^{*}","f");
-  leg->AddEntry(ZXhisto,"l^{+}l^{-}+X","f");
+  leg->AddEntry(ZXhisto,"Z+X","f");
 
   leg->Draw();
 
@@ -132,4 +152,12 @@ void plotSuperMelaProjections(TString drawString="superLD", TString cutString="Z
   TText *text = pt->AddText(0.01,0.5,"CMS preliminary");
   text = pt->AddText(0.3,0.6,"#sqrt{s} = 7 TeV, L = 5.1 fb^{-1}  #sqrt{s} = 8 TeV, L = 12.2 fb^{-1}");
   pt->Draw();   
+  
+
+  // ------------ save 
+
+  can->SaveAs("graviMELAproj_superMELA_p5.png");
+  can->SaveAs("graviMELAproj_superMELA_p5.eps");
+  can->SaveAs("graviMELAproj_superMELA_p5.root");
+  
 }
