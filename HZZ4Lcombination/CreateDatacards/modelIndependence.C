@@ -82,4 +82,19 @@ void modelIndependence(){
   can->SaveAs("modelIndependence_MELA.eps");
   can->SaveAs("modelIndependence_MELA.png");
 
+  // -------- plot header --------------
+
+
+  /*
+  TPaveText *pt = new TPaveText(0.1577181,0.9562937,0.9580537,0.9947552,"brNDC");
+  pt->SetBorderSize(0);
+  pt->SetTextAlign(12);
+  pt->SetFillStyle(0);
+  pt->SetTextFont(42);
+  pt->SetTextSize(0.03);
+  TText *text = pt->AddText(0.01,0.5,"CMS simulation");
+  //text = pt->AddText(0.3,0.6,"#sqrt{s} = 7 TeV, L = 5.1 fb^{-1}  #sqrt{s} = 8 TeV, L = 12.2 fb^{-1}");
+  pt->Draw();   
+
+  */
 }
