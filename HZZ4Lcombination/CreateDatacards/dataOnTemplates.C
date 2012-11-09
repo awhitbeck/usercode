@@ -43,7 +43,8 @@ void dataOnTemplates_looping(bool isLowMass, bool signal, bool background){
   if(isLowMass)
     MC->Draw("ZZLD:ZZMass>>sum(40,100,180,30,0,1)","MC_weight*(ZZMass>0)");
   else
-    MC->Draw("ZZLD:ZZMass>>sum(310,145,800,30,0,1)","MC_weight*(ZZMass>0)");
+    //MC->Draw("ZZLD:ZZMass>>sum(310,145,800,30,0,1)","MC_weight*(ZZMass>0)");
+    MC->Draw("ZZLD:ZZMass>>sum(310,180,800,30,0,1)","MC_weight*(ZZMass>0)");
 
   TChain* MCReweight = new TChain("SelectedTree");
   MCReweight->Add("/tmp/sbologne/261012/PRODFSR_8TeV/4e/HZZ*Tree_H126.root");
@@ -58,15 +59,19 @@ void dataOnTemplates_looping(bool isLowMass, bool signal, bool background){
   else if(isLowMass)
     MCReweight->Draw("ZZLD:ZZMass>>sum2(40,100,180,30,0,1)","MC_weight*(ZZMass>0)*(ZZMass>100 && ZZMass<180)");
   else
-    MCReweight->Draw("ZZLD:ZZMass>>sum2(310,145,800,30,0,1)","MC_weight*(ZZMass>0)");
+    // MCReweight->Draw("ZZLD:ZZMass>>sum2(310,145,800,30,0,1)","MC_weight*(ZZMass>0)");
+    MCReweight->Draw("ZZLD:ZZMass>>sum2(310,180,800,30,0,1)","MC_weight*(ZZMass>0)");
 
-  //ONLY ICHEP STATISTICS !!!!!!!!!
   TGraphErrors * graph7_or=createGraph("/tmp/sbologne/261012/PRODFSR/data/HZZ4lTree_DoubleOr.root",3,7);
   TGraphErrors * graph7_ele=createGraph("/tmp/sbologne/261012/PRODFSR/data/HZZ4lTree_DoubleEle.root",2,7);
   TGraphErrors * graph7_mu=createGraph("/tmp/sbologne/261012/PRODFSR/data/HZZ4lTree_DoubleMu.root",1,7);
-  TGraphErrors * graph8_or=createGraph("/tmp/sbologne/261012/PRODFSR_8TeV/data/HZZ4lTree_DoubleOr_5300.root",3,8);
-  TGraphErrors * graph8_ele=createGraph("/tmp/sbologne/261012/PRODFSR_8TeV/data/HZZ4lTree_DoubleEle_5300.root",2,8);
-  TGraphErrors * graph8_mu=createGraph("/tmp/sbologne/261012/PRODFSR_8TeV/data/HZZ4lTree_DoubleMu_5300.root",1,8);
+  TGraphErrors * graph8_or=createGraph("/tmp/sbologne/261012/PRODFSR_8TeV/data/HZZ4lTree_DoubleOr.root",3,8);
+  TGraphErrors * graph8_ele=createGraph("/tmp/sbologne/261012/PRODFSR_8TeV/data/HZZ4lTree_DoubleEle.root",2,8);
+  TGraphErrors * graph8_mu=createGraph("/tmp/sbologne/261012/PRODFSR_8TeV/data/HZZ4lTree_DoubleMu.root",1,8);
+  //ONLY ICHEP STATISTICS !!!!!!!!!
+  //TGraphErrors * graph8_or=createGraph("/tmp/sbologne/261012/PRODFSR_8TeV/data/HZZ4lTree_DoubleOr_5300.root",3,8);
+  //TGraphErrors * graph8_ele=createGraph("/tmp/sbologne/261012/PRODFSR_8TeV/data/HZZ4lTree_DoubleEle_5300.root",2,8);
+  //TGraphErrors * graph8_mu=createGraph("/tmp/sbologne/261012/PRODFSR_8TeV/data/HZZ4lTree_DoubleMu_5300.root",1,8);
  
   if(!isLowMass){
     graph7_or->SetMarkerSize(1);
@@ -86,22 +91,22 @@ void dataOnTemplates_looping(bool isLowMass, bool signal, bool background){
   }
   //if(signal && !background)
   //sum2->Add(sum3);
-
+   TString label_m4l = "m_{4#font[12]{l}} (GeV)";
   sum->GetYaxis()->SetTitle("#it{K_{D}}");
-  sum->GetXaxis()->SetTitle("m_{4l} (GeV)");
+  sum->GetXaxis()->SetTitle(label_m4l);
   if(isLowMass)
     sum->GetXaxis()->SetRangeUser(100,179.9);
   else
-    sum->GetXaxis()->SetRangeUser(145,799.9);
+    sum->GetXaxis()->SetRangeUser(180,799.9);
 
   sum2->GetYaxis()->SetTitle("#it{K_{D}}");
-  sum2->GetXaxis()->SetTitle("m_{4l} (GeV)");
+  sum2->GetXaxis()->SetTitle(label_m4l);
   if(isLowMass)
     sum2->GetXaxis()->SetRangeUser(100,179.9);
   else
-    sum2->GetXaxis()->SetRangeUser(145,799.9);
+    sum2->GetXaxis()->SetRangeUser(180,799.9);
 
-  for (int i = 100; i< 145; i=i+2){
+  for (int i = 100; i< 180; i=i+2){
     for (int j = 0; j< 30; j++){
       //cout<<i<<" "<<j/30.<<endl;
       sum2->Fill(i,j/30.,0.00001);
@@ -112,10 +117,10 @@ void dataOnTemplates_looping(bool isLowMass, bool signal, bool background){
   sum2->Smooth(1);
   sum2->Smooth(1);
   if(!isLowMass && background){
-    //sum->Scale(285./sum->Integral());
-    //sum2->Scale(285./sum2->Integral());
-    sum->Scale(295./sum->Integral());
-    sum2->Scale(295./sum2->Integral());
+    sum->Scale(285./sum->Integral());
+    sum2->Scale(285./sum2->Integral());
+    //sum->Scale(295./sum->Integral());
+    //sum2->Scale(295./sum2->Integral());
   }
   if(isLowMass && signal){
     //sum->Scale(77./sum->Integral());
@@ -129,29 +134,65 @@ void dataOnTemplates_looping(bool isLowMass, bool signal, bool background){
   }
   char canName[100];
   if(!isLowMass && !signal && background)
-    sprintf(canName,"mela2D_highMassPaperNoErr_background_highmass");
+    sprintf(canName,"mela2D_HCPPAS_background_highmass");
   else if (isLowMass && !signal && background)
-    sprintf(canName,"mela2D_highMassPaperNoErr_background_lowmass");
+    sprintf(canName,"mela2D_HCPPAS_background_lowmass");
   else if (isLowMass && signal && !background)
-    sprintf(canName,"mela2D_highMassPaperNoErr_signal126_lowmass");
+    sprintf(canName,"mela2D_HCPPAS_signal126_lowmass");
   cout<<canName<<endl;
-  TCanvas* cmass = new TCanvas(canName, canName);
-  cmass->SetFillColor(kWhite);
-  /*  delete sum->FindObject("palette");
-  delete sum2->FindObject("palette");
-  delete dataHisto7->FindObject("palette");
-  delete dataHisto8->FindObject("palette");*/
-  //sum->FindObject("palette")->SetObjectStat(0000000);
-  //sum2->FindObject("palette")->SetObjectStat(0000000);
-  //dataHisto7->FindObject("palette")->SetObjectStat(0000000);
-  //dataHisto8->FindObject("palette")->SetObjectStat(0000000);
+  TCanvas* cmass = new TCanvas(canName, canName,286,86,600,600);
+  //cmass->SetFillColor(kWhite);
+  cmass->SetFillColor(0);
+   cmass->SetBorderMode(0);
+   cmass->SetBorderSize(2);
+   cmass->SetTickx(1);
+   cmass->SetTicky(1);
+   cmass->SetLeftMargin(0.15);
+   cmass->SetRightMargin(0.05);
+   cmass->SetTopMargin(0.05);
+   cmass->SetBottomMargin(0.15);
+   cmass->SetFrameFillStyle(0);
+   cmass->SetFrameBorderMode(0);
+   cmass->SetFrameFillStyle(0);
+   cmass->SetFrameBorderMode(0);
+
+   sum->GetXaxis()->SetRange(8,81);
+   sum->GetXaxis()->SetLabelFont(42);
+   sum->GetXaxis()->SetLabelOffset(0.007);
+   sum->GetXaxis()->SetLabelSize(0.045);
+   sum->GetXaxis()->SetTitleSize(0.05);
+   sum->GetXaxis()->SetTitleOffset(1.15);
+   sum->GetXaxis()->SetTitleFont(42);
+   sum->GetYaxis()->SetLabelFont(42);
+   sum->GetYaxis()->SetLabelOffset(0.007);
+   sum->GetYaxis()->SetLabelSize(0.045);
+   sum->GetYaxis()->SetTitleSize(0.05);
+   sum->GetYaxis()->SetTitleOffset(1.4);
+   sum->GetYaxis()->SetTitleFont(42); 
+
+   sum2->GetXaxis()->SetRange(8,81);
+   sum2->GetXaxis()->SetLabelFont(42);
+   sum2->GetXaxis()->SetLabelOffset(0.007);
+   sum2->GetXaxis()->SetLabelSize(0.045);
+   sum2->GetXaxis()->SetTitleSize(0.05);
+   sum2->GetXaxis()->SetTitleOffset(1.15);
+   sum2->GetXaxis()->SetTitleFont(42);
+   sum2->GetYaxis()->SetLabelFont(42);
+   sum2->GetYaxis()->SetLabelOffset(0.007);
+   sum2->GetYaxis()->SetLabelSize(0.045);
+   sum2->GetYaxis()->SetTitleSize(0.05);
+   sum2->GetYaxis()->SetTitleOffset(1.4);
+   sum2->GetYaxis()->SetTitleFont(42); 
+
+
   if(background)
     sum->Draw("COLZ");
   else if(signal)
     sum2->Draw("COLZ");
-  sum->GetYaxis()->SetTitleOffset(0.9);
-  sum2->GetYaxis()->SetTitleOffset(0.9);
-  //dataHisto7->Draw("SAME");
+  //sum->GetYaxis()->SetTitleOffset(0.9);
+  //sum2->GetYaxis()->SetTitleOffset(0.9);
+
+ //dataHisto7->Draw("SAME");
   //dataHisto8->Draw("SAME");
   graph7_or->Draw("Psame");
   graph8_or->Draw("Psame");
@@ -160,7 +201,14 @@ void dataOnTemplates_looping(bool isLowMass, bool signal, bool background){
   graph7_mu->Draw("Psame");
   graph8_mu->Draw("Psame");
   TLegend* leg2 = new TLegend(.7,.7,.9,.9);
+  //leg2->SetFillColor(0);
+  //leg2->SetTextFont(42);
+  //leg2->SetBorderSize(0);
+  leg2->SetLineColor(kBlack);
+  leg2->SetLineStyle(1);
+  leg2->SetLineWidth(3);
   leg2->SetFillColor(0);
+  leg2->SetFillStyle(0);
   leg2->SetTextFont(42);
   //leg2->AddEntry(bkg_K_{D},"qqZZ","l");
   leg2->AddEntry(graph7_ele,"4e","LP");
@@ -168,23 +216,27 @@ void dataOnTemplates_looping(bool isLowMass, bool signal, bool background){
   leg2->AddEntry(graph7_or,"2e2#mu","LP");
   leg2->Draw("same");
   leg2->SetFillColor(0);
-  TPaveText *t=new TPaveText(0.16,0.95,0.45,0.99,"NDC");
+  TPaveText *pt = new TPaveText(0.1577181,0.9562937,0.9580537,0.9947552,"brNDC");
+  pt->SetBorderSize(0);
+  pt->SetTextAlign(12);
+  pt->SetFillStyle(0);
+  pt->SetTextFont(42);
+  pt->SetTextSize(0.03);
+  TText *text = pt->AddText(0.01,0.5,"CMS preliminary");
+  text = pt->AddText(0.3,0.6,"#sqrt{s} = 7 TeV, L = 5.1 fb^{-1}  #sqrt{s} = 8 TeV, L = 12.2 fb^{-1}");
+  pt->Draw();   
+  /* TPaveText *t=new TPaveText(0.16,0.95,0.45,0.99,"NDC");
   t->SetFillColor(0);
   t->SetTextFont(42);
   t->AddText("CMS");
   t->SetTextAlign(12);
   t->Draw("same");
   TPaveText *t2=new TPaveText(0.16,0.95,0.45,0.99,"NDC");
-  //t2->AddText("#sqrt{s}=7 TeV, L=5.05 fb^{-1};  #sqrt{s}=8 TeV, L=12.21 fb^{-1}");
-  t2->AddText("#sqrt{s}=7 TeV, L=5.05 fb^{-1};  #sqrt{s}=8 TeV, L=5.26 fb^{-1}");
+  t2->AddText("#sqrt{s}=7 TeV, L=5.1 fb^{-1};  #sqrt{s}=8 TeV, L=12.2 fb^{-1}");
+  //t2->AddText("#sqrt{s}=7 TeV, L=5.1 fb^{-1};  #sqrt{s}=8 TeV, L=5.26 fb^{-1}");
   t2->SetFillColor(0);
   t2->SetTextFont(42);
-  t2->Draw("same");
-  TPaveText *t3=new TPaveText(0.16,0.95,0.45,0.99,"NDC");
-  t3->AddText("#sqrt{s}=8 TeV, L=12.21 fb^{-1}");
-  t3->SetFillColor(0);
-  t3->SetTextFont(42);
-  //t3->Draw("same");
+  t2->Draw("same");*/
   }
 
 //vector<pair<float,float> > readErrors(int sqrt){
@@ -304,7 +356,7 @@ TGraphErrors* createGraph(TString pathTree, int channel, int sqrt){
     }
     x7[i] = ZZMassV7[i];
     y7[i] = ZZLDV7[i];
-    ex7[i] = 0;//ZZMassErrorV7[i];
+    ex7[i] = ZZMassErrorV7[i];
     ey7[i] = 0;
   }
   cout<<endl<<endl;
@@ -324,8 +376,8 @@ TGraphErrors* createGraph(TString pathTree, int channel, int sqrt){
   else if(channel==3 && sqrt==8)
     //graph7->SetMarkerStyle(25);
     graph7->SetMarkerStyle(21);
-  graph7->SetMarkerSize(1.7);
-  //graph7->SetMarkerSize(1.2);
+  //graph7->SetMarkerSize(1.7);
+  graph7->SetMarkerSize(1.2);
   graph7->SetLineWidth(2);
   return graph7;
 
