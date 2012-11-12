@@ -107,8 +107,7 @@ combineCards.py hzz4l_2e2muS_8TeV_ALT.txt hzz4l_4eS_8TeV_ALT.txt hzz4l_4muS_8TeV
 
 cp ../../../SignalSeparation/execute_SignalSeparationCombine.sh .
 cp ../../../SignalSeparation/extractSignificanceStats.C .	
-
-## !!!! note the default in execute_SignalSeparationCombine.sh is mH = 126 !!!!
+#you need to set properly the MH mass inside the first script !!!!
 
 ./execute_SignalSeparationCombine.sh ./ hzz4l_4lS_ALT.txt 2
 root -l -n -b extractSignificanceStats.C+
