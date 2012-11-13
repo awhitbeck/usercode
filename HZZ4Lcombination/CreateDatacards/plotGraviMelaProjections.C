@@ -1,11 +1,13 @@
 
 double ZXnorm = 1.0268 + 1.9260 + 0.5210 + 1.1377 + 0.3423 + 0.5697;
-TString inputDir="/scratch0/hep/whitbeck/4lHelicity/datafiles/Trees_261012/";
+
+TString JHUinputDir="/scratch0/hep/whitbeck/4lHelicity/datafiles/Trees_M126_special/Trees_061112_M125/";
+TString inputDir="/scratch0/hep/whitbeck/4lHelicity/datafiles/Trees_M126_special/Trees_061112_M126/";
 
 void plotGraviMelaProjections(){
 
   TString drawString="graviLD";
-  TString cutString="ZZMass>105.&&ZZMass<140.&&superLD>.5";
+  TString cutString="ZZMass>106.&&ZZMass<141.&&superLD>.5";
 
   gROOT->ProcessLine(".L ~/tdrstyle.C");
   setTDRStyle();
@@ -22,13 +24,13 @@ void plotGraviMelaProjections(){
   qqZZ_7->Add(inputDir+"PRODFSR_7TeV/2e2mu/HZZ4lTree_ZZTo*_withSMD_doubleCBonly.root");
 
   TChain* SM_8 = new TChain("SelectedTree");
-  SM_8->Add(inputDir+"PRODFSR_8TeV/4mu/HZZ4lTree_H125_withSMD_doubleCBonly.root");
-  SM_8->Add(inputDir+"PRODFSR_8TeV/4e/HZZ4lTree_H125_withSMD_doubleCBonly.root");
-  SM_8->Add(inputDir+"PRODFSR_8TeV/2e2mu/HZZ4lTree_H125_withSMD_doubleCBonly.root");
+  SM_8->Add(inputDir+"PRODFSR_8TeV/4mu/HZZ4lTree_H126_withSMD_doubleCBonly.root");
+  SM_8->Add(inputDir+"PRODFSR_8TeV/4e/HZZ4lTree_H126_withSMD_doubleCBonly.root");
+  SM_8->Add(inputDir+"PRODFSR_8TeV/2e2mu/HZZ4lTree_H126_withSMD_doubleCBonly.root");
   TChain* SM_7 = new TChain("SelectedTree");
-  SM_7->Add(inputDir+"PRODFSR_7TeV/4mu/HZZ4lTree_H125_withSMD_doubleCBonly.root");
-  SM_7->Add(inputDir+"PRODFSR_7TeV/4e/HZZ4lTree_H125_withSMD_doubleCBonly.root");
-  SM_7->Add(inputDir+"PRODFSR_7TeV/2e2mu/HZZ4lTree_H125_withSMD_doubleCBonly.root");
+  SM_7->Add(inputDir+"PRODFSR_7TeV/4mu/HZZ4lTree_H126_withSMD_doubleCBonly.root");
+  SM_7->Add(inputDir+"PRODFSR_7TeV/4e/HZZ4lTree_H126_withSMD_doubleCBonly.root");
+  SM_7->Add(inputDir+"PRODFSR_7TeV/2e2mu/HZZ4lTree_H126_withSMD_doubleCBonly.root");
 
   //TChain* ZX = new TChain("SelectedTree");
 
@@ -40,13 +42,13 @@ void plotGraviMelaProjections(){
   TH1F* datahisto = (TH1F*) gDirectory->Get("datahisto");
 
   TChain* PS_8 = new TChain("SelectedTree");
-  PS_8->Add(inputDir+"JHU_8TeV/4mu/HZZ4lTree_jhuPseH125_withSMD_doubleCBonly.root");
-  PS_8->Add(inputDir+"JHU_8TeV/4e/HZZ4lTree_jhuPseH125_withSMD_doubleCBonly.root");
-  PS_8->Add(inputDir+"JHU_8TeV/2e2mu/HZZ4lTree_jhuPseH125_withSMD_doubleCBonly.root");
+  PS_8->Add(JHUinputDir+"JHU_8TeV/4mu/HZZ4lTree_jhuPseH125_withSMD_doubleCBonly.root");
+  PS_8->Add(JHUinputDir+"JHU_8TeV/4e/HZZ4lTree_jhuPseH125_withSMD_doubleCBonly.root");
+  PS_8->Add(JHUinputDir+"JHU_8TeV/2e2mu/HZZ4lTree_jhuPseH125_withSMD_doubleCBonly.root");
   TChain* PS_7 = new TChain("SelectedTree");
-  PS_7->Add(inputDir+"JHU_7TeV/4mu/HZZ4lTree_jhuPseH125_withSMD_doubleCBonly.root");
-  PS_7->Add(inputDir+"JHU_7TeV/4e/HZZ4lTree_jhuPseH125_withSMD_doubleCBonly.root");
-  PS_7->Add(inputDir+"JHU_7TeV/2e2mu/HZZ4lTree_jhuPseH125_withSMD_doubleCBonly.root");
+  PS_7->Add(JHUinputDir+"JHU_7TeV/4mu/HZZ4lTree_jhuPseH125_withSMD_doubleCBonly.root");
+  PS_7->Add(JHUinputDir+"JHU_7TeV/4e/HZZ4lTree_jhuPseH125_withSMD_doubleCBonly.root");
+  PS_7->Add(JHUinputDir+"JHU_7TeV/2e2mu/HZZ4lTree_jhuPseH125_withSMD_doubleCBonly.root");
   
   qqZZ_7->Draw(drawString+">>qqZZ_7histo(30,0,1)","5.051*MC_weight*("+cutString+")");
   TH1F* qqZZ_7histo = (TH1F*) gDirectory->Get("qqZZ_7histo");
@@ -67,17 +69,19 @@ void plotGraviMelaProjections(){
   TH1F* PS_7histo = (TH1F*) gDirectory->Get("PS_7histo");
  
   //=========================
-
-  datahisto->SetMarkerStyle(8);
-
+  
+	datahisto->SetBinErrorOption(TH1::kPoisson);
+	datahisto->SetMarkerStyle(20);
+	datahisto->SetMarkerSize(1.1);
+	
   TH1F* qqZZhisto = new TH1F(*qqZZ_7histo);
   qqZZhisto->Add(qqZZ_8histo);
   qqZZhisto->SetLineColor(1);
   qqZZhisto->SetLineWidth(2);
   qqZZhisto->SetFillColor(kAzure-9);
 
-  double with =(double) qqZZ_8->Draw("ZZMass","ZZMass>105.&&ZZMass<140.&&superLD>.5");
-  double without = (double) qqZZ_8->Draw("ZZMass","ZZMass>105.&&ZZMass<140.");
+  double with =(double) qqZZ_8->Draw("ZZMass",cutString);
+  double without = (double) qqZZ_8->Draw("ZZMass","ZZMass>106.&&ZZMass<141.");
 
   cout << " efficiency of superMELA cut: " << with/without << endl;
 
@@ -97,12 +101,13 @@ void plotGraviMelaProjections(){
   PShisto->Add(PS_8histo);
   PShisto->SetLineColor(kRed+1);
   PShisto->SetLineWidth(2);
+  PShisto->SetLineStyle(2);
   PShisto->SetFillColor(0);
   PShisto->Scale(SMhisto->Integral()/PShisto->Integral());
 
   //==========================
 
-  datahisto->GetXaxis()->SetTitle("pseudo-MELA");
+  datahisto->GetXaxis()->SetTitle("gravi-MELA");
   datahisto->GetYaxis()->SetTitle("Events");
 
   THStack* stackSM = new THStack("stackSM","stackSM");
@@ -130,9 +135,9 @@ void plotGraviMelaProjections(){
   leg->SetFillColor(0);
   leg->SetBorderSize(0);
 
-  leg->AddEntry(data,"data","p");
-  leg->AddEntry(SMhisto,"0^{+}, m_{H}=125 GeV","l");
-  leg->AddEntry(PShisto,"2^{+}_{min}, m_{H}=125 GeV","l");
+  leg->AddEntry(datahisto,"data","p");
+  leg->AddEntry(SMhisto,"0^{+}, m_{H}=126 GeV","l");
+  leg->AddEntry(PShisto,"2^{+}_{min}, m_{H}=126 GeV","l");
   leg->AddEntry(qqZZhisto,"ZZ/Z#gamma^{*}","f");
   leg->AddEntry(ZXhisto,"Z+X","f");
 

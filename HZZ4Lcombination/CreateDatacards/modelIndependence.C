@@ -81,6 +81,7 @@ void modelIndependence(){
 
   can->SaveAs("modelIndependence_MELA.eps");
   can->SaveAs("modelIndependence_MELA.png");
+  can->SaveAs("modelIndependence_MELA.root");
 
   // -------- plot header --------------
 
@@ -97,4 +98,5 @@ void modelIndependence(){
   pt->Draw();   
 
   */
+
 }
