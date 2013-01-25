@@ -1,16 +1,21 @@
+// source /afs/cern.ch/sw/lcg/app/releases/ROOT/5.34.04/x86_64-slc5-gcc43-opt/root/bin/thisroot.sh
+
+bool plotData=false;
+bool plotAltSig=false;
 
 double ZXnorm = 1.0268 + 1.9260 + 0.5210 + 1.1377 + 0.3423 + 0.5697;
-TString inputDir="/scratch0/hep/whitbeck/4lHelicity/datafiles/Trees_M126_special/Trees_061112_M126/";
+TString inputDir="/tmp/sbologne/Trees_061112_M126/";
+TString JHUinputDir="/tmp/sbologne/Trees_061112_M126/";
 
-TString JHUinputDir="/scratch0/hep/whitbeck/4lHelicity/datafiles/Trees_M126_special/Trees_061112_M125/";
-
-void plotSuperMelaProjections(TString drawString="superLD", 
-														  TString cutString="ZZMass>106.&&ZZMass<141."){
+void plotSuperMelaProjections(TString drawString="superLD",
+			      TString cutString="ZZMass>106.&&ZZMass<141."){
 
   gROOT->ProcessLine(".L ~/tdrstyle.C");
   setTDRStyle();
 
   TCanvas* can = new TCanvas("can","can",500,500);
+
+  gStyle->SetOptStat(0);
 
   TChain* qqZZ_8 = new TChain("SelectedTree");
   qqZZ_8->Add(inputDir+"PRODFSR_8TeV/4mu/HZZ4lTree_ZZTo*_withSMD_doubleCBonly.root");
@@ -40,27 +45,27 @@ void plotSuperMelaProjections(TString drawString="superLD",
   TH1F* datahisto = (TH1F*) gDirectory->Get("datahisto");
 
   TChain* PS_8 = new TChain("SelectedTree");
-  PS_8->Add(JHUinputDir+"JHU_8TeV/4mu/HZZ4lTree_jhuPseH125_withSMD_doubleCBonly.root");
-  PS_8->Add(JHUinputDir+"JHU_8TeV/4e/HZZ4lTree_jhuPseH125_withSMD_doubleCBonly.root");
-  PS_8->Add(JHUinputDir+"JHU_8TeV/2e2mu/HZZ4lTree_jhuPseH125_withSMD_doubleCBonly.root");
+  PS_8->Add(JHUinputDir+"JHU_8TeV_withInterf/4mu/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly.root");
+  PS_8->Add(JHUinputDir+"JHU_8TeV_withInterf/4e/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly.root");
+  PS_8->Add(JHUinputDir+"JHU_8TeV_withInterf/2e2mu/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly.root");
   TChain* PS_7 = new TChain("SelectedTree");
-  PS_7->Add(JHUinputDir+"JHU_7TeV/4mu/HZZ4lTree_jhuPseH125_withSMD_doubleCBonly.root");
-  PS_7->Add(JHUinputDir+"JHU_7TeV/4e/HZZ4lTree_jhuPseH125_withSMD_doubleCBonly.root");
-  PS_7->Add(JHUinputDir+"JHU_7TeV/2e2mu/HZZ4lTree_jhuPseH125_withSMD_doubleCBonly.root");
+  PS_7->Add(JHUinputDir+"JHU_7TeV_withInterf/4mu/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly.root");
+  PS_7->Add(JHUinputDir+"JHU_7TeV_withInterf/4e/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly.root");
+  PS_7->Add(JHUinputDir+"JHU_7TeV_withInterf/2e2mu/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly.root");
   
   qqZZ_7->Draw(drawString+">>qqZZ_7histo(30,0,1)","5.051*MC_weight*("+cutString+")");
   TH1F* qqZZ_7histo = (TH1F*) gDirectory->Get("qqZZ_7histo");
 
-  qqZZ_8->Draw(drawString+">>qqZZ_8histo(30,0,1)","12.21*MC_weight*("+cutString+")");
+  qqZZ_8->Draw(drawString+">>qqZZ_8histo(30,0,1)","21.0*MC_weight*("+cutString+")");
   TH1F* qqZZ_8histo = (TH1F*) gDirectory->Get("qqZZ_8histo");
 
   SM_7->Draw(drawString+">>SM_7histo(30,0,1)","5.051*MC_weight*("+cutString+")");
   TH1F* SM_7histo = (TH1F*) gDirectory->Get("SM_7histo");
 
-  SM_8->Draw(drawString+">>SM_8histo(30,0,1)","12.21*MC_weight*("+cutString+")");
+  SM_8->Draw(drawString+">>SM_8histo(30,0,1)","21.0*MC_weight*("+cutString+")");
   TH1F* SM_8histo = (TH1F*) gDirectory->Get("SM_8histo");
 
-  PS_8->Draw(drawString+">>PS_8histo(30,0,1)","12.21*MC_weight*("+cutString+")");
+  PS_8->Draw(drawString+">>PS_8histo(30,0,1)","21.0*MC_weight*("+cutString+")");
   TH1F* PS_8histo = (TH1F*) gDirectory->Get("PS_8histo");
 
   PS_7->Draw(drawString+">>PS_7histo(30,0,1)","5.051*MC_weight*("+cutString+")");
@@ -68,9 +73,9 @@ void plotSuperMelaProjections(TString drawString="superLD",
  
   //=========================
 	
-	datahisto->SetBinErrorOption(TH1::kPoisson);
+  datahisto->SetBinErrorOption(TH1::kPoisson);
   datahisto->SetMarkerStyle(20);
-	datahisto->SetMarkerSize(1.1);
+  datahisto->SetMarkerSize(1.1);
 	
   TH1F* qqZZhisto = new TH1F(*qqZZ_7histo);
   qqZZhisto->Add(qqZZ_8histo);
@@ -105,10 +110,14 @@ void plotSuperMelaProjections(TString drawString="superLD",
   stack->Add(qqZZhisto);
   stack->Add(SMhisto);
 
-  datahisto->Draw("E1");
-  stack->Draw("SAME");
-  datahisto->Draw("E1same");
-  datahisto->Draw("SAMEp");
+  if(plotData){
+    datahisto->Draw("E1");
+    stack->Draw("SAME");
+    datahisto->Draw("E1same");
+    datahisto->Draw("SAMEp");
+  }else{
+    stack->Draw();
+  }
 
   // --------------- legend ----------------
 
@@ -116,14 +125,14 @@ void plotSuperMelaProjections(TString drawString="superLD",
   leg->SetFillColor(0);
   leg->SetBorderSize(0);
 
-  leg->AddEntry(datahisto,"data","p");
+  if(plotData) leg->AddEntry(datahisto,"data","p");
   leg->AddEntry(SMhisto,"0^{+}, m_{H}=126 GeV","l");
   leg->AddEntry(qqZZhisto,"ZZ/Z#gamma^{*}","f");
   leg->AddEntry(ZXhisto,"Z+X","f");
 
   leg->Draw();
 
-  datahisto->Draw("E1same");
+  if(plotData) datahisto->Draw("E1same");
   gPad->RedrawAxis();
 
   // -------- plot header --------------
@@ -135,7 +144,7 @@ void plotSuperMelaProjections(TString drawString="superLD",
   pt->SetTextFont(42);
   pt->SetTextSize(0.03);
   TText *text = pt->AddText(0.01,0.5,"CMS preliminary");
-  text = pt->AddText(0.3,0.6,"#sqrt{s} = 7 TeV, L = 5.1 fb^{-1}  #sqrt{s} = 8 TeV, L = 12.2 fb^{-1}");
+  text = pt->AddText(0.3,0.6,"#sqrt{s} = 7 TeV, L = 5.1 fb^{-1}  #sqrt{s} = 8 TeV, L = 21.0 fb^{-1}");
   pt->Draw();   
 
   // ---------- save ----------
