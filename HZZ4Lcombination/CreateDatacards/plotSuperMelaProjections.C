@@ -3,11 +3,11 @@
 bool plotData=false;
 bool plotAltSig=false;
 
-double ZXnorm = 1.0268 + 1.9260 + 0.5210 + 1.1377 + 0.3423 + 0.5697;
+double ZXnorm = 21;//HCP:1.0268 + 1.9260 + 0.5210 + 1.1377 + 0.3423 + 0.5697;
 TString inputDir="/tmp/sbologne/Trees_061112_M126/";
 TString JHUinputDir="/tmp/sbologne/Trees_061112_M126/";
 
-void plotSuperMelaProjections(TString drawString="superLD",
+void plotSuperMelaProjections(TString drawString="(p0plus_VAJHU*p0plus_m4l)/((p0plus_VAJHU*p0plus_m4l)+(bkg_VAMCFMNorm*bkg_m4l))",
 			      TString cutString="ZZMass>106.&&ZZMass<141."){
 
   gROOT->ProcessLine(".L ~/tdrstyle.C");
@@ -18,54 +18,54 @@ void plotSuperMelaProjections(TString drawString="superLD",
   gStyle->SetOptStat(0);
 
   TChain* qqZZ_8 = new TChain("SelectedTree");
-  qqZZ_8->Add(inputDir+"PRODFSR_8TeV/4mu/HZZ4lTree_ZZTo*_withSMD_doubleCBonly.root");
-  qqZZ_8->Add(inputDir+"PRODFSR_8TeV/4e/HZZ4lTree_ZZTo*_withSMD_doubleCBonly.root");
-  qqZZ_8->Add(inputDir+"PRODFSR_8TeV/2e2mu/HZZ4lTree_ZZTo*_withSMD_doubleCBonly.root");
+  qqZZ_8->Add(inputDir+"PRODFSR_8TeV/4mu/HZZ4lTree_ZZTo*_withSMD_doubleCBonly_withProbabilities.root");
+  qqZZ_8->Add(inputDir+"PRODFSR_8TeV/4e/HZZ4lTree_ZZTo*_withSMD_doubleCBonly_withProbabilities.root");
+  qqZZ_8->Add(inputDir+"PRODFSR_8TeV/2e2mu/HZZ4lTree_ZZTo*_withSMD_doubleCBonly_withProbabilities.root");
   TChain* qqZZ_7 = new TChain("SelectedTree");
-  qqZZ_7->Add(inputDir+"PRODFSR_7TeV/4mu/HZZ4lTree_ZZTo*_withSMD_doubleCBonly.root");
-  qqZZ_7->Add(inputDir+"PRODFSR_7TeV/4e/HZZ4lTree_ZZTo*_withSMD_doubleCBonly.root");
-  qqZZ_7->Add(inputDir+"PRODFSR_7TeV/2e2mu/HZZ4lTree_ZZTo*_withSMD_doubleCBonly.root");
+  qqZZ_7->Add(inputDir+"PRODFSR_7TeV/4mu/HZZ4lTree_ZZTo*_withSMD_doubleCBonly_withProbabilities.root");
+  qqZZ_7->Add(inputDir+"PRODFSR_7TeV/4e/HZZ4lTree_ZZTo*_withSMD_doubleCBonly_withProbabilities.root");
+  qqZZ_7->Add(inputDir+"PRODFSR_7TeV/2e2mu/HZZ4lTree_ZZTo*_withSMD_doubleCBonly_withProbabilities.root");
 
   TChain* SM_8 = new TChain("SelectedTree");
-  SM_8->Add(inputDir+"PRODFSR_8TeV/4mu/HZZ4lTree_H126_withSMD_doubleCBonly.root");
-  SM_8->Add(inputDir+"PRODFSR_8TeV/4e/HZZ4lTree_H126_withSMD_doubleCBonly.root");
-  SM_8->Add(inputDir+"PRODFSR_8TeV/2e2mu/HZZ4lTree_H126_withSMD_doubleCBonly.root");
+  SM_8->Add(inputDir+"PRODFSR_8TeV/4mu/HZZ4lTree_H126_withSMD_doubleCBonly_withProbabilities.root");
+  SM_8->Add(inputDir+"PRODFSR_8TeV/4e/HZZ4lTree_H126_withSMD_doubleCBonly_withProbabilities.root");
+  SM_8->Add(inputDir+"PRODFSR_8TeV/2e2mu/HZZ4lTree_H126_withSMD_doubleCBonly_withProbabilities.root");
   TChain* SM_7 = new TChain("SelectedTree");
-  SM_7->Add(inputDir+"PRODFSR_7TeV/4mu/HZZ4lTree_H126_withSMD_doubleCBonly.root");
-  SM_7->Add(inputDir+"PRODFSR_7TeV/4e/HZZ4lTree_H126_withSMD_doubleCBonly.root");
-  SM_7->Add(inputDir+"PRODFSR_7TeV/2e2mu/HZZ4lTree_H126_withSMD_doubleCBonly.root");
+  SM_7->Add(inputDir+"PRODFSR_7TeV/4mu/HZZ4lTree_H126_withSMD_doubleCBonly_withProbabilities.root");
+  SM_7->Add(inputDir+"PRODFSR_7TeV/4e/HZZ4lTree_H126_withSMD_doubleCBonly_withProbabilities.root");
+  SM_7->Add(inputDir+"PRODFSR_7TeV/2e2mu/HZZ4lTree_H126_withSMD_doubleCBonly_withProbabilities.root");
 
   //TChain* ZX = new TChain("SelectedTree");
 
-  TChain* data = new TChain("data_obs");
-  data->Add(inputDir+"PRODFSR_8TeV/data/HZZ4lTree_Double*_withSMD_doubleCBonly.root");
-  data->Add(inputDir+"PRODFSR_7TeV/data/HZZ4lTree_Double*_withSMD_doubleCBonly.root");
+  TChain* data = new TChain("SelectedTree");
+  data->Add(inputDir+"PRODFSR_8TeV/data/HZZ4lTree_Double*_withSMD_doubleCBonly_withProbabilities.root");
+  data->Add(inputDir+"PRODFSR_7TeV/data/HZZ4lTree_Double*_withSMD_doubleCBonly_withProbabilities.root");
 
   data->Draw(drawString+">>datahisto(30,0,1)",cutString);
   TH1F* datahisto = (TH1F*) gDirectory->Get("datahisto");
 
   TChain* PS_8 = new TChain("SelectedTree");
-  PS_8->Add(JHUinputDir+"JHU_8TeV_withInterf/4mu/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly.root");
-  PS_8->Add(JHUinputDir+"JHU_8TeV_withInterf/4e/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly.root");
-  PS_8->Add(JHUinputDir+"JHU_8TeV_withInterf/2e2mu/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly.root");
+  PS_8->Add(JHUinputDir+"JHU_8TeV_withInterf/4mu/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly_withProbabilities.root");
+  PS_8->Add(JHUinputDir+"JHU_8TeV_withInterf/4e/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly_withProbabilities.root");
+  PS_8->Add(JHUinputDir+"JHU_8TeV_withInterf/2e2mu/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly_withProbabilities.root");
   TChain* PS_7 = new TChain("SelectedTree");
-  PS_7->Add(JHUinputDir+"JHU_7TeV_withInterf/4mu/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly.root");
-  PS_7->Add(JHUinputDir+"JHU_7TeV_withInterf/4e/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly.root");
-  PS_7->Add(JHUinputDir+"JHU_7TeV_withInterf/2e2mu/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly.root");
+  PS_7->Add(JHUinputDir+"JHU_7TeV_withInterf/4mu/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly_withProbabilities.root");
+  PS_7->Add(JHUinputDir+"JHU_7TeV_withInterf/4e/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly_withProbabilities.root");
+  PS_7->Add(JHUinputDir+"JHU_7TeV_withInterf/2e2mu/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly_withProbabilities.root");
   
   qqZZ_7->Draw(drawString+">>qqZZ_7histo(30,0,1)","5.051*MC_weight*("+cutString+")");
   TH1F* qqZZ_7histo = (TH1F*) gDirectory->Get("qqZZ_7histo");
 
-  qqZZ_8->Draw(drawString+">>qqZZ_8histo(30,0,1)","21.0*MC_weight*("+cutString+")");
+  qqZZ_8->Draw(drawString+">>qqZZ_8histo(30,0,1)","19.6*MC_weight*("+cutString+")");
   TH1F* qqZZ_8histo = (TH1F*) gDirectory->Get("qqZZ_8histo");
 
   SM_7->Draw(drawString+">>SM_7histo(30,0,1)","5.051*MC_weight*("+cutString+")");
   TH1F* SM_7histo = (TH1F*) gDirectory->Get("SM_7histo");
 
-  SM_8->Draw(drawString+">>SM_8histo(30,0,1)","21.0*MC_weight*("+cutString+")");
+  SM_8->Draw(drawString+">>SM_8histo(30,0,1)","19.6*MC_weight*("+cutString+")");
   TH1F* SM_8histo = (TH1F*) gDirectory->Get("SM_8histo");
 
-  PS_8->Draw(drawString+">>PS_8histo(30,0,1)","21.0*MC_weight*("+cutString+")");
+  PS_8->Draw(drawString+">>PS_8histo(30,0,1)","19.6*MC_weight*("+cutString+")");
   TH1F* PS_8histo = (TH1F*) gDirectory->Get("PS_8histo");
 
   PS_7->Draw(drawString+">>PS_7histo(30,0,1)","5.051*MC_weight*("+cutString+")");
@@ -73,7 +73,7 @@ void plotSuperMelaProjections(TString drawString="superLD",
  
   //=========================
 	
-  datahisto->SetBinErrorOption(TH1::kPoisson);
+  //datahisto->SetBinErrorOption(TH1::kPoisson);
   datahisto->SetMarkerStyle(20);
   datahisto->SetMarkerSize(1.1);
 	
@@ -102,13 +102,16 @@ void plotSuperMelaProjections(TString drawString="superLD",
   PShisto->SetFillColor(0);
   //==========================
 
-  datahisto->GetXaxis()->SetTitle("super-MELA");
+  datahisto->GetXaxis()->SetTitle("it{D}_{bkg}");
   datahisto->GetYaxis()->SetTitle("Events");
 
   THStack* stack = new THStack("stack","stack");
   stack->Add(ZXhisto);
   stack->Add(qqZZhisto);
   stack->Add(SMhisto);
+  stack->Draw("");
+  stack->GetXaxis()->SetTitle("#it{D}_{bkg}");
+  stack->GetYaxis()->SetTitle("Events");  
 
   if(plotData){
     datahisto->Draw("E1");
@@ -144,7 +147,7 @@ void plotSuperMelaProjections(TString drawString="superLD",
   pt->SetTextFont(42);
   pt->SetTextSize(0.03);
   TText *text = pt->AddText(0.01,0.5,"CMS preliminary");
-  text = pt->AddText(0.3,0.6,"#sqrt{s} = 7 TeV, L = 5.1 fb^{-1}  #sqrt{s} = 8 TeV, L = 21.0 fb^{-1}");
+  text = pt->AddText(0.3,0.6,"#sqrt{s} = 7 TeV, L = 5.1 fb^{-1}  #sqrt{s} = 8 TeV, L = 19.6 fb^{-1}");
   pt->Draw();   
 
   // ---------- save ----------
@@ -152,5 +155,5 @@ void plotSuperMelaProjections(TString drawString="superLD",
   can->SaveAs("superMELAproj.png");
   can->SaveAs("superMELAproj.eps");
   can->SaveAs("superMELAproj.root");
-
+  
 }
