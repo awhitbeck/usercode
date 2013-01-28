@@ -11,11 +11,8 @@
 #include <vector>
 #include "../src/AngularPdfFactory.cc"
 #include "../src/ScalarPdfFactory.cc"
+#include "../src/VectorPdfFactory.cc"
 #include "../src/TensorPdfFactory.cc"
-#include "../src/pseudoMELA.cc"
-#include "../src/graviMELA.cc"
-#include "../src/vectorMELA.cc"
-#include "../src/psVectorMELA.cc"
 #include "../PDFs/RooqqZZ_JHU.h"
 
 #include "MELA.h"
@@ -26,6 +23,7 @@
 be sure to compile/load everything:
 
 gSystem->AddIncludePath("-I/$ROOFITSYS/include/");
+
 .L ../PDFs/RooXZsZs_5D.cxx+
 .L ../PDFs/RooSpinOne_7D.cxx+
 .L ../PDFs/RooSpinTwo_7D.cxx+
@@ -34,6 +32,7 @@ gSystem->AddIncludePath("-I/$ROOFITSYS/include/");
 .L ../src/VectorPdfFactory.cc+
 .L ../src/TensorPdfFactory.cc+
 .L ../PDFs/RooqqZZ_JHU.cxx+
+
 .L MELA.C+
  - -  - - - - - - - - - - - - - - -  - - -  -  -
 ===============================================*/
