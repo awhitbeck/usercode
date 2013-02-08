@@ -1,27 +1,30 @@
 #include <algorithm>
 
-double ZXnorm =  1.6 + 1.06 + 0.78 + 0.73 + 0.35 + 0.28 ;//1.0086+0.3826+0.4505+1.3097+0.8967+1.9897;
+double ZXnorm = 1.0086+0.3826+0.4505+1.3097+0.8967+1.9897;
 
-TString JHUinputDir="/tmp/sbologne/130205/";
-TString inputDir="/tmp/sbologne/130205/";
+TString JHUinputDir="/scratch0/hep/whitbeck/4lHelicity/datafiles/130203/";
+TString inputDir="/scratch0/hep/whitbeck/4lHelicity/datafiles/130203/";
 
-enum model {k0minus,k0hplus,k1minus,k1plus,k2mplus_gg,k2mplus_qqb,kNUM};
+enum model {kqqZZ,k0minus,k0hplus,k1minus,k1plus,k2mplus_gg,k2mplus_qqb,kNUM};
 
-TString saveTag[6]={"0minus",
+TString saveTag[7]={"superKD",
+                    "0minus",
 		    "0hplus",
 		    "1minus",
 		    "1plus",
 		    "2mplus_gg",
 		    "2mplus_qqbar"};
 
-TString sampleName[6]={"jhuGenV2PseH126",
+TString sampleName[7]={"jhuGenV2PseH126",
+                       "jhuGenV2PseH126",
 		       "jhuGenV2ScaHH126",
 		       "jhuGenV2Vec1MH126",
 		       "jhuGenV2Vec1PH126",
 		       "jhuGenV2GravH126",
 		       "jhuGenV2qqGravH126"};
 
-TString legendTag[6]={"J^{P}=0^{-}",
+TString legendTag[7]={"",
+                      "J^{P}=0^{-}",
 		      "J^{P}=0^{+}_{h}",
 		      "J^{P}=1^{-}",
 		      "J^{P}=1^{+}",
@@ -29,14 +32,16 @@ TString legendTag[6]={"J^{P}=0^{-}",
 		      "J^{P}=2^{+}_{m} (q#bar{q})"};		      
 
 
-TString axisLabel[6]={"#it{D}_{0^{-}}",
+TString axisLabel[7]={"#it{D}_{bkg}",
+                      "#it{D}_{0^{-}}",
 		      "#it{D}_{0^{+}_{h}}",
 		      "#it{D}(1^{-})",
 		      "#it{D}(1^{+})",
 		      "#it{D}_{2^{+}_{m} (gg)}",
 		      "#it{D}_{2^{+}_{m} (q#bar{q})}"};		      
 
-TString drawString[6]={"p0plus_VAJHU/(p0plus_VAJHU+p0minus_VAJHU)",
+TString drawString[7]={"p0plus_VAJHU*p0plus_m4l/(p0plus_VAJHU*p0plus_m4l+bkg_VAMCFMNorm*bkg_m4l)",
+                       "p0plus_VAJHU/(p0plus_VAJHU+p0minus_VAJHU)",
 		       "p0plus_VAJHU/(p0plus_VAJHU+p0hplus_VAJHU)",
 		       "p0plus_VAJHU/(p0plus_VAJHU+p1_VAJHU)",
 		       "p0plus_VAJHU/(p0plus_VAJHU+p1plus_VAJHU)",
@@ -45,7 +50,7 @@ TString drawString[6]={"p0plus_VAJHU/(p0plus_VAJHU+p0minus_VAJHU)",
 
 TString cutString;
 
-bool applySuperKDcut=true;
+bool applySuperKDcut=false;
 
 void plotKDprojections(model myModel){
 
@@ -64,18 +69,18 @@ void plotKDprojections(model myModel){
   qqZZ_8->Add(inputDir+"PRODFSR_8TeV/4e/HZZ4lTree_ZZTo*.root");
   qqZZ_8->Add(inputDir+"PRODFSR_8TeV/2mu2e/HZZ4lTree_ZZTo*.root");
   TChain* qqZZ_7 = new TChain("SelectedTree");
-  qqZZ_7->Add(inputDir+"PRODFSR_8TeV/4mu/HZZ4lTree_ZZTo*.root");
-  qqZZ_7->Add(inputDir+"PRODFSR_8TeV/4e/HZZ4lTree_ZZTo*.root");
-  qqZZ_7->Add(inputDir+"PRODFSR_8TeV/2mu2e/HZZ4lTree_ZZTo*.root");
+  qqZZ_7->Add(inputDir+"PRODFSR/4mu/HZZ4lTree_ZZTo*.root");
+  qqZZ_7->Add(inputDir+"PRODFSR/4e/HZZ4lTree_ZZTo*.root");
+  qqZZ_7->Add(inputDir+"PRODFSR/2mu2e/HZZ4lTree_ZZTo*.root");
 
   TChain* SM_8 = new TChain("SelectedTree");
-  SM_8->Add(inputDir+"JHU_8TeV/4mu/HZZ4lTree_jhuGenV2H126.root");
-  SM_8->Add(inputDir+"JHU_8TeV/4e/HZZ4lTree_jhuGenV2H126.root");
-  SM_8->Add(inputDir+"JHU_8TeV/2mu2e/HZZ4lTree_jhuGenV2H126.root");
+  SM_8->Add(inputDir+"JHU_8TeV/4mu/ZZ4lAnalysis_jhuGenV2H126.root");
+  SM_8->Add(inputDir+"JHU_8TeV/4e/ZZ4lAnalysis_jhuGenV2H126.root");
+  SM_8->Add(inputDir+"JHU_8TeV/2mu2e/ZZ4lAnalysis_jhuGenV2H126.root");
   TChain* SM_7 = new TChain("SelectedTree");
-  SM_7->Add(inputDir+"JHU_8TeV/4mu/HZZ4lTree_jhuGenV2H126.root");
-  SM_7->Add(inputDir+"JHU_8TeV/4e/HZZ4lTree_jhuGenV2H126.root");
-  SM_7->Add(inputDir+"JHU_8TeV/2mu2e/HZZ4lTree_jhuGenV2H126.root");
+  SM_7->Add(inputDir+"JHU/4mu/HZZ4lTree_jhuGenV2H126.root");
+  SM_7->Add(inputDir+"JHU/4e/HZZ4lTree_jhuGenV2H126.root");
+  SM_7->Add(inputDir+"JHU/2mu2e/HZZ4lTree_jhuGenV2H126.root");
 
   TChain* POWHEG_8 = new TChain("SelectedTree");
   POWHEG_8->Add(inputDir+"PRODFSR_8TeV/4mu/HZZ4lTree_H126.root");
@@ -83,55 +88,56 @@ void plotKDprojections(model myModel){
   POWHEG_8->Add(inputDir+"PRODFSR_8TeV/2mu2e/HZZ4lTree_H126.root");
 
   TChain* POWHEG_7 = new TChain("SelectedTree");
-  POWHEG_7->Add(inputDir+"PRODFSR_8TeV/4mu/HZZ4lTree_H126.root");
-  POWHEG_7->Add(inputDir+"PRODFSR_8TeV/4e/HZZ4lTree_H126.root");
-  POWHEG_7->Add(inputDir+"PRODFSR_8TeV/2mu2e/HZZ4lTree_H126.root");
+  POWHEG_7->Add(inputDir+"PRODFSR/4mu/HZZ4lTree_H126.root");
+  POWHEG_7->Add(inputDir+"PRODFSR/4e/HZZ4lTree_H126.root");
+  POWHEG_7->Add(inputDir+"PRODFSR/2mu2e/HZZ4lTree_H126.root");
 
   TChain* PS_8 = new TChain("SelectedTree");
-  PS_8->Add(JHUinputDir+"JHU_8TeV/4mu/HZZ4lTree_"+sampleName[myModel]+".root");
-  PS_8->Add(JHUinputDir+"JHU_8TeV/4e/HZZ4lTree_"+sampleName[myModel]+".root");
-  PS_8->Add(JHUinputDir+"JHU_8TeV/2mu2e/HZZ4lTree_"+sampleName[myModel]+".root");
+  PS_8->Add(JHUinputDir+"JHU_8TeV/4mu/ZZ4lAnalysis_"+sampleName[myModel]+".root");
+  PS_8->Add(JHUinputDir+"JHU_8TeV/4e/ZZ4lAnalysis_"+sampleName[myModel]+".root");
+  PS_8->Add(JHUinputDir+"JHU_8TeV/2mu2e/ZZ4lAnalysis_"+sampleName[myModel]+".root");
   TChain* PS_7 = new TChain("SelectedTree");
-  PS_7->Add(JHUinputDir+"JHU_8TeV/4mu/HZZ4lTree_"+sampleName[myModel]+".root");
-  PS_7->Add(JHUinputDir+"JHU_8TeV/4e/HZZ4lTree_"+sampleName[myModel]+".root");
-  PS_7->Add(JHUinputDir+"JHU_8TeV/2mu2e/HZZ4lTree_"+sampleName[myModel]+".root");
+  PS_7->Add(JHUinputDir+"JHU/4mu/HZZ4lTree_"+sampleName[myModel]+".root");
+  PS_7->Add(JHUinputDir+"JHU/4e/HZZ4lTree_"+sampleName[myModel]+".root");
+  PS_7->Add(JHUinputDir+"JHU/2mu2e/HZZ4lTree_"+sampleName[myModel]+".root");
 
   TChain* data = new TChain("SelectedTree");
   data->Add(inputDir+"PRODFSR_8TeV/data/HZZ4lTree_DoubleMu.root");
   data->Add(inputDir+"PRODFSR_8TeV/data/HZZ4lTree_DoubleOr.root");
   data->Add(inputDir+"PRODFSR_8TeV/data/HZZ4lTree_DoubleEle.root");
+
   data->Add(inputDir+"PRODFSR/data/HZZ4lTree_DoubleMu.root");
   data->Add(inputDir+"PRODFSR/data/HZZ4lTree_DoubleOr.root");
   data->Add(inputDir+"PRODFSR/data/HZZ4lTree_DoubleEle.root");
 
-  data->Draw(drawString[myModel]+">>datahisto(30,0,1)",cutString);
+  data->Draw(drawString[myModel]+">>datahisto(20,0,1)",cutString);
   TH1F* datahisto = (TH1F*) gDirectory->Get("datahisto");
   
-  qqZZ_7->Draw(drawString[myModel]+">>qqZZ_7histo(30,0,1)","5.051*MC_weight*("+cutString+")");
+  qqZZ_7->Draw(drawString[myModel]+">>qqZZ_7histo(20,0,1)","5.051*MC_weight*("+cutString+")");
   TH1F* qqZZ_7histo = (TH1F*) gDirectory->Get("qqZZ_7histo");
 
-  qqZZ_8->Draw(drawString[myModel]+">>qqZZ_8histo(30,0,1)","19.61*MC_weight*("+cutString+")");
+  qqZZ_8->Draw(drawString[myModel]+">>qqZZ_8histo(20,0,1)","19.61*MC_weight*("+cutString+")");
   TH1F* qqZZ_8histo = (TH1F*) gDirectory->Get("qqZZ_8histo");
 
-  POWHEG_7->Draw(drawString[myModel]+">>POWHEG_7histo(30,0,1)","5.051*MC_weight*("+cutString+")");
+  POWHEG_7->Draw(drawString[myModel]+">>POWHEG_7histo(20,0,1)","5.051*MC_weight*("+cutString+")");
   TH1F* POWHEG_7histo = (TH1F*) gDirectory->Get("POWHEG_7histo");
 
-  POWHEG_8->Draw(drawString[myModel]+">>POWHEG_8histo(30,0,1)","19.61*MC_weight*("+cutString+")");
+  POWHEG_8->Draw(drawString[myModel]+">>POWHEG_8histo(20,0,1)","19.61*MC_weight*("+cutString+")");
   TH1F* POWHEG_8histo = (TH1F*) gDirectory->Get("POWHEG_8histo");
 
-  SM_7->Draw(drawString[myModel]+">>SM_7histo(30,0,1)","5.051*MC_weight*("+cutString+")");
+  SM_7->Draw(drawString[myModel]+">>SM_7histo(20,0,1)","5.051*MC_weight*("+cutString+")");
   TH1F* SM_7histo = (TH1F*) gDirectory->Get("SM_7histo");
   SM_7histo->Scale(POWHEG_7histo->Integral()/SM_7histo->Integral());
 
-  SM_8->Draw(drawString[myModel]+">>SM_8histo(30,0,1)","19.61*MC_weight*("+cutString+")");
+  SM_8->Draw(drawString[myModel]+">>SM_8histo(20,0,1)","19.61*MC_weight*("+cutString+")");
   TH1F* SM_8histo = (TH1F*) gDirectory->Get("SM_8histo");
   SM_8histo->Scale(POWHEG_8histo->Integral()/SM_8histo->Integral());
 
-  PS_8->Draw(drawString[myModel]+">>PS_8histo(30,0,1)","19.61*MC_weight*("+cutString+")");
+  PS_8->Draw(drawString[myModel]+">>PS_8histo(20,0,1)","19.61*MC_weight*("+cutString+")");
   TH1F* PS_8histo = (TH1F*) gDirectory->Get("PS_8histo");
   PS_8histo->Scale(POWHEG_8histo->Integral()/PS_8histo->Integral());
 
-  PS_7->Draw(drawString[myModel]+">>PS_7histo(30,0,1)","5.051*MC_weight*("+cutString+")");
+  PS_7->Draw(drawString[myModel]+">>PS_7histo(20,0,1)","5.051*MC_weight*("+cutString+")");
   TH1F* PS_7histo = (TH1F*) gDirectory->Get("PS_7histo");
   PS_7histo->Scale(POWHEG_7histo->Integral()/PS_7histo->Integral());
  
@@ -149,11 +155,8 @@ void plotKDprojections(model myModel){
   qqZZhisto->SetLineWidth(2);
   qqZZhisto->SetFillColor(kAzure-9);
 
-  //double with =(double) qqZZ_8->Draw("ZZMass",cutString);
-  //double without = (double) qqZZ_8->Draw("ZZMass","ZZMass>106.&&ZZMass<141.");
-  
-  double with =(double) qqZZ_8->Draw("ZZMass","MC_weight*("+cutString+")");
-  double without = (double) qqZZ_8->Draw("ZZMass","MC_weight*(ZZMass>106.&&ZZMass<141.)");
+  double with =(double) qqZZ_8->Draw("ZZMass",cutString);
+  double without = (double) qqZZ_8->Draw("ZZMass","ZZMass>106.&&ZZMass<141.");
 
   TH1F* ZXhisto = new TH1F(*qqZZhisto);
   ZXhisto->Scale(ZXnorm/ZXhisto->Integral()*with/without);
@@ -179,23 +182,16 @@ void plotKDprojections(model myModel){
   
   datahisto->GetXaxis()->SetTitle(axisLabel[myModel]);
   datahisto->GetYaxis()->SetTitle("Events");
-  datahisto->SetTitle("");
-
+  
   THStack* stackSM = new THStack("stackSM","stackSM");
-  ZXhisto->SetTitle("");
-  qqZZhisto->SetTitle("");
-  SMhisto->SetTitle("");
   stackSM->Add(ZXhisto);
   stackSM->Add(qqZZhisto);
   stackSM->Add(SMhisto);
-  stackSM->SetTitle("");
 
   THStack* stackPS = new THStack("stackPS","stackPS");
-  PShisto->SetTitle("");
   stackPS->Add(ZXhisto);
   stackPS->Add(qqZZhisto);
   stackPS->Add(PShisto);
-  stackPS->SetTitle("");
 
   // ------------ draw ----------------
 
@@ -208,19 +204,19 @@ void plotKDprojections(model myModel){
   //stackSM->SetMaximum(stackSM->GetMaximum()*1.5);  
   
   stackSM->Draw("SAME");
-  stackPS->Draw("SAME");
+  if(myModel!=0) stackPS->Draw("SAME");
   datahisto->Draw("E1same");
   datahisto->Draw("SAMEp");
 
   // ------------ legend ---------------
 
-  TLegend* leg = new TLegend(.2,.65,.45,.9);
+  TLegend* leg = new TLegend(.2,.65,.6,.9);
   leg->SetFillColor(0);
   leg->SetBorderSize(0);
 
   leg->AddEntry(datahisto,"data","p");
   leg->AddEntry(SMhisto,"0^{+}, m_{H}=126 GeV","l");
-  leg->AddEntry(PShisto,legendTag[myModel]+", m_{H}=126 GeV","l");
+  if(myModel!=0) leg->AddEntry(PShisto,legendTag[myModel]+", m_{H}=126 GeV","l");
   leg->AddEntry(qqZZhisto,"ZZ/Z#gamma^{*}","f");
   leg->AddEntry(ZXhisto,"Z+X","f");
 
@@ -244,16 +240,15 @@ void plotKDprojections(model myModel){
 
   // ------------ save 
 
-
   if(applySuperKDcut){
-    can->SetName("KD_"+saveTag[myModel]+"_Proj_superKDcut");
     can->SaveAs("KD_"+saveTag[myModel]+"_Proj_superKDcut.png");
     can->SaveAs("KD_"+saveTag[myModel]+"_Proj_superKDcut.eps");
+    can->SaveAs("KD_"+saveTag[myModel]+"_Proj_superKDcut.pdf");
     can->SaveAs("KD_"+saveTag[myModel]+"_Proj_superKDcut.root");
   }else{
-    can->SetName("KD_"+saveTag[myModel]+"_Proj");
     can->SaveAs("KD_"+saveTag[myModel]+"_Proj.png");
     can->SaveAs("KD_"+saveTag[myModel]+"_Proj.eps");
+    can->SaveAs("KD_"+saveTag[myModel]+"_Proj.pdf");
     can->SaveAs("KD_"+saveTag[myModel]+"_Proj.root");
   }
 
@@ -262,10 +257,16 @@ void plotKDprojections(model myModel){
 
 void plotAll(){
 
-  for(model i = 0 ; i<model::kNUM ; i++){
+  applySuperKDcut=true;
 
+  for(model i = 1 ; i<model::kNUM ; i++){
     plotKDprojections(i);
+  }
 
+  applySuperKDcut=false;
+
+  for(model i = 0 ; i<model::kNUM ; i++){
+    plotKDprojections(i);
   }
 
 }
