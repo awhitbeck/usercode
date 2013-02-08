@@ -1,11 +1,11 @@
 // source /afs/cern.ch/sw/lcg/app/releases/ROOT/5.34.04/x86_64-slc5-gcc43-opt/root/bin/thisroot.sh
 
-bool plotData=false;
+bool plotData=true;
 bool plotAltSig=false;
 
-double ZXnorm = 21;//HCP:1.0268 + 1.9260 + 0.5210 + 1.1377 + 0.3423 + 0.5697;
-TString inputDir="/tmp/sbologne/Trees_061112_M126/";
-TString JHUinputDir="/tmp/sbologne/Trees_061112_M126/";
+double ZXnorm = 1.6 + 1.06 + 0.78 + 0.73 + 0.35 + 0.28 ;//HCP:1.0268 + 1.9260 + 0.5210 + 1.1377 + 0.3423 + 0.5697;
+TString inputDir="/tmp/sbologne/130205/";
+TString JHUinputDir="/tmp/sbologne/130205/";
 
 void plotSuperMelaProjections(TString drawString="(p0plus_VAJHU*p0plus_m4l)/((p0plus_VAJHU*p0plus_m4l)+(bkg_VAMCFMNorm*bkg_m4l))",
 			      TString cutString="ZZMass>106.&&ZZMass<141."){
@@ -18,40 +18,44 @@ void plotSuperMelaProjections(TString drawString="(p0plus_VAJHU*p0plus_m4l)/((p0
   gStyle->SetOptStat(0);
 
   TChain* qqZZ_8 = new TChain("SelectedTree");
-  qqZZ_8->Add(inputDir+"PRODFSR_8TeV/4mu/HZZ4lTree_ZZTo*_withSMD_doubleCBonly_withProbabilities.root");
-  qqZZ_8->Add(inputDir+"PRODFSR_8TeV/4e/HZZ4lTree_ZZTo*_withSMD_doubleCBonly_withProbabilities.root");
-  qqZZ_8->Add(inputDir+"PRODFSR_8TeV/2e2mu/HZZ4lTree_ZZTo*_withSMD_doubleCBonly_withProbabilities.root");
+  qqZZ_8->Add(inputDir+"PRODFSR_8TeV/4mu/HZZ4lTree_ZZTo*.root");
+  qqZZ_8->Add(inputDir+"PRODFSR_8TeV/4e/HZZ4lTree_ZZTo*.root");
+  qqZZ_8->Add(inputDir+"PRODFSR_8TeV/2mu2e/HZZ4lTree_ZZTo*.root");
   TChain* qqZZ_7 = new TChain("SelectedTree");
-  qqZZ_7->Add(inputDir+"PRODFSR_7TeV/4mu/HZZ4lTree_ZZTo*_withSMD_doubleCBonly_withProbabilities.root");
-  qqZZ_7->Add(inputDir+"PRODFSR_7TeV/4e/HZZ4lTree_ZZTo*_withSMD_doubleCBonly_withProbabilities.root");
-  qqZZ_7->Add(inputDir+"PRODFSR_7TeV/2e2mu/HZZ4lTree_ZZTo*_withSMD_doubleCBonly_withProbabilities.root");
+  qqZZ_7->Add(inputDir+"PRODFSR/4mu/HZZ4lTree_ZZTo*.root");
+  qqZZ_7->Add(inputDir+"PRODFSR/4e/HZZ4lTree_ZZTo*.root");
+  qqZZ_7->Add(inputDir+"PRODFSR/2mu2e/HZZ4lTree_ZZTo*.root");
 
   TChain* SM_8 = new TChain("SelectedTree");
-  SM_8->Add(inputDir+"PRODFSR_8TeV/4mu/HZZ4lTree_H126_withSMD_doubleCBonly_withProbabilities.root");
-  SM_8->Add(inputDir+"PRODFSR_8TeV/4e/HZZ4lTree_H126_withSMD_doubleCBonly_withProbabilities.root");
-  SM_8->Add(inputDir+"PRODFSR_8TeV/2e2mu/HZZ4lTree_H126_withSMD_doubleCBonly_withProbabilities.root");
+  SM_8->Add(inputDir+"PRODFSR_8TeV/4mu/HZZ4lTree_H126.root");
+  SM_8->Add(inputDir+"PRODFSR_8TeV/4e/HZZ4lTree_H126.root");
+  SM_8->Add(inputDir+"PRODFSR_8TeV/2mu2e/HZZ4lTree_H126.root");
   TChain* SM_7 = new TChain("SelectedTree");
-  SM_7->Add(inputDir+"PRODFSR_7TeV/4mu/HZZ4lTree_H126_withSMD_doubleCBonly_withProbabilities.root");
-  SM_7->Add(inputDir+"PRODFSR_7TeV/4e/HZZ4lTree_H126_withSMD_doubleCBonly_withProbabilities.root");
-  SM_7->Add(inputDir+"PRODFSR_7TeV/2e2mu/HZZ4lTree_H126_withSMD_doubleCBonly_withProbabilities.root");
+  SM_7->Add(inputDir+"PRODFSR/4mu/HZZ4lTree_H126.root");
+  SM_7->Add(inputDir+"PRODFSR/4e/HZZ4lTree_H126.root");
+  SM_7->Add(inputDir+"PRODFSR/2mu2e/HZZ4lTree_H126.root");
 
   //TChain* ZX = new TChain("SelectedTree");
 
   TChain* data = new TChain("SelectedTree");
-  data->Add(inputDir+"PRODFSR_8TeV/data/HZZ4lTree_Double*_withSMD_doubleCBonly_withProbabilities.root");
-  data->Add(inputDir+"PRODFSR_7TeV/data/HZZ4lTree_Double*_withSMD_doubleCBonly_withProbabilities.root");
+  data->Add(inputDir+"PRODFSR_8TeV/data/HZZ4lTree_DoubleEle.root");
+  data->Add(inputDir+"PRODFSR_8TeV/data/HZZ4lTree_DoubleMu.root");
+  data->Add(inputDir+"PRODFSR_8TeV/data/HZZ4lTree_DoubleOr.root");
+  data->Add(inputDir+"PRODFSR/data/HZZ4lTree_DoubleEle.root");
+  data->Add(inputDir+"PRODFSR/data/HZZ4lTree_DoubleMu.root");
+  data->Add(inputDir+"PRODFSR/data/HZZ4lTree_DoubleOr.root");
 
   data->Draw(drawString+">>datahisto(30,0,1)",cutString);
   TH1F* datahisto = (TH1F*) gDirectory->Get("datahisto");
 
   TChain* PS_8 = new TChain("SelectedTree");
-  PS_8->Add(JHUinputDir+"JHU_8TeV_withInterf/4mu/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly_withProbabilities.root");
-  PS_8->Add(JHUinputDir+"JHU_8TeV_withInterf/4e/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly_withProbabilities.root");
-  PS_8->Add(JHUinputDir+"JHU_8TeV_withInterf/2e2mu/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly_withProbabilities.root");
+  PS_8->Add(JHUinputDir+"JHU_8TeV/4mu/HZZ4lTree_jhuGenV2PseH126.root");
+  PS_8->Add(JHUinputDir+"JHU_8TeV/4e/HZZ4lTree_jhuGenV2PseH126.root");
+  PS_8->Add(JHUinputDir+"JHU_8TeV/2mu2e/HZZ4lTree_jhuGenV2PseH126.root");
   TChain* PS_7 = new TChain("SelectedTree");
-  PS_7->Add(JHUinputDir+"JHU_7TeV_withInterf/4mu/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly_withProbabilities.root");
-  PS_7->Add(JHUinputDir+"JHU_7TeV_withInterf/4e/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly_withProbabilities.root");
-  PS_7->Add(JHUinputDir+"JHU_7TeV_withInterf/2e2mu/HZZ4lTree_jhuPseH126_withSMD_doubleCBonly_withProbabilities.root");
+  PS_7->Add(JHUinputDir+"JHU/4mu/HZZ4lTree_jhuGenV2PseH126.root");
+  PS_7->Add(JHUinputDir+"JHU/4e/HZZ4lTree_jhuGenV2PseH126.root");
+  PS_7->Add(JHUinputDir+"JHU/2mu2e/HZZ4lTree_jhuGenV2PseH126.root");
   
   qqZZ_7->Draw(drawString+">>qqZZ_7histo(30,0,1)","5.051*MC_weight*("+cutString+")");
   TH1F* qqZZ_7histo = (TH1F*) gDirectory->Get("qqZZ_7histo");
@@ -79,6 +83,7 @@ void plotSuperMelaProjections(TString drawString="(p0plus_VAJHU*p0plus_m4l)/((p0
 	
   TH1F* qqZZhisto = new TH1F(*qqZZ_7histo);
   qqZZhisto->Add(qqZZ_8histo);
+  cout<<qqZZhisto->Integral()<<endl;
   qqZZhisto->SetLineColor(1);
   qqZZhisto->SetLineWidth(2);
   qqZZhisto->SetFillColor(kAzure-9);
@@ -102,7 +107,7 @@ void plotSuperMelaProjections(TString drawString="(p0plus_VAJHU*p0plus_m4l)/((p0
   PShisto->SetFillColor(0);
   //==========================
 
-  datahisto->GetXaxis()->SetTitle("it{D}_{bkg}");
+  datahisto->GetXaxis()->SetTitle("#it{D}_{bkg}");
   datahisto->GetYaxis()->SetTitle("Events");
 
   THStack* stack = new THStack("stack","stack");
@@ -114,6 +119,7 @@ void plotSuperMelaProjections(TString drawString="(p0plus_VAJHU*p0plus_m4l)/((p0
   stack->GetYaxis()->SetTitle("Events");  
 
   if(plotData){
+    datahisto->SetMaximum(20);
     datahisto->Draw("E1");
     stack->Draw("SAME");
     datahisto->Draw("E1same");

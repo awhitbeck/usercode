@@ -1,9 +1,9 @@
 #include <algorithm>
 
-double ZXnorm = 1.0086+0.3826+0.4505+1.3097+0.8967+1.9897;
+double ZXnorm =  1.6 + 1.06 + 0.78 + 0.73 + 0.35 + 0.28 ;//1.0086+0.3826+0.4505+1.3097+0.8967+1.9897;
 
-TString JHUinputDir="/scratch0/hep/whitbeck/4lHelicity/datafiles/130130/";
-TString inputDir="/scratch0/hep/whitbeck/4lHelicity/datafiles/130130/";
+TString JHUinputDir="/tmp/sbologne/130205/";
+TString inputDir="/tmp/sbologne/130205/";
 
 enum model {k0minus,k0hplus,k1minus,k1plus,k2mplus_gg,k2mplus_qqb,kNUM};
 
@@ -69,13 +69,13 @@ void plotKDprojections(model myModel){
   qqZZ_7->Add(inputDir+"PRODFSR_8TeV/2mu2e/HZZ4lTree_ZZTo*.root");
 
   TChain* SM_8 = new TChain("SelectedTree");
-  SM_8->Add(inputDir+"JHU_8TeV/4mu/ZZ4lAnalysis_jhuGenV2H126.root");
-  SM_8->Add(inputDir+"JHU_8TeV/4e/ZZ4lAnalysis_jhuGenV2H126.root");
-  SM_8->Add(inputDir+"JHU_8TeV/2mu2e/ZZ4lAnalysis_jhuGenV2H126.root");
+  SM_8->Add(inputDir+"JHU_8TeV/4mu/HZZ4lTree_jhuGenV2H126.root");
+  SM_8->Add(inputDir+"JHU_8TeV/4e/HZZ4lTree_jhuGenV2H126.root");
+  SM_8->Add(inputDir+"JHU_8TeV/2mu2e/HZZ4lTree_jhuGenV2H126.root");
   TChain* SM_7 = new TChain("SelectedTree");
-  SM_7->Add(inputDir+"JHU_8TeV/4mu/ZZ4lAnalysis_jhuGenV2H126.root");
-  SM_7->Add(inputDir+"JHU_8TeV/4e/ZZ4lAnalysis_jhuGenV2H126.root");
-  SM_7->Add(inputDir+"JHU_8TeV/2mu2e/ZZ4lAnalysis_jhuGenV2H126.root");
+  SM_7->Add(inputDir+"JHU_8TeV/4mu/HZZ4lTree_jhuGenV2H126.root");
+  SM_7->Add(inputDir+"JHU_8TeV/4e/HZZ4lTree_jhuGenV2H126.root");
+  SM_7->Add(inputDir+"JHU_8TeV/2mu2e/HZZ4lTree_jhuGenV2H126.root");
 
   TChain* POWHEG_8 = new TChain("SelectedTree");
   POWHEG_8->Add(inputDir+"PRODFSR_8TeV/4mu/HZZ4lTree_H126.root");
@@ -88,18 +88,21 @@ void plotKDprojections(model myModel){
   POWHEG_7->Add(inputDir+"PRODFSR_8TeV/2mu2e/HZZ4lTree_H126.root");
 
   TChain* PS_8 = new TChain("SelectedTree");
-  PS_8->Add(JHUinputDir+"JHU_8TeV/4mu/ZZ4lAnalysis_"+sampleName[myModel]+".root");
-  PS_8->Add(JHUinputDir+"JHU_8TeV/4e/ZZ4lAnalysis_"+sampleName[myModel]+".root");
-  PS_8->Add(JHUinputDir+"JHU_8TeV/2mu2e/ZZ4lAnalysis_"+sampleName[myModel]+".root");
+  PS_8->Add(JHUinputDir+"JHU_8TeV/4mu/HZZ4lTree_"+sampleName[myModel]+".root");
+  PS_8->Add(JHUinputDir+"JHU_8TeV/4e/HZZ4lTree_"+sampleName[myModel]+".root");
+  PS_8->Add(JHUinputDir+"JHU_8TeV/2mu2e/HZZ4lTree_"+sampleName[myModel]+".root");
   TChain* PS_7 = new TChain("SelectedTree");
-  PS_7->Add(JHUinputDir+"JHU_8TeV/4mu/ZZ4lAnalysis_"+sampleName[myModel]+".root");
-  PS_7->Add(JHUinputDir+"JHU_8TeV/4e/ZZ4lAnalysis_"+sampleName[myModel]+".root");
-  PS_7->Add(JHUinputDir+"JHU_8TeV/2mu2e/ZZ4lAnalysis_"+sampleName[myModel]+".root");
+  PS_7->Add(JHUinputDir+"JHU_8TeV/4mu/HZZ4lTree_"+sampleName[myModel]+".root");
+  PS_7->Add(JHUinputDir+"JHU_8TeV/4e/HZZ4lTree_"+sampleName[myModel]+".root");
+  PS_7->Add(JHUinputDir+"JHU_8TeV/2mu2e/HZZ4lTree_"+sampleName[myModel]+".root");
 
   TChain* data = new TChain("SelectedTree");
   data->Add(inputDir+"PRODFSR_8TeV/data/HZZ4lTree_DoubleMu.root");
   data->Add(inputDir+"PRODFSR_8TeV/data/HZZ4lTree_DoubleOr.root");
   data->Add(inputDir+"PRODFSR_8TeV/data/HZZ4lTree_DoubleEle.root");
+  data->Add(inputDir+"PRODFSR/data/HZZ4lTree_DoubleMu.root");
+  data->Add(inputDir+"PRODFSR/data/HZZ4lTree_DoubleOr.root");
+  data->Add(inputDir+"PRODFSR/data/HZZ4lTree_DoubleEle.root");
 
   data->Draw(drawString[myModel]+">>datahisto(30,0,1)",cutString);
   TH1F* datahisto = (TH1F*) gDirectory->Get("datahisto");
@@ -146,8 +149,11 @@ void plotKDprojections(model myModel){
   qqZZhisto->SetLineWidth(2);
   qqZZhisto->SetFillColor(kAzure-9);
 
-  double with =(double) qqZZ_8->Draw("ZZMass",cutString);
-  double without = (double) qqZZ_8->Draw("ZZMass","ZZMass>106.&&ZZMass<141.");
+  //double with =(double) qqZZ_8->Draw("ZZMass",cutString);
+  //double without = (double) qqZZ_8->Draw("ZZMass","ZZMass>106.&&ZZMass<141.");
+  
+  double with =(double) qqZZ_8->Draw("ZZMass","MC_weight*("+cutString+")");
+  double without = (double) qqZZ_8->Draw("ZZMass","MC_weight*(ZZMass>106.&&ZZMass<141.)");
 
   TH1F* ZXhisto = new TH1F(*qqZZhisto);
   ZXhisto->Scale(ZXnorm/ZXhisto->Integral()*with/without);
@@ -173,16 +179,23 @@ void plotKDprojections(model myModel){
   
   datahisto->GetXaxis()->SetTitle(axisLabel[myModel]);
   datahisto->GetYaxis()->SetTitle("Events");
-  
+  datahisto->SetTitle("");
+
   THStack* stackSM = new THStack("stackSM","stackSM");
+  ZXhisto->SetTitle("");
+  qqZZhisto->SetTitle("");
+  SMhisto->SetTitle("");
   stackSM->Add(ZXhisto);
   stackSM->Add(qqZZhisto);
   stackSM->Add(SMhisto);
+  stackSM->SetTitle("");
 
   THStack* stackPS = new THStack("stackPS","stackPS");
+  PShisto->SetTitle("");
   stackPS->Add(ZXhisto);
   stackPS->Add(qqZZhisto);
   stackPS->Add(PShisto);
+  stackPS->SetTitle("");
 
   // ------------ draw ----------------
 
@@ -231,11 +244,14 @@ void plotKDprojections(model myModel){
 
   // ------------ save 
 
+
   if(applySuperKDcut){
+    can->SetName("KD_"+saveTag[myModel]+"_Proj_superKDcut");
     can->SaveAs("KD_"+saveTag[myModel]+"_Proj_superKDcut.png");
     can->SaveAs("KD_"+saveTag[myModel]+"_Proj_superKDcut.eps");
     can->SaveAs("KD_"+saveTag[myModel]+"_Proj_superKDcut.root");
   }else{
+    can->SetName("KD_"+saveTag[myModel]+"_Proj");
     can->SaveAs("KD_"+saveTag[myModel]+"_Proj.png");
     can->SaveAs("KD_"+saveTag[myModel]+"_Proj.eps");
     can->SaveAs("KD_"+saveTag[myModel]+"_Proj.root");
