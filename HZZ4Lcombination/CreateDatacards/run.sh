@@ -18,7 +18,7 @@ python makeDCsandWSsSMD.py -i SM_inputs_8TeV_MorAppr -a $1_8TeV -b -t templates2
 
 cd cards_$1_8TeV/HCG/126/
 cp ../../../cards_$1_7TeV/HCG/126/* .
-cp ../../../ex* .
+cp ../../../../SignalSeparation/ex* .
 
 
 combineCards.py hzz4l_2e2muS_7TeV_ALT.txt hzz4l_2e2muS_8TeV_ALT.txt hzz4l_4eS_7TeV_ALT.txt hzz4l_4eS_8TeV_ALT.txt hzz4l_4muS_7TeV_ALT.txt hzz4l_4muS_8TeV_ALT.txt > hzz4l_ALT.txt
