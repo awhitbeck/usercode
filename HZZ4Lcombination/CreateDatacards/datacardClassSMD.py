@@ -37,6 +37,38 @@ class datacardClass:
         ROOT.gSystem.Load("include/HiggsCSandWidth_cc.so")
         ROOT.gSystem.Load("include/HiggsCSandWidthSM4_cc.so")
 
+    def reflectSystematics(self,nomShape,altShape):
+
+        if(nomShape.GetNbinsX()!=altShape.GetNbinsX() or nomShape.GetNbinsY()!=altShape.GetNbinsY()):
+            print "AHHHHHHHHHHH, templates don't have the same binning!!!!"
+            return 0
+
+        newAltShape = ROOT.TH2F(altShape)
+
+        for x in range(1,nomShape.GetNbinsX()):
+            for y in range(1,nomShape.GetNbinsY()):
+                delta=altShape.GetBinContent(x,y)-nomShape.GetBinContent(x,y)
+                newAltShape.SetBinContent(x,y,nomShape.GetBinContent(x,y)-delta)
+                if(newAltShape.GetBinContent(x,y)<0.0):
+                    newAltShape.SetBinContent(x,y,0.0)
+            # done with loop over y bins
+        #done with loop over x bins
+
+        newAltShape.Scale(1.0/newAltShape.Integral())
+
+        #check that no bins are zero
+
+        for x in range(1,newAltShape.GetNbinsX()):
+            for y in range(1,newAltShape.GetNbinsY()):
+                if(newAltShape.GetBinContent(x,y)<0.000001):
+                    newAltShape.SetBinContent(x,y,0.000001)
+            # done with loop over y bins
+        #done with loop over x bins
+
+        newAltShape.Scale(1.0/newAltShape.Integral())
+
+        return newAltShape
+
     # cross section filter for 7 TeV efficiency
     def csFilter(self,hmass):
 
@@ -744,8 +776,8 @@ class datacardClass:
         TemplateName = "bkgTemplatePdf_qqzz_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)
         bkgTemplatePdf_qqzz = ROOT.RooHistPdf(TemplateName,TemplateName,ROOT.RooArgSet(SD,D),bkgTempDataHist)
         TemplateName = "bkgTemplatePdf_ggzz_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)
+        
         bkgTemplatePdf_ggzz = ROOT.RooHistPdf(TemplateName,TemplateName,ROOT.RooArgSet(SD,D),ggbkgTempDataHist)
-
 
         templateBkgName = "{0}/Dbackground_ZJetsCR_AllChans.root".format(self.templateDir)
         zjetsTempFile = ROOT.TFile(templateBkgName)
@@ -760,10 +792,17 @@ class datacardClass:
 #        bkgTemplatePdf_zjets = ROOT.RooHistPdf(TemplateName,TemplateName,ROOT.RooArgSet(SD,D),zjetsTempDataHist)
         TemplateName = "bkgTemplatePdf_zjets_Up_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)
         bkgTemplatePdf_zjets_Up = ROOT.RooHistPdf(TemplateName,TemplateName,ROOT.RooArgSet(SD,D),bkgTempDataHist_zjetsUp)
-        TemplateName = "bkgTemplatePdf_zjets_Down_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)
-        bkgTemplatePdf_zjets_Down = ROOT.RooHistPdf(TemplateName,TemplateName,ROOT.RooArgSet(SD,D),zjetsTempDataHist)
 
-        
+
+        zjetsTemplateDown = self.reflectSystematics(bkgTemplate,zjetsTemplate)
+        #zjetsTemplateDown.setName("zjetsTemplateDown_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts))
+        #zjetsTemplateDown.setTitle("zjetsTemplateDown_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts))
+        TemplateName = "zjetsTempDataHistDown_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)
+        zjetsTempDataHistDown = ROOT.RooDataHist(TemplateName,TemplateName,ROOT.RooArgList(SD,D),zjetsTemplateDown)
+        TemplateName = "bkgTemplatePdf_zjets_Down_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)
+        bkgTemplatePdf_zjets_Down = ROOT.RooHistPdf(TemplateName,TemplateName,ROOT.RooArgSet(SD,D),bkgTempDataHist)
+                
+
         funcList_zjets = ROOT.RooArgList()  
         morphBkgVarName =  "CMS_zz4l_smd_zjets_bkg_{0:.0f}".format(self.channel)    
         alphaMorphBkg = ROOT.RooRealVar(morphBkgVarName,morphBkgVarName,0,-20,20)
@@ -781,9 +820,9 @@ class datacardClass:
 
 
         TemplateName = "bkgTemplateMorphPdf_qqzz_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)    
-        bkgTemplateMorphPdf_qqzz = ROOT.FastVerticalInterpHistPdf2D(TemplateName,TemplateName,SD,D,true,ROOT.RooArgList(bkgTemplatePdf_qqzz),ROOT.RooArgList(),1.0,1)
+        bkgTemplateMorphPdf_qqzz = ROOT.FastVerticalInterpHistPdf2D(TemplateName,TemplateName,SD,D,false,ROOT.RooArgList(bkgTemplatePdf_qqzz),ROOT.RooArgList(),1.0,1)
         TemplateName = "bkgTemplateMorphPdf_ggzz_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)    
-        bkgTemplateMorphPdf_ggzz = ROOT.FastVerticalInterpHistPdf2D(TemplateName,TemplateName,SD,D,true,ROOT.RooArgList(bkgTemplatePdf_ggzz),ROOT.RooArgList(),1.0,1)
+        bkgTemplateMorphPdf_ggzz = ROOT.FastVerticalInterpHistPdf2D(TemplateName,TemplateName,SD,D,false,ROOT.RooArgList(bkgTemplatePdf_ggzz),ROOT.RooArgList(),1.0,1)
 
         print 'MORPHING the ZJETS BKG'
         TemplateName = "bkgTemplateMorphPdf_zjets_{0:.0f}_{1:.0f}".format(self.channel,self.sqrts)    
@@ -1093,69 +1132,38 @@ class datacardClass:
                
                 getattr(w,'import')(sigCB2d_ggH, ROOT.RooFit.RecycleConflictNodes())
 
-                if(self.sigMorph): #this switches on the inclusion of shape systematics
-                  #  sigTemplatePdf_ggH.SetNameTitle("ggH","ggH")
-                    sigTemplateMorphPdf_ggH.SetNameTitle("ggH","ggH")
-                    getattr(w,'import')(sigTemplatePdf_ggH, ROOT.RooFit.RecycleConflictNodes())
-                    getattr(w,'import')(sigTemplateMorphPdf_ggH, ROOT.RooFit.RecycleConflictNodes())
-                    #save syst templates individually
-                    systTempName=("ggHCMS_zz4l_leptScale_sig_{0}_{1:.0f}_Up").format(self.channel,self.sqrts)
-                    sigTemplatePdf_ggH_syst1Up.SetNameTitle(systTempName,systTempName)
-                    systTempName=("ggHCMS_zz4l_leptScale_sig_{0}_{1:.0f}_Down").format(self.channel,self.sqrts)
-                    sigTemplatePdf_ggH_syst1Down.SetNameTitle(systTempName,systTempName)
-                    
-                    if(self.isAltSig):   
-                        sigCB2d_ggH_ALT.SetNameTitle("ORIGggH{0}".format(self.appendHypType),"ggH{0}".format(self.appendHypType))
-                 #       sigTemplatePdf_ggH_ALT.SetNameTitle("ggH{0}".format(self.appendHypType),"ggH{0}".format(self.appendHypType))
-                        sigTemplateMorphPdf_ggH_ALT.SetNameTitle("ggH{0}".format(self.appendHypType),"ggH{0}".format(self.appendHypType))
-                        getattr(w,'import')(sigCB2d_ggH_ALT, ROOT.RooFit.RecycleConflictNodes())
-
-                        getattr(w,'import')(sigTemplatePdf_ggH_ALT, ROOT.RooFit.RecycleConflictNodes())
-                        getattr(w,'import')(sigTemplateMorphPdf_ggH_ALT, ROOT.RooFit.RecycleConflictNodes())
-                        
-                else: ### standard case, no signal syst shapes
-                    sigTemplatePdf_ggH.SetNameTitle("ggH","ggH")
-                    getattr(w,'import')(sigTemplatePdf_ggH, ROOT.RooFit.RecycleConflictNodes())
-                    systTempName=("ggHCMS_zz4l_leptScale_sig_{0}_{1:.0f}_Up").format(self.channel,self.sqrts)
-                    sigTemplatePdf_ggH_syst1Up.SetNameTitle(systTempName,systTempName)
-                    systTempName=("ggHCMS_zz4l_leptScale_sig_{0}_{1:.0f}_Down").format(self.channel,self.sqrts)
-                    sigTemplatePdf_ggH_syst1Down.SetNameTitle(systTempName,systTempName)
+                #  sigTemplatePdf_ggH.SetNameTitle("ggH","ggH")
+                sigTemplateMorphPdf_ggH.SetNameTitle("ggH","ggH")
+                getattr(w,'import')(sigTemplateMorphPdf_ggH, ROOT.RooFit.RecycleConflictNodes())
+                #save syst templates individually
+                systTempName=("ggHCMS_zz4l_leptScale_sig_{0}_{1:.0f}_Up").format(self.channel,self.sqrts)
+                sigTemplatePdf_ggH_syst1Up.SetNameTitle(systTempName,systTempName)
+                systTempName=("ggHCMS_zz4l_leptScale_sig_{0}_{1:.0f}_Down").format(self.channel,self.sqrts)
+                sigTemplatePdf_ggH_syst1Down.SetNameTitle(systTempName,systTempName)
                 
-                    if(self.isAltSig):   
-                        sigCB2d_ggH_ALT.SetNameTitle("ORIGggH{0}".format(self.appendHypType),"ggH{0}".format(self.appendHypType))
-                        sigTemplatePdf_ggH_ALT.SetNameTitle("ggH{0}".format(self.appendHypType),"ggH{0}".format(self.appendHypType))
-                        getattr(w,'import')(sigCB2d_ggH_ALT, ROOT.RooFit.RecycleConflictNodes())
-
-                        getattr(w,'import')(sigTemplatePdf_ggH_ALT, ROOT.RooFit.RecycleConflictNodes())
-                        ###systematics for ALT signal
-                        systTempName=("ggH{0}CMS_zz4l_leptScale_sig_{1}_{2:.0f}_Up").format(self.appendHypType,self.channel,self.sqrts)
-                        sigTemplatePdf_ggH_syst1Up.SetNameTitle(systTempName,systTempName)
-                        systTempName=("ggH{0}CMS_zz4l_leptScale_sig_{1}_{2:.0f}_Down").format(self.appendHypType,self.channel,self.sqrts)
-                        sigTemplatePdf_ggH_syst1Down.SetNameTitle(systTempName,systTempName)
-                        getattr(w,'import')(sigTemplatePdf_ggH_syst1Up, ROOT.RooFit.RecycleConflictNodes())
-                        getattr(w,'import')(sigTemplatePdf_ggH_syst1Down, ROOT.RooFit.RecycleConflictNodes())
-  
+                if(self.isAltSig):   
+                    sigCB2d_ggH_ALT.SetNameTitle("ORIGggH{0}".format(self.appendHypType),"ggH{0}".format(self.appendHypType))
+                    #       sigTemplatePdf_ggH_ALT.SetNameTitle("ggH{0}".format(self.appendHypType),"ggH{0}".format(self.appendHypType))
+                    sigTemplateMorphPdf_ggH_ALT.SetNameTitle("ggH{0}".format(self.appendHypType),"ggH{0}".format(self.appendHypType))
+                    getattr(w,'import')(sigCB2d_ggH_ALT, ROOT.RooFit.RecycleConflictNodes())
+                    
+                    getattr(w,'import')(sigTemplatePdf_ggH_ALT, ROOT.RooFit.RecycleConflictNodes())
+                    getattr(w,'import')(sigTemplateMorphPdf_ggH_ALT, ROOT.RooFit.RecycleConflictNodes())
+                    
 
             print 'Saving in WS bkgd shapes for superMELA'
             bkg2d_qqzz.SetNameTitle("ORIGbkg2d_qqzz","ORIGbkg2d_qqzz")
             bkg2d_ggzz.SetNameTitle("ORIGbkg2d_ggzz","ORIGbkg2d_ggzz")
             bkg2d_zjets.SetNameTitle("ORIGbkg2d_zjets","ORIGbkg2d_zjets")            
     
-            getattr(w,'import')(bkg2d_qqzz,ROOT.RooFit.RecycleConflictNodes())
-            getattr(w,'import')(bkg2d_ggzz,ROOT.RooFit.RecycleConflictNodes())
-            getattr(w,'import')(bkg2d_zjets,ROOT.RooFit.RecycleConflictNodes())
+            bkgTemplateMorphPdf_qqzz.SetNameTitle("bkg2d_qqzz","bkg2d_qqzz")
+            bkgTemplateMorphPdf_ggzz.SetNameTitle("bkg2d_ggzz","bkg2d_ggzz")
 
-            bkgTemplatePdf_qqzz.SetNameTitle("bkg2d_qqzz","bkg2d_qqzz")
-            bkgTemplatePdf_ggzz.SetNameTitle("bkg2d_ggzz","bkg2d_ggzz")
-            if(self.bkgMorph):
-                bkgTemplateMorphPdf_zjets.SetNameTitle("bkg2d_zjets","bkg2d_zjets")
-            else:
-                bkgTemplatePdf_zjets.SetNameTitle("bkg2d_zjets","bkg2d_zjets")
-            getattr(w,'import')(bkgTemplatePdf_qqzz,ROOT.RooFit.RecycleConflictNodes())
-            getattr(w,'import')(bkgTemplatePdf_ggzz,ROOT.RooFit.RecycleConflictNodes())
-            getattr(w,'import')(bkgTemplatePdf_zjets,ROOT.RooFit.RecycleConflictNodes())
-            if(self.bkgMorph):
-                getattr(w,'import')(bkgTemplateMorphPdf_zjets,ROOT.RooFit.RecycleConflictNodes())
+            bkgTemplateMorphPdf_zjets.SetNameTitle("bkg2d_zjets","bkg2d_zjets")
+            
+            getattr(w,'import')(bkgTemplateMorphPdf_qqzz,ROOT.RooFit.RecycleConflictNodes())
+            getattr(w,'import')(bkgTemplateMorphPdf_ggzz,ROOT.RooFit.RecycleConflictNodes())
+            getattr(w,'import')(bkgTemplateMorphPdf_zjets,ROOT.RooFit.RecycleConflictNodes())
             print 'finished to save bkg 2D pdfs in the WS'
 #################
 
