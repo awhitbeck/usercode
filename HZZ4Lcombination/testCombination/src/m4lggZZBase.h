@@ -1,15 +1,12 @@
-#ifndef M4L_SIGNAL_BASE
-#define M4L_SIGNAL_BASE
+#ifndef M4L_GGZZ_BASE
+#define M4L_GGZZ_BASE
 
-#include "HiggsAnalysis/CombinedLimit/interface/HZZ2L2QRooPdfs.h"
 #include "HiggsAnalysis/CombinedLimit/interface/HZZ4LRooPdfs.h"
 #include "TString.h"
 #include "RooRealVar.h"
 #include "RooAbsPdf.h"
 #include "RooFormulaVar.h"
 //#include "HiggsCSandWidth.h"
-//#include "RooDoubleCB.h"
-//#include "RooRelBWUFParam.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -18,7 +15,7 @@
 
 using namespace std;
 
-class m4lSignalBase{
+class m4lggZZBase{
 
 public:
 
@@ -27,22 +24,21 @@ public:
   TString tag;
   TString append;
 
-  RooRealVar *mH;  
   RooRealVar *m4l;
 
   //nuisance parameters
-  RooRealVar *CMS_zz4l_n,*CMS_zz4l_alpha;
-  RooRealVar *CMS_zz4l_scale,*CMS_zz4l_reso;
-
-  RooFormulaVar *n_CB_rfv,*alpha_CB_rfv,*n2_CB_rfv;
-  RooFormulaVar *alpha2_CB_rfv,*mean_CB_rfv,*sigma_CB_rfv;
-
+  // ---- none ----
+  //
+ 
+  RooRealVar *a0,*a1,*a2,*a3,*a4,*a5,*a6;
+  RooRealVar *a7,*a8,*a9;
+ 
   //HiggsCSandWidth* myCS;
 
-  RooDoubleCB *m4lModel;  
+  RooggZZPdf_v2 *m4lModel;  
 
-  m4lSignalBase(){};
-  m4lSignalBase(TString channel_, TString sqrts_, TString tag_, RooRealVar* mH_, RooRealVar* m4l_);
+  m4lggZZBase(){};
+  m4lggZZBase(TString channel_, TString sqrts_, TString tag_, RooRealVar* m4l_);
   void initializePDFs(char* inputs);
   string getInputString(char* inputs,string inputTag);
 
