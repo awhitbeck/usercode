@@ -4,9 +4,9 @@ cmsenv
 
 cvs co HiggsAnalysis/CombinedLimit
 cvs co -d HiggsAnalysis/HZZ4lCombination UserCode/Whitbeck/HZZ4Lcombination/testCombination
-cvs co -r V00-03-00 -r HiggsAnalysis/Higgs_CS_and_Width UserCode/Snowball/Higgs/Higgs_CS_and_Width
+cvs co -r V00-03-00 -d HiggsAnalysis/Higgs_CS_and_Width UserCode/Snowball/Higgs/Higgs_CS_and_Width
 
-sed -i 's|#include "HiggsCSandWidth.h"|#include "HiggsAnalysis/Higgs_CS_and_Width/include/HiggsCSandWidth.h"|' HiggsAnalysis/Higgs_CS_and_Width/src/HiggsCSandWidth.h
+sed -i 's|#include "HiggsCSandWidth.h"|#include "HiggsAnalysis/Higgs_CS_and_Width/include/HiggsCSandWidth.h"|' HiggsAnalysis/Higgs_CS_and_Width/src/HiggsCSandWidth.cc
 
 scram b -j4
 
