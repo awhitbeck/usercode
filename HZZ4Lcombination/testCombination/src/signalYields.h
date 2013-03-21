@@ -9,7 +9,7 @@
 #include "RooRealVar.h"
 #include "RooArgList.h"
 #include <algorithm>
-#include <FWCore/ParameterSet/interface/FileInPath.h>
+
 
 using namespace std;
 

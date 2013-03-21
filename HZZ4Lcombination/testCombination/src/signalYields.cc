@@ -1,4 +1,5 @@
 #include "signalYields.h"
+#include "FWCore/ParameterSet/interface/FileInPath.h"
 
 signalYields::signalYields(TString channel_, TString sqrts_, 
 			   TString tag_, RooRealVar* mH_){
