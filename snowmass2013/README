@@ -3,7 +3,7 @@
 ########
 
 cvs co -d snowmass2013 UserCode/Whitbeck/snowmass2013
-cd snowmass
+cd snowmass2013
 
 ## check out PDFs and factories from MELA package
 cvs co -d src UserCode/CJLST/ZZMatrixElement/MELA/src/RooSpinTwo_7D.cc
