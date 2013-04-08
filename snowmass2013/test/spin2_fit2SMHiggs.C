@@ -1,31 +1,15 @@
-#include "RooRealVar.h"
-#include "RooPlot.h"
-#include "RooDataSet.h"
-#include "TChain.h"
-#include "TCanvas.h"
 #include <vector>
 
 using namespace RooFit;
 
 void spin2_fit2SMHiggs(int plotIndex=0, int binning=80){
-  gROOT->ProcessLine(".L  ../PDFs/RooXZsZs_5D.cxx+");
-  gROOT->ProcessLine(".L  ../PDFs/RooSpinOne_7D.cxx+");  
-  gROOT->ProcessLine(".L  ../PDFs/RooSpinTwo_7D.cxx+");  
-  gROOT->ProcessLine(".L  ../src/AngularPdfFactory.cc+");
-  gROOT->ProcessLine(".L  ../src/ScalarPdfFactory.cc+");
-  gROOT->ProcessLine(".L  ../src/VectorPdfFactory.cc+");
-  gROOT->ProcessLine(".L  ../src/TensorPdfFactory.cc+");
 
   gROOT->ProcessLine(".L  ~/tdrstyle.C");
   setTDRStyle();
 
   // observables
   RooRealVar* z1mass = new RooRealVar("z1mass","m_{1} [GeV]",90,40,110);
-  RooRealVar* z2mass = new RooRealVar("z2mass","m_{2} [GeV]",30,1e-09,65);
-
-  //z1mass.setConstant(kTRUE);
-  //z2mass.setConstant(kTRUE);
-  
+  RooRealVar* z2mass = new RooRealVar("z2mass","m_{2} [GeV]",30,1e-09,65);  
   RooRealVar* hs = new RooRealVar("costhetastar","cos#theta*",-1,1);
   RooRealVar* h1 = new RooRealVar("costheta1","cos#theta_{1}",-1,1);
   RooRealVar* h2 = new RooRealVar("costheta2","cos#theta_{2}",-1,1);
@@ -80,11 +64,9 @@ void spin2_fit2SMHiggs(int plotIndex=0, int binning=80){
   if(treeMinGrav->GetEntries()<=0){ cout << "couldn't load minGrav data" << endl; return;}
   RooDataSet* dataSM = new RooDataSet("dataSM","dataSM",treeMinGrav,RooArgSet(*mzz,*z1mass,*z2mass,*hs,*h1,*h2,*Phi,*Phi1),"((phi*100000)%1000)<-995");
 
-  dataSM->getNorm
-
   cout << "TOTAL NUMBER OF EVENTS: " << dataSM.numEntries() << endl;
 
-  //MinGrav->PDF->fitTo(*dataSM);
+  MinGrav->PDF->fitTo(*dataSM);
 
   RooPlot* plot = measureables[plotIndex]->frame(binning);
   plot->GetXaxis()->CenterTitle();
