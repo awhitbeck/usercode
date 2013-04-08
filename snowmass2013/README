@@ -1,0 +1,14 @@
+########
+# setup
+########
+
+cvs co -d snowmass2013 UserCode/Whitbeck/snowmass2013
+
+cvs co -d src UserCode/CJLST/ZZMatrixElement/MELA/src/RooSpinTwo_7D.cc
+cvs co -d src UserCode/CJLST/ZZMatrixElement/MELA/src/RooSpinTwo_7D.h
+
+cvs co -d src UserCode/CJLST/ZZMatrixElement/MELA/src/RooSpinOne_7D.cc
+cvs co -d src UserCode/CJLST/ZZMatrixElement/MELA/src/RooSpinOne_7D.h
+
+cvs co -d src UserCode/CJLST/ZZMatrixElement/MELA/src/RooXZsZs_5D.cc
+cvs co -d src UserCode/CJLST/ZZMatrixElement/MELA/src/RooXZsZs_5D.h
