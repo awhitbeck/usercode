@@ -2,8 +2,12 @@
 # setup
 ########
 
-cvs co -d snowmass2013 UserCode/Whitbeck/snowmass2013
-cd snowmass2013
+scram p CMSSW CMSSW_5_2_5
+cd CMSSW_5_2_5/src
+cmsenv
+
+cvs co -d ZZMatrixElement/snowmass2013 UserCode/Whitbeck/snowmass2013
+cd ZZMatrixElement/snowmass2013
 
 ## check out PDFs and factories from MELA package
 cvs co -d src UserCode/CJLST/ZZMatrixElement/MELA/src/RooSpinTwo_7D.cc
