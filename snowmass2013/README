@@ -10,26 +10,26 @@ cvs co -d ZZMatrixElement/snowmass2013 UserCode/Whitbeck/snowmass2013
 cd ZZMatrixElement/snowmass2013
 
 ## check out PDFs and factories from MELA package
-cvs co -d fromMELA UserCode/CJLST/ZZMatrixElement/MELA/src/RooSpinTwo_7D.cc
-cvs co -d fromMELA UserCode/CJLST/ZZMatrixElement/MELA/src/RooSpinTwo_7D.h
-cvs co -d fromMELA UserCode/CJLST/ZZMatrixElement/MELA/src/RooSpinOne_7D.cc
-cvs co -d fromMELA UserCode/CJLST/ZZMatrixElement/MELA/src/RooSpinOne_7D.h
-cvs co -d fromMELA UserCode/CJLST/ZZMatrixElement/MELA/src/RooXZsZs_5D.cc
-cvs co -d fromMELA UserCode/CJLST/ZZMatrixElement/MELA/src/RooXZsZs_5D.h
+cvs co UserCode/CJLST/ZZMatrixElement/MELA/src/RooSpinTwo_7D.cc
+cvs co UserCode/CJLST/ZZMatrixElement/MELA/src/RooSpinTwo_7D.h
+cvs co UserCode/CJLST/ZZMatrixElement/MELA/src/RooSpinOne_7D.cc
+cvs co UserCode/CJLST/ZZMatrixElement/MELA/src/RooSpinOne_7D.h
+cvs co UserCode/CJLST/ZZMatrixElement/MELA/src/RooXZsZs_5D.cc
+cvs co UserCode/CJLST/ZZMatrixElement/MELA/src/RooXZsZs_5D.h
 
 ## dependencies for above code:
-cvs co -d fromMELA UserCode/CJLST/ZZMatrixElement/MELA/interface/TVar.hh
+cvs co UserCode/CJLST/ZZMatrixElement/MELA/interface/TVar.hh
 
-cvs co -d fromMELA UserCode/CJLST/ZZMatrixElement/MELA/src/AngularPdfFactory.h
-cvs co -d fromMELA UserCode/CJLST/ZZMatrixElement/MELA/src/VectorPdfFactory.h
-cvs co -d fromMELA UserCode/CJLST/ZZMatrixElement/MELA/src/TensorPdfFactory.h
+cvs co UserCode/CJLST/ZZMatrixElement/MELA/src/AngularPdfFactory.h
+cvs co UserCode/CJLST/ZZMatrixElement/MELA/src/VectorPdfFactory.h
+cvs co UserCode/CJLST/ZZMatrixElement/MELA/src/TensorPdfFactory.h
 
 mkdir src
-cp fromMELA/Roo* src/.
-cp fromMELA/*PdfFactory.h src/.
+cp UserCode/CJLST/ZZMatrixElement/MELA/src/Roo* src/.
+cp UserCode/CJLST/ZZMatrixElement/MELA/src/*PdfFactory.h src/.
 
 mkdir interface
-cp fromMELA/TVar.hh interface/.
+cp UserCode/CJLST/ZZMatrixElement/MELA/interfaceTVar.hh interface/.
 
 ## fixing hard coded paths in .h files
 sed -i 's|ZZMatrixElement/MELA|ZZMatrixElement/snowmass2013|' src/*PdfFactory.h
