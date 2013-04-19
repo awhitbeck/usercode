@@ -27,6 +27,8 @@ public:
   RooRealVar* g4ValIm;
 
   TF1* fmZZNorm;
+
+  ScalarPdfFactory(){};
     
   ScalarPdfFactory(RooRealVar* m1,RooRealVar* m2,RooRealVar* hs,RooRealVar* h1,RooRealVar* h2,RooRealVar* Phi,RooRealVar* Phi1,RooRealVar* mZZ){
 
@@ -81,7 +83,8 @@ public:
     delete g3ValIm;
     delete g4ValIm;
 
-    delete fmZZNorm;
+    if(fmZZNorm)
+      delete fmZZNorm;
   };
 
   void makeSMHiggs(){
