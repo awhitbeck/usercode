@@ -9,6 +9,14 @@ using namespace RooFit;
 
 void spin0Toys(){
 
+  gSystem->AddIncludePath("-I$ROOFITSYS/include/");
+  gROOT->ProcessLine(".L ../src/RooSpinZero_7DComplex.cc+");
+  gROOT->ProcessLine(".L ../src/AngularPdfFactory.cc+");
+  gROOT->ProcessLine(".L ../src/ScalarPdfFactory.cc+");
+
+  gROOT->ProcessLine(".L ~whitbeck/tdrstyle.C");
+  setTDRStyle();
+
   // observables
   RooRealVar* z1mass = new RooRealVar("z1mass","m_{1} [GeV]",90,40,110);
   RooRealVar* z2mass = new RooRealVar("z2mass","m_{2} [GeV]",30,1e-09,65);

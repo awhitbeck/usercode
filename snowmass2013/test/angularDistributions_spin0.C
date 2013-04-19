@@ -1,14 +1,17 @@
-#include "RooRealVar.h"
-#include "RooPlot.h"
-#include "RooDataSet.h"
-#include "TChain.h"
-#include "TCanvas.h"
 #include <vector>
 #include <algorithm>
 
 using namespace RooFit;
 
 void angularDistributions_spin0(int plotIndex=0, int binning=80){
+
+  gSystem->AddIncludePath("-I$ROOFITSYS/include/");
+  gROOT->ProcessLine(".L ../src/RooSpinZero_7DComplex.cc+");
+  gROOT->ProcessLine(".L ../src/AngularPdfFactory.cc+");
+  gROOT->ProcessLine(".L ../src/ScalarPdfFactory.cc+");
+
+  gROOT->ProcessLine(".L ~whitbeck/tdrstyle.C");
+  setTDRStyle();
 
   // observables
   RooRealVar* z1mass = new RooRealVar("z1mass","m_{1} [GeV]",40,110);
@@ -56,11 +59,9 @@ void angularDistributions_spin0(int plotIndex=0, int binning=80){
   plot->Draw();
 
   char temp[150];
-  sprintf(temp,"epsfiles/%s_125GeV_spin0_3in1_wIntegral.eps",measureables[plotIndex]->GetName());
+  sprintf(temp,"%s_125GeV_spin0_3in1_wIntegral.eps",measureables[plotIndex]->GetName());
   can->SaveAs(temp);
-  sprintf(temp,"pngfiles/%s_125GeV_spin0_3in1_wIntegral.png",measureables[plotIndex]->GetName());
+  sprintf(temp,"%s_125GeV_spin0_3in1_wIntegral.png",measureables[plotIndex]->GetName());
   can->SaveAs(temp);
-
-  delete SMHiggs;
 
 }

@@ -9,5 +9,5 @@ cmsenv
 cvs co -d ZZMatrixElement/snowmass2013 UserCode/Whitbeck/snowmass2013
 cd ZZMatrixElement/snowmass2013
 
-scram b
+source /home/ntran/ROOTdistributions/myROOT528_fromSource/root/bin/thisroot.csh
 
