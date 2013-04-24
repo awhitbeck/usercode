@@ -15,35 +15,42 @@
 
 class RooSpinZero_7DComplex : public RooAbsPdf {
 public:
-    RooSpinZero_7DComplex() {} ; 
-    RooSpinZero_7DComplex(const char *name, const char *title,
-                RooAbsReal& _m1,
-                RooAbsReal& _m2,
-                RooAbsReal& _h1,
-                RooAbsReal& _h2,
-                RooAbsReal& _hs,
-                RooAbsReal& _Phi,
-                RooAbsReal& _Phi1,
-                RooAbsReal& _a1Val,
-                RooAbsReal& _phi1Val,
-                RooAbsReal& _a2Val,
-                RooAbsReal& _phi2Val,
-                RooAbsReal& _a3Val,
-                RooAbsReal& _phi3Val,
-                RooAbsReal& _useGTerm,
-                RooAbsReal& _g1Val,
-                RooAbsReal& _g2Val,
-                RooAbsReal& _g3Val,
-                RooAbsReal& _g4Val,
-                RooAbsReal& _g1ValIm,
-                RooAbsReal& _g2ValIm,
-                RooAbsReal& _g3ValIm,
-                RooAbsReal& _g4ValIm,                   
-                RooAbsReal& _mZ,
-                RooAbsReal& _gamZ,
-                RooAbsReal& _mX,
-                RooAbsReal& _R1Val,
-                RooAbsReal& _R2Val);
+  RooSpinZero_7DComplex() {} ; 
+  RooSpinZero_7DComplex(const char *name, const char *title,
+			RooAbsReal& _m1,
+			RooAbsReal& _m2,
+			RooAbsReal& _h1,
+			RooAbsReal& _h2,
+			RooAbsReal& _hs,
+			RooAbsReal& _Phi,
+			RooAbsReal& _Phi1,
+			RooAbsReal& _a1Val,
+			RooAbsReal& _phi1Val,
+			RooAbsReal& _a2Val,
+			RooAbsReal& _phi2Val,
+			RooAbsReal& _a3Val,
+			RooAbsReal& _phi3Val,
+			int _parameterization,
+			RooAbsReal& _g1Val,
+			RooAbsReal& _g2Val,
+			RooAbsReal& _g3Val,
+			RooAbsReal& _g4Val,
+			RooAbsReal& _g1ValIm,
+			RooAbsReal& _g2ValIm,
+			RooAbsReal& _g3ValIm,
+			RooAbsReal& _g4ValIm,                  
+			
+			RooAbsReal& _fg2,
+			RooAbsReal& _fg4,
+			RooAbsReal& _phig2,
+			RooAbsReal& _phig4,
+
+			RooAbsReal& _mZ,
+			RooAbsReal& _gamZ,
+			RooAbsReal& _mX,
+			RooAbsReal& _R1Val,
+			RooAbsReal& _R2Val);
+
     RooSpinZero_7DComplex(const RooSpinZero_7DComplex& other, const char* name=0) ;
     virtual TObject* clone(const char* newname) const { return new RooSpinZero_7DComplex(*this,newname); }
     inline virtual ~RooSpinZero_7DComplex() { }
@@ -66,7 +73,7 @@ protected:
     RooRealProxy phi2Val ;
     RooRealProxy a3Val ;
     RooRealProxy phi3Val ;
-    RooRealProxy useGTerm ;
+    int parameterization ;
     RooRealProxy g1Val ;
     RooRealProxy g2Val ;
     RooRealProxy g3Val ;
@@ -75,12 +82,18 @@ protected:
     RooRealProxy g2ValIm ;
     RooRealProxy g3ValIm ;
     RooRealProxy g4ValIm ;
+
+    RooRealProxy fg2;
+    RooRealProxy fg4;
+    RooRealProxy phig2;
+    RooRealProxy phig4;
+    
     RooRealProxy mZ ;
     RooRealProxy gamZ ;
     RooRealProxy mX ;
     RooRealProxy R1Val ;
     RooRealProxy R2Val ;
-    
+
     Double_t evaluate() const ;
     
 private:
