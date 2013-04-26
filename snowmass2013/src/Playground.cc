@@ -58,24 +58,34 @@ public:
     varContainer.push_back(phi1);
     varContainer.push_back(mzz);
 
-    scalar = new ScalarPdfFactory(z1mass,z2mass,costhetastar,costheta1,costheta2,phi,phi1,mzz);
-    
+    int parameterization = 2;
+    scalar = new ScalarPdfFactory(z1mass,z2mass,costhetastar,costheta1,costheta2,phi,phi1,mzz,parameterization);
     mzz->setConstant(kTRUE);
-
     scalar->makeParamsConst(true);
-    scalar->fg2->setConstant(kFALSE);
-    scalar->fg4->setConstant(kFALSE);
-    scalar->phig2->setConstant(kFALSE);
-    scalar->phig4->setConstant(kFALSE);
-
-    /*
-    scalar->makeParamsConst(true);
-    scalar->g2Val->setConstant(kFALSE);
-    scalar->g4Val->setConstant(kFALSE);
-    scalar->g2ValIm->setConstant(kFALSE);
-    scalar->g4ValIm->setConstant(kFALSE);
-    */
-
+    
+    if ( parameterization = 2 ) {
+      
+      scalar->fg2->setConstant(kFALSE);
+      scalar->fg2->setRange(0.,1.);
+      scalar->fg4->setConstant(kFALSE);
+      scalar->fg4->setVal(0.5);
+      scalar->fg4->setRange(0.,1.);
+      
+      scalar->phig2->setConstant(kFALSE);
+      scalar->phig2->setRange(0, 2*TMath::Pi());
+      scalar->phig4->setConstant(kFALSE);
+      scalar->phig4->setVal(0.5*TMath::Pi());
+      scalar->phig4->setRange(0, 2*TMath::Pi());
+    }
+    
+    if ( parameterization == 1 ) {
+      scalar->g2Val->setConstant(kFALSE);
+      scalar->g2ValIm->setConstant(kFALSE);
+      scalar->g4Val->setConstant(kFALSE); 
+      scalar->g4Val->setVal(0.);
+      scalar->g4ValIm->setConstant(kFALSE);
+      scalar->g4ValIm->setVal(2.5);
+    }
   }
     
   ~Playground(){
