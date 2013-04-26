@@ -16,7 +16,7 @@
 
 using namespace TMath;
 
-enum parameterizationList {kMagPhase_As,kRealImag_Gs,kFracPhase_Gs,kNUMparameterizations};
+enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMparameterizations=3};
 
 RooSpinZero_7DComplex::RooSpinZero_7DComplex(const char *name, const char *title,
 					     RooAbsReal& _m1,
@@ -150,52 +150,62 @@ Double_t RooSpinZero_7DComplex::evaluate() const
   double kappa=s/(1000*1000);
     
   double a1=0,a2=0,a3=0,a1Im=0,a2Im=0,a3Im=0;
+  double g1(1.0), g1Im(0.), g2(0.), g2Im(0.), g3(0.), g3Im(0.), g4(0.), g4Im(0.);
 
-  if(parameterization==kFracPhase_Gs){
-    // convert fraction and phase to g1,g2...etc
-
-    double sigma_1=2.0418442;   // numbers coming from JHUGen
-    double sigma_2=0.77498928;
-    double sigma_4=0.32711197;
-
-    double g1Mag = 1.;
-    double g2Mag = sqrt(fg2/(1.-fg2-fg4))*sqrt(sigma_1/sigma_2); 
-    double g4Mag = sqrt(fg4/(1.-fg2-fg4))*sqrt(sigma_1/sigma_4); 
-
-    double g1   = g1Mag;
-    double g1Im = 0.0;
-    double g2   = g2Mag*cos(phig2);
-    double g2Im = g2Mag*sin(phig2);
-    double g3   = 0.0;
-    double g3Im = 0.0;
-    double g4   = g4Mag*cos(phig4);
-    double g4Im = g4Mag*sin(phig4);
-
-    a1 = g1*mZ*mZ/(mX*mX) + g2*2.*s/(mX*mX) + g3*kappa*s/(mX*mX);
-    a1Im = g1Im*mZ*mZ/(mX*mX) + g2Im*2.*s/(mX*mX) + g3Im*kappa*s/(mX*mX);
-    a2 = -2.*g2 - g3*kappa;
-    a2Im = -2.*g2Im - g3Im*kappa;
-    a3 = -2.*g4;
-    a3Im = -2.*g4Im;
-    
-
-  }else if(parameterization==kRealImag_Gs){
-    a1 = g1Val*mZ*mZ/(mX*mX) + g2Val*2.*s/(mX*mX) + g3Val*kappa*s/(mX*mX);
-    a1Im = g1ValIm*mZ*mZ/(mX*mX) + g2ValIm*2.*s/(mX*mX) + g3ValIm*kappa*s/(mX*mX);
-    a2 = -2.*g2Val - g3Val*kappa;
-    a2Im = -2.*g2ValIm - g3ValIm*kappa;
-    a3 = -2.*g4Val;
-    a3Im = -2.*g4ValIm;
-        
-  }else if(parameterization==kMagPhase_As){
+  if(parameterization==kMagPhase_As){
     a1=a1Val;
     a1Im=phi1Val;
     a2=a2Val;
     a2Im=phi2Val;
     a3=a3Val;
     a3Im=phi3Val;
-  }
+  } else {
+
+    // 
+    // Important, the PDF has an emphirical fix
+    // Forcing the couplings to be its conjugate 
+    // to agree with the generator shapes
+    // 
+    if(parameterization==kFracPhase_Gs){
+      // convert fraction and phase to g1,g2...etc
+      double sigma_1=2.0418442;   // numbers coming from JHUGen
+      double sigma_2=0.77498928;
+      double sigma_4=0.32711197;
+      
+      double g1Mag = 1.;
+      double g2Mag = sqrt(fg2/(1.-fg2-fg4))*sqrt(sigma_1/sigma_2); 
+      double g4Mag = sqrt(fg4/(1.-fg2-fg4))*sqrt(sigma_1/sigma_4); 
+      
+      g1   = g1Mag;
+      g1Im = 0.0;
+      g2   = g2Mag*cos(phig2);
+      g2Im = - g2Mag*sin(phig2);
+      g3   = 0.0;
+      g3Im = 0.0;
+      g4   = g4Mag*cos(phig4);
+      g4Im = - g4Mag*sin(phig4);
+      
+    }else if(parameterization==kRealImag_Gs){
+      
+      g1   = g1Val;
+      g1Im = - g1ValIm;
+      g2   = g2Val;
+      g2Im = - g2ValIm;
+      g3   = g3Val;
+      g3Im = - g3ValIm;
+      g4   = g4Val;
+      g4Im = - g4ValIm;
+    }
     
+    a1 = g1*mZ*mZ/(mX*mX) + g2*2.*s/(mX*mX) + g3*kappa*s/(mX*mX);
+    a1Im = g1Im*mZ*mZ/(mX*mX) + g2Im*2.*s/(mX*mX) + g3Im*kappa*s/(mX*mX);
+    a2 = -2.*g2 - g3*kappa;
+    a2Im = -2.*g2Im - g3Im*kappa;
+    a3 = -2.*g4;
+    a3Im = -2.*g4Im;
+
+  }
+  
   // From the form output in terms of the g couplings
   // https://dl.dropbox.com/u/86680464/result_spin0.txt
   Double_t x = (mX*mX-m1*m1-m2*m2)/(2.0*m1*m2);
@@ -280,7 +290,7 @@ Double_t RooSpinZero_7DComplex::analyticalIntegral(Int_t code, const char* range
   }
   double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mX,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mX,2)));
   if (nanval != nanval) return 1e-9;
-    
+
   //
   //  common variables to use for all cases
   //
@@ -291,55 +301,63 @@ Double_t RooSpinZero_7DComplex::analyticalIntegral(Int_t code, const char* range
     
   double a1=0,a2=0,a3=0,a1Im=0,a2Im=0,a3Im=0;
 
-  if(parameterization==kFracPhase_Gs){
-    // convert fraction and phase to g1,g2...etc
+  double g1(1.0), g1Im(0.), g2(0.), g2Im(0.), g3(0.), g3Im(0.), g4(0.), g4Im(0.);
 
-    double sigma_1=2.0418442;   // numbers coming from JHUGen
-    double sigma_2=0.77498928;
-    double sigma_4=0.32711197;
-
-    double g1Mag = 1.;
-    double g2Mag = sqrt(fg2/(1.-fg2-fg4))*sqrt(sigma_1/sigma_2); 
-    double g4Mag = sqrt(fg4/(1.-fg2-fg4))*sqrt(sigma_1/sigma_4); 
-
-    double g1   = g1Mag;
-    double g1Im = 0.0;
-    double g2   = g2Mag*cos(phig2);
-    double g2Im = g2Mag*sin(phig2);
-    double g3   = 0.0;
-    double g3Im = 0.0;
-    double g4   = g4Mag*cos(phig4);
-    double g4Im = g4Mag*sin(phig4);
-
-    a1 = g1*mZ*mZ/(mX*mX) + g2*2.*s/(mX*mX) + g3*kappa*s/(mX*mX);
-    a1Im = g1Im*mZ*mZ/(mX*mX) + g2Im*2.*s/(mX*mX) + g3Im*kappa*s/(mX*mX);
-    a2 = -2.*g2 - g3*kappa;
-    a2Im = -2.*g2Im - g3Im*kappa;
-    //phi2 = atan2(0.,a2);
-    a3 = -2.*g4;
-    //phi3 = atan2(0.,a3);
-    a3Im = -2.*g4Im;
-    
-
-  }else if(parameterization==kRealImag_Gs){
-    a1 = g1Val*mZ*mZ/(mX*mX) + g2Val*2.*s/(mX*mX) + g3Val*kappa*s/(mX*mX);
-    a1Im = g1ValIm*mZ*mZ/(mX*mX) + g2ValIm*2.*s/(mX*mX) + g3ValIm*kappa*s/(mX*mX);
-    a2 = -2.*g2Val - g3Val*kappa;
-    a2Im = -2.*g2ValIm - g3ValIm*kappa;
-    //phi2 = atan2(0.,a2);
-    a3 = -2.*g4Val;
-    //phi3 = atan2(0.,a3);
-    a3Im = -2.*g4ValIm;
-        
-  }else if(parameterization==kMagPhase_As){
+  if(parameterization==kMagPhase_As){
     a1=a1Val;
     a1Im=phi1Val;
     a2=a2Val;
     a2Im=phi2Val;
     a3=a3Val;
     a3Im=phi3Val;
-  }
+  } else {
+
+    // 
+    // Important, the PDF has an emphirical fix
+    // Forcing the couplings to be its conjugate 
+    // to agree with the generator shapes
+    // 
+    if(parameterization==kFracPhase_Gs){
+      // convert fraction and phase to g1,g2...etc
+      double sigma_1=2.0418442;   // numbers coming from JHUGen
+      double sigma_2=0.77498928;
+      double sigma_4=0.32711197;
+      
+      double g1Mag = 1.;
+      double g2Mag = sqrt(fg2/(1.-fg2-fg4))*sqrt(sigma_1/sigma_2); 
+      double g4Mag = sqrt(fg4/(1.-fg2-fg4))*sqrt(sigma_1/sigma_4); 
+      
+      g1   = g1Mag;
+      g1Im = 0.0;
+      g2   = g2Mag*cos(phig2);
+      g2Im = - g2Mag*sin(phig2);
+      g3   = 0.0;
+      g3Im = 0.0;
+      g4   = g4Mag*cos(phig4);
+      g4Im = - g4Mag*sin(phig4);
+      
+    }else if(parameterization==kRealImag_Gs){
+      
+      g1   = g1Val;
+      g1Im = - g1ValIm;
+      g2   = g2Val;
+      g2Im = - g2ValIm;
+      g3   = g3Val;
+      g3Im = - g3ValIm;
+      g4   = g4Val;
+      g4Im = - g4ValIm;
+    }
     
+    // std::cout << "g4 = " << g4 << "\t " << "i " << g4Im << "\n";
+    a1 = g1*mZ*mZ/(mX*mX) + g2*2.*s/(mX*mX) + g3*kappa*s/(mX*mX);
+    a1Im = g1Im*mZ*mZ/(mX*mX) + g2Im*2.*s/(mX*mX) + g3Im*kappa*s/(mX*mX);
+    a2 = -2.*g2 - g3*kappa;
+    a2Im = -2.*g2Im - g3Im*kappa;
+    a3 = -2.*g4;
+    a3Im = -2.*g4Im;
+
+  }
+  
   // From the form output in terms of the g couplings
   // https://dl.dropbox.com/u/86680464/result_spin0.txt
   Double_t x = (mX*mX-m1*m1-m2*m2)/(2.0*m1*m2);
