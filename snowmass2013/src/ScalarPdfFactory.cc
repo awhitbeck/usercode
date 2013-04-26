@@ -33,7 +33,7 @@ public:
 
   ScalarPdfFactory(){};
     
-  ScalarPdfFactory(RooRealVar* m1,RooRealVar* m2,RooRealVar* hs,RooRealVar* h1,RooRealVar* h2,RooRealVar* Phi,RooRealVar* Phi1,RooRealVar* mZZ){
+  ScalarPdfFactory(RooRealVar* m1,RooRealVar* m2,RooRealVar* hs,RooRealVar* h1,RooRealVar* h2,RooRealVar* Phi,RooRealVar* Phi1,RooRealVar* mZZ, int para) {
 
     // Parameters
     mZ     = new RooRealVar("mZ","mZ",91.188);
@@ -46,7 +46,7 @@ public:
     a3Val  = new RooRealVar("a3Val","a3Val",0.);
     phi3Val= new RooRealVar("phi3Val","phi3Val",0.);
            
-    parameterization = 2;
+    parameterization = para;
 
     g1Val  = new RooRealVar("g1Val","g1Val",1.);
     g2Val  = new RooRealVar("g2Val","g2Val",0.);
@@ -213,6 +213,9 @@ public:
   };
 
 };
+
+
+
 
 #endif
 
