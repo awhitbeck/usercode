@@ -2,12 +2,16 @@
 # setup
 ########
 
-scram p CMSSW CMSSW_5_2_5
-cd CMSSW_5_2_5/src
-cmsenv
-
 cvs co -d ZZMatrixElement/snowmass2013 UserCode/Whitbeck/snowmass2013
 cd ZZMatrixElement/snowmass2013
 
+#JHU
 source /home/ntran/ROOTdistributions/myROOT528_fromSource/root/bin/thisroot.csh
+#lxplus
+source /afs/cern.ch/sw/lcg/app/releases/ROOT/5.28.00/slc4_amd64_gcc34/root/bin/thisroot.sh
 
+cd test 
+root -l -n loadLib.C
+Playground test(126.) 
+test.loadTree("root://eoscms.cern.ch//eos/cms/store/cmst3/user/mmozer/Higgs/Prophecy/root/prophecy_inputemu_126_unweighted.root","newTree")
+test.fitData()      
