@@ -41,10 +41,10 @@ RooSpinZero_7DComplex::RooSpinZero_7DComplex(const char *name, const char *title
 					     RooAbsReal& _g2ValIm,
 					     RooAbsReal& _g3ValIm,
 					     RooAbsReal& _g4ValIm,
-					     RooAbsReal& _fg2,
-					     RooAbsReal& _fg4,
-					     RooAbsReal& _phig2,
-					     RooAbsReal& _phig4,
+					     RooAbsReal& _fa2,
+					     RooAbsReal& _fa3,
+					     RooAbsReal& _phia2,
+					     RooAbsReal& _phia3,
 					     RooAbsReal& _mZ,
 					     RooAbsReal& _gamZ,
 					     RooAbsReal& _mX,
@@ -74,10 +74,10 @@ RooSpinZero_7DComplex::RooSpinZero_7DComplex(const char *name, const char *title
   g3ValIm("g3ValIm","g3ValIm",this,_g3ValIm),
   g4ValIm("g4ValIm","g4ValIm",this,_g4ValIm),
 
-  fg2("fg2","fg2",this,_fg2),
-  fg4("fg4","fg4",this,_fg4),
-  phig2("phig2","phig2",this,_phig2),
-  phig4("phig4","phig4",this,_phig4),
+  fa2("fa2","fa2",this,_fa2),
+  fa3("fa3","fa3",this,_fa3),
+  phia2("phia2","phia2",this,_phia2),
+  phia3("phia3","phia3",this,_phia3),
 
   mZ("mZ","mZ",this,_mZ),
   gamZ("gamZ","gamZ",this,_gamZ),
@@ -113,10 +113,10 @@ RooSpinZero_7DComplex::RooSpinZero_7DComplex(const RooSpinZero_7DComplex& other,
   g3ValIm("g3ValIm",this,other.g3ValIm),
   g4ValIm("g4ValIm",this,other.g4ValIm),
 
-  fg2("fg2",this,other.fg2),
-  fg4("fg4",this,other.fg4),
-  phig2("phig2",this,other.phig2),
-  phig4("phig4",this,other.phig4),
+  fa2("fa2",this,other.fa2),
+  fa3("fa3",this,other.fa3),
+  phia2("phia2",this,other.phia2),
+  phia3("phia3",this,other.phia3),
 
   mZ("mZ",this,other.mZ),
   gamZ("gamZ",this,other.gamZ),
@@ -173,17 +173,17 @@ Double_t RooSpinZero_7DComplex::evaluate() const
       double sigma_4=0.32711197;
       
       double g1Mag = 1.;
-      double g2Mag = sqrt(fg2/(1.-fg2-fg4))*sqrt(sigma_1/sigma_2); 
-      double g4Mag = sqrt(fg4/(1.-fg2-fg4))*sqrt(sigma_1/sigma_4); 
+      double g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma_1/sigma_2); 
+      double g4Mag = sqrt(fa3/(1.-fa2-fa3))*sqrt(sigma_1/sigma_4); 
       
       g1   = g1Mag;
       g1Im = 0.0;
-      g2   = g2Mag*cos(phig2);
-      g2Im = - g2Mag*sin(phig2);
+      g2   = g2Mag*cos(phia2);
+      g2Im = - g2Mag*sin(phia2);
       g3   = 0.0;
       g3Im = 0.0;
-      g4   = g4Mag*cos(phig4);
-      g4Im = - g4Mag*sin(phig4);
+      g4   = g4Mag*cos(phia3);
+      g4Im = - g4Mag*sin(phia3);
       
     }else if(parameterization==kRealImag_Gs){
       
@@ -324,17 +324,17 @@ Double_t RooSpinZero_7DComplex::analyticalIntegral(Int_t code, const char* range
       double sigma_4=0.32711197;
       
       double g1Mag = 1.;
-      double g2Mag = sqrt(fg2/(1.-fg2-fg4))*sqrt(sigma_1/sigma_2); 
-      double g4Mag = sqrt(fg4/(1.-fg2-fg4))*sqrt(sigma_1/sigma_4); 
+      double g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma_1/sigma_2); 
+      double g4Mag = sqrt(fa3/(1.-fa2-fa3))*sqrt(sigma_1/sigma_4); 
       
       g1   = g1Mag;
       g1Im = 0.0;
-      g2   = g2Mag*cos(phig2);
-      g2Im = - g2Mag*sin(phig2);
+      g2   = g2Mag*cos(phia2);
+      g2Im = - g2Mag*sin(phia2);
       g3   = 0.0;
       g3Im = 0.0;
-      g4   = g4Mag*cos(phig4);
-      g4Im = - g4Mag*sin(phig4);
+      g4   = g4Mag*cos(phia3);
+      g4Im = - g4Mag*sin(phia3);
       
     }else if(parameterization==kRealImag_Gs){
       

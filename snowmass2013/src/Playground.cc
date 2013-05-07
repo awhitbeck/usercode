@@ -65,10 +65,10 @@ public:
     // float these parameters by default
     if ( parameterization_ == 2 ) {
         
-      scalar->fg2->setConstant(kFALSE);
-      scalar->phig2->setConstant(kFALSE);
-      scalar->fg4->setConstant(kFALSE);
-      scalar->phig4->setConstant(kFALSE);
+      scalar->fa2->setConstant(kFALSE);
+      scalar->phia2->setConstant(kFALSE);
+      scalar->fa3->setConstant(kFALSE);
+      scalar->phia3->setConstant(kFALSE);
     }
     
     if ( parameterization_ == 1 ) {

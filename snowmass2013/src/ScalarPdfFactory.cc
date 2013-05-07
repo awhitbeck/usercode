@@ -26,10 +26,10 @@ public:
   RooRealVar* g2ValIm;
   RooRealVar* g3ValIm;
   RooRealVar* g4ValIm;
-  RooRealVar* fg2;
-  RooRealVar* fg4;
-  RooRealVar* phig2;
-  RooRealVar* phig4;
+  RooRealVar* fa2;
+  RooRealVar* fa3;
+  RooRealVar* phia2;
+  RooRealVar* phia3;
 
   ScalarPdfFactory(){};
     
@@ -58,15 +58,15 @@ public:
     g3ValIm  = new RooRealVar("g3ValIm","g3ValIm",0.);
     g4ValIm  = new RooRealVar("g4ValIm","g4ValIm",0.);
 
-    fg2  = new RooRealVar("fg2","f_{g2}",0.,0.,1.0);
-    fg4  = new RooRealVar("fg4","f_{g4}",0.,0.,1.0);
-    phig2  = new RooRealVar("phig2","#phi_{g2}",0.,0.,2*TMath::Pi());
-    phig4  = new RooRealVar("phig4","#phi_{g4}",0.,0.,2*TMath::Pi());
+    fa2  = new RooRealVar("fa2","f_{g2}",0.,0.,1.0);
+    fa3  = new RooRealVar("fa3","f_{g4}",0.,0.,1.0);
+    phia2  = new RooRealVar("phia2","#phi_{g2}",0.,0.,2*TMath::Pi());
+    phia3  = new RooRealVar("phia3","#phi_{g4}",0.,0.,2*TMath::Pi());
 
     R1Val  = new RooRealVar("R1Val","R1Val",0.15);
     R2Val  = new RooRealVar("R2Val","R2Val",0.15);
 
-    PDF = new RooSpinZero_7DComplex("PDF","PDF",*m1,*m2,*h1,*h2,*hs,*Phi,*Phi1,*a1Val,*phi1Val,*a2Val,*phi2Val,*a3Val,*phi3Val,parameterization,*g1Val,*g2Val,*g3Val,*g4Val,*g1ValIm,*g2ValIm,*g3ValIm,*g4ValIm,*fg2,*fg4,*phig2,*phig4,*mZ,*gamZ,*mZZ,*R1Val,*R2Val);
+    PDF = new RooSpinZero_7DComplex("PDF","PDF",*m1,*m2,*h1,*h2,*hs,*Phi,*Phi1,*a1Val,*phi1Val,*a2Val,*phi2Val,*a3Val,*phi3Val,parameterization,*g1Val,*g2Val,*g3Val,*g4Val,*g1ValIm,*g2ValIm,*g3ValIm,*g4ValIm,*fa2,*fa3,*phia2,*phia3,*mZ,*gamZ,*mZZ,*R1Val,*R2Val);
 
   };
 
@@ -90,10 +90,10 @@ public:
       delete g3ValIm;
       delete g4ValIm;
       
-      delete fg2;
-      delete fg4;
-      delete phig2;
-      delete phig4;
+      delete fa2;
+      delete fa3;
+      delete phia2;
+      delete phia3;
     }
 
   };
@@ -178,10 +178,10 @@ public:
       g2ValIm->setConstant(kTRUE);
       g3ValIm->setConstant(kTRUE);
       g4ValIm->setConstant(kTRUE);
-      fg2->setConstant(kTRUE);
-      fg4->setConstant(kTRUE);
-      phig2->setConstant(kTRUE);
-      phig4->setConstant(kTRUE);
+      fa2->setConstant(kTRUE);
+      fa3->setConstant(kTRUE);
+      phia2->setConstant(kTRUE);
+      phia3->setConstant(kTRUE);
       gamZ->setConstant(kTRUE);
       mZ->setConstant(kTRUE);
       R1Val->setConstant(kTRUE);
@@ -201,10 +201,10 @@ public:
       g2ValIm->setConstant(kFALSE);
       g3ValIm->setConstant(kFALSE);
       g4ValIm->setConstant(kFALSE);
-      fg2->setConstant(kFALSE);
-      fg4->setConstant(kFALSE);
-      phig2->setConstant(kFALSE);
-      phig4->setConstant(kFALSE);
+      fa2->setConstant(kFALSE);
+      fa3->setConstant(kFALSE);
+      phia2->setConstant(kFALSE);
+      phia3->setConstant(kFALSE);
       gamZ->setConstant(kFALSE);
       mZ->setConstant(kFALSE);
       R1Val->setConstant(kFALSE);
