@@ -25,7 +25,7 @@ void testfit() {
   // Get Playground class started
   // 
   bool debug = false;
-  int parameterization = 1; 
+  int parameterization = 2; 
   Playground test(mH, debug, parameterization);
   test.loadTree(fileName, treeName);
   ScalarPdfFactory *scalar = test.scalar;
