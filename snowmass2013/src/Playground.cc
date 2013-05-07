@@ -61,6 +61,23 @@ public:
     scalar = new ScalarPdfFactory(z1mass,z2mass,costhetastar,costheta1,costheta2,phi,phi1,mzz,parameterization_);
     mzz->setConstant(kTRUE);
     scalar->makeParamsConst(true);
+
+    // float these parameters by default
+    if ( parameterization_ == 2 ) {
+        
+      scalar->fg2->setConstant(kFALSE);
+      scalar->phig2->setConstant(kFALSE);
+      scalar->fg4->setConstant(kFALSE);
+      scalar->phig4->setConstant(kFALSE);
+    }
+    
+    if ( parameterization_ == 1 ) {
+      scalar->g2Val->setConstant(kFALSE);
+      scalar->g2ValIm->setConstant(kFALSE);
+      scalar->g4Val->setConstant(kFALSE);
+      scalar->g4ValIm->setConstant(kFALSE);
+    }
+
   }
     
    ~Playground(){
