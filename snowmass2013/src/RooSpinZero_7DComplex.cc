@@ -268,7 +268,7 @@ Double_t RooSpinZero_7DComplex::evaluate() const
 Int_t RooSpinZero_7DComplex::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const
 {
 
-  //if (matchArgs(allVars,analVars,RooArgSet(*m1.absArg(),*m2.absArg(),*hs.absArg(),*h1.absArg(),*h2.absArg(),*Phi.absArg(),*Phi1.absArg()))) return 7 ; // all integrated
+  //  if (matchArgs(allVars,analVars,RooArgSet(*m1.absArg(),*m2.absArg(),*hs.absArg(),*h1.absArg(),*h2.absArg(),*Phi.absArg(),*Phi1.absArg()))) return 7 ; // all integrated
   if (matchArgs(allVars,analVars,RooArgSet(*hs.absArg(),*h1.absArg(),*h2.absArg(),*Phi.absArg(),*Phi1.absArg()))) return 6 ; // No m1,m2
   if (matchArgs(allVars,analVars,hs,h1,h2,Phi)) return 2 ; // No Phi1
   if (matchArgs(allVars,analVars,hs,h1,h2,Phi1)) return 5 ; // No Phi
@@ -500,12 +500,33 @@ Double_t RooSpinZero_7DComplex::analyticalIntegral(Int_t code, const char* range
     case 7:
       {
         double value = 0.;
+	/*
         value += (g1Val*g1Val+g1ValIm*g1ValIm)*2.37727e9;
 	value += (g2Val*g2Val+g2ValIm*g2ValIm)*9.86079e8;
 	value += (g4Val*g4Val+g4ValIm*g4ValIm)*4.08027e8;
         value += sqrt(g1Val*g1Val+g1ValIm*g1ValIm)*g2Val*2.65195e9;
         
         return 58./120.*value;
+	*/
+	
+	double constintegral = 6.77441e+7;
+	double g2integral = 7.55714e+7;
+	double g2sqintegral = 2.80999e+7;
+	double g4sqintegral = 1.16274e+7;
+	
+	value += constintegral;
+	value += g2*g2integral;
+	value += (g2*g2 + g2Im*g2Im)*g2sqintegral;
+	value += (g4*g4 + g4Im*g4Im)*g4sqintegral;
+	/*	
+	std::cout << "g2 = " << g2 << "\t";
+	std::cout << "g4 = " << g4 << "\t";
+	std::cout << "g4Im = " << g4Im << "\t";
+	std::cout << "g4Im = " << g4Im << "\t";
+	std::cout << "value = " << value << "\n";
+	*/
+	return value*32*Power(Pi(),2)/9.;
+
       }
     }
   assert(0) ;
