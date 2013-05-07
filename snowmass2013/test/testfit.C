@@ -11,7 +11,7 @@ void testfit() {
   // inputs 
   // 
   bool dofit = true;  
-  bool drawprojections = false;
+  bool drawprojections = true;
   
   float mH = 126.;
   float phase0m=0;
@@ -36,22 +36,22 @@ void testfit() {
 
   if ( parameterization == 2 ) {
     
-    double fg2Val = 0.2;
-    double phig2Val = TMath::Pi();
-    double fg4Val = 0.2;
-    double phig4Val = 0;
+    double fa2Val = 0.2;
+    double phia2Val = 3*TMath::Pi()/2.;
+    double fa3Val = 0.2;
+    double phia3Val = 0;
     
-    scalar->fg2->setConstant(kFALSE);
-    scalar->fg2->setVal(fg2Val);
+    scalar->fa2->setConstant(kFALSE);
+    scalar->fa2->setVal(fa2Val);
     
-    scalar->phig2->setConstant(kFALSE);
-    scalar->phig2->setVal(phig2Val);
+    scalar->phia2->setConstant(kFALSE);
+    scalar->phia2->setVal(phia2Val);
     
-    scalar->fg4->setConstant(kFALSE);
-    scalar->fg4->setVal(fg4Val);
+    scalar->fa3->setConstant(kFALSE);
+    scalar->fa3->setVal(fa3Val);
     
-    scalar->phig4->setConstant(kFALSE);
-    scalar->phig4->setVal(phig4Val);
+    scalar->phia3->setConstant(kFALSE);
+    scalar->phia3->setVal(phia3Val);
   }
 
   if ( parameterization == 1 ) {
