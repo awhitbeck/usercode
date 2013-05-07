@@ -35,17 +35,17 @@ public:
 
   Playground(){};
 
-  Playground(double mH, bool debug_=false){
+  Playground(double mH, bool debug_=false, int parameterization_=2){
     
     debug=debug_;
 
-    z1mass = new RooRealVar("z1mass","m_{Z1}",12.,120.);
-    z2mass = new RooRealVar("z2mass","m_{Z2}",12.,120.);
+    z1mass = new RooRealVar("Z1Mass","m_{Z1}",12.,120.);
+    z2mass = new RooRealVar("Z2Mass","m_{Z2}",12.,120.);
     costhetastar = new RooRealVar("costhetastar","cos#theta*",-1.,1.);
-    costheta1 = new RooRealVar("costheta1","cos#theta_{1}",-1.,1.);
-    costheta2 = new RooRealVar("costheta2","cos#theta_{2}",-1.,1.);
-    phi = new RooRealVar("phi","#Phi",-TMath::Pi(),TMath::Pi());
-    phi1 = new RooRealVar("phistar1","#Phi_{1}",-TMath::Pi(),TMath::Pi());
+    costheta1 = new RooRealVar("helcosthetaZ1","cos#theta_{1}",-1.,1.);
+    costheta2 = new RooRealVar("helcosthetaZ2","cos#theta_{2}",-1.,1.);
+    phi = new RooRealVar("helphi","#Phi",-TMath::Pi(),TMath::Pi());
+    phi1 = new RooRealVar("phistarZ1","#Phi_{1}",-TMath::Pi(),TMath::Pi());
       
     mzz = new RooRealVar("ZZMass","m_{ZZ}",mH,100,1000);
 
@@ -58,37 +58,12 @@ public:
     varContainer.push_back(phi1);
     varContainer.push_back(mzz);
 
-    int parameterization = 2;
-    scalar = new ScalarPdfFactory(z1mass,z2mass,costhetastar,costheta1,costheta2,phi,phi1,mzz,parameterization);
+    scalar = new ScalarPdfFactory(z1mass,z2mass,costhetastar,costheta1,costheta2,phi,phi1,mzz,parameterization_);
     mzz->setConstant(kTRUE);
     scalar->makeParamsConst(true);
-    
-    if ( parameterization = 2 ) {
-      
-      scalar->fg2->setConstant(kFALSE);
-      scalar->fg2->setRange(0.,1.);
-      scalar->fg4->setConstant(kFALSE);
-      scalar->fg4->setVal(0.5);
-      scalar->fg4->setRange(0.,1.);
-      
-      scalar->phig2->setConstant(kFALSE);
-      scalar->phig2->setRange(0, 2*TMath::Pi());
-      scalar->phig4->setConstant(kFALSE);
-      scalar->phig4->setVal(0.5*TMath::Pi());
-      scalar->phig4->setRange(0, 2*TMath::Pi());
-    }
-    
-    if ( parameterization == 1 ) {
-      scalar->g2Val->setConstant(kFALSE);
-      scalar->g2ValIm->setConstant(kFALSE);
-      scalar->g4Val->setConstant(kFALSE); 
-      scalar->g4Val->setVal(0.);
-      scalar->g4ValIm->setConstant(kFALSE);
-      scalar->g4ValIm->setVal(2.5);
-    }
   }
     
-  ~Playground(){
+   ~Playground(){
 
     delete z1mass;
     delete z2mass;
@@ -129,10 +104,10 @@ public:
     RooPlot* plot = varContainer[myVar]->frame(bins);
     data->plotOn(plot);
     scalar->PDF->plotOn(plot);
-
+    
     plot->Draw();
-  }
 
+  }
 };
 
 #endif
