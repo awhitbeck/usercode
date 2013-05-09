@@ -62,8 +62,8 @@ public:
 
     fa2  = new RooRealVar("fa2","f_{g2}",0.,0.,1.0);
     fa3  = new RooRealVar("fa3","f_{g4}",0.,0.,1.0);
-    phia2  = new RooRealVar("phia2","#phi_{g2}",0.,0.,2*TMath::Pi());
-    phia3  = new RooRealVar("phia3","#phi_{g4}",0.,0.,2*TMath::Pi());
+    phia2  = new RooRealVar("phia2","#phi_{g2}",0.,-2.*TMath::Pi(),2*TMath::Pi());
+    phia3  = new RooRealVar("phia3","#phi_{g4}",0.,-2.*TMath::Pi(),2*TMath::Pi());
 
     R1Val  = new RooRealVar("R1Val","R1Val",0.15);
     R2Val  = new RooRealVar("R2Val","R2Val",0.15);
