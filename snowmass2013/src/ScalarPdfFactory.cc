@@ -31,6 +31,8 @@ public:
   RooRealVar* phia2;
   RooRealVar* phia3;
 
+  RooSpinZero_7DComplex* PDF;
+
   ScalarPdfFactory(){};
     
   ScalarPdfFactory(RooRealVar* m1,RooRealVar* m2,RooRealVar* hs,RooRealVar* h1,RooRealVar* h2,RooRealVar* Phi,RooRealVar* Phi1,RooRealVar* mZZ, int para) {

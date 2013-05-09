@@ -32,6 +32,7 @@ public:
   ScalarPdfFactory* scalar;
 
   RooDataSet* data;
+  RooDataSet* toyData;
 
   Playground(){};
 
@@ -93,10 +94,18 @@ public:
     
     delete scalar;
     if(data) delete data;
+    if(toyData) delete toyData;
 
   };
 
-  void generate(){};
+  void generate(int nEvents, bool pure=true){
+
+    if(!pure) cout << "Playground::generate() -- ERROR, embedded toys not supported" << endl;
+
+    toyData = scalar->PDF->generate(RooArgSet(*z1mass,*z2mass,*costhetastar,*costheta1,*costheta2,*phi1,*phi),nEvents);
+    
+  };
+
   int loadTree(TString fileName, TString treeName){
 
     TChain* myChain = new TChain(treeName);
