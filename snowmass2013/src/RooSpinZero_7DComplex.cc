@@ -511,8 +511,10 @@ Double_t RooSpinZero_7DComplex::analyticalIntegral(Int_t code, const char* range
 	value += (g2*g2+g2Im*g2Im)*9.86079e8;
 	value += (g4*g4+g4Im*g4Im)*4.08027e8;
         value += sqrt(g1*g1+g1Im*g1Im)*g2*2.65195e9;
-        
-        return value;
+
+	// fudge factor of /2 to make the normalization of plots ready 
+	// this does not affect the fitting
+	return value/2.; 
 
       }
     }
