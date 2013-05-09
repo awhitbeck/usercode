@@ -39,13 +39,13 @@ public:
     
     debug=debug_;
 
-    z1mass = new RooRealVar("Z1Mass","m_{Z1}",12.,120.);
-    z2mass = new RooRealVar("Z2Mass","m_{Z2}",12.,120.);
-    costhetastar = new RooRealVar("costhetastar","cos#theta*",-1.,1.);
-    costheta1 = new RooRealVar("helcosthetaZ1","cos#theta_{1}",-1.,1.);
-    costheta2 = new RooRealVar("helcosthetaZ2","cos#theta_{2}",-1.,1.);
-    phi = new RooRealVar("helphi","#Phi",-TMath::Pi(),TMath::Pi());
-    phi1 = new RooRealVar("phistarZ1","#Phi_{1}",-TMath::Pi(),TMath::Pi());
+    z1mass = new RooRealVar("Z1Mass","m_{Z1}",90.,12.,120.);
+    z2mass = new RooRealVar("Z2Mass","m_{Z2}",25.,12.,120.);
+    costhetastar = new RooRealVar("costhetastar","cos#theta*",0.,-1.,1.);
+    costheta1 = new RooRealVar("helcosthetaZ1","cos#theta_{1}",0.,-1.,1.);
+    costheta2 = new RooRealVar("helcosthetaZ2","cos#theta_{2}",0.,-1.,1.);
+    phi = new RooRealVar("helphi","#Phi",0.,-TMath::Pi(),TMath::Pi());
+    phi1 = new RooRealVar("phistarZ1","#Phi_{1}",0.,-TMath::Pi(),TMath::Pi());
       
     mzz = new RooRealVar("ZZMass","m_{ZZ}",mH,100,1000);
 
