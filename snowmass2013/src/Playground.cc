@@ -14,7 +14,7 @@ class Playground{
 
 public:
     
-  enum ERRORcode {kNoError,kFileLoadFailure};
+  enum ERRORcode {kNoError,kFileLoadFailure,kNotEnoughEvents};
   enum varList {kz1mass,kz2mass,kcosthetastar,kcostheta1,kcostheta2,kphi,kphi1,kmzz};
 
   bool debug;
@@ -98,12 +98,38 @@ public:
 
   };
 
-  void generate(int nEvents, bool pure=true){
+  int generate(int nEvents, bool pure=true){
 
-    if(!pure) cout << "Playground::generate() -- ERROR, embedded toys not supported" << endl;
+    if(debug)
+      cout << "Playground::generate()" << endl;
 
-    toyData = scalar->PDF->generate(RooArgSet(*z1mass,*z2mass,*costhetastar,*costheta1,*costheta2,*phi1,*phi),nEvents);
-    
+    if(pure)
+      toyData = scalar->PDF->generate(RooArgSet(*z1mass,*z2mass,*costhetastar,*costheta1,*costheta2,*phi1,*phi),nEvents);
+    else{
+
+      if(debug) cout << "Playground::generate() - drawing a random number of events from Playground::data ... note events will be removed from this dataset!" << endl;
+      
+      RooArgSet *tempEvent;
+      if(toyData) delete toyData;
+      toyData = new RooDataSet("toyData","toyData",RooArgSet(*z1mass,*z2mass,*costhetastar,*costheta1,*costheta2,*phi,*phi1));
+
+      if(nEvents>data->sumEntries()){
+	cout << "Playground::generate() - ERROR!!! Playground::data does not have enough events to fill toy!!!!  bye :) " << endl;
+	toyData = NULL;
+	return kNotEnoughEvents;
+      }
+
+      for(int iEvent=0; iEvent<nEvents; iEvent++){
+	if(debug) cout << "generating event: " << iEvent << endl;
+	tempEvent = (RooArgSet*) data->get(0);
+	toyData->add(*tempEvent);
+	data->reduce(*tempEvent);
+      }
+	
+    }
+
+    return kNoError;
+
   };
 
   int loadTree(TString fileName, TString treeName){
