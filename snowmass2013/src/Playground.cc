@@ -122,13 +122,24 @@ public:
   
   };
 
-  void fitData(){
-    scalar->PDF->fitTo(*data);
+  RooFitResult* fitData(bool istoy = false){
+
+    if ( istoy )  {
+      return (scalar->PDF->fitTo(*toyData, RooFit::PrintLevel(-1), RooFit::Save(true)));
+    }
+    else  {
+      return ((scalar->PDF)->fitTo(*data, RooFit::Save(true))); 
+    }
+    
   };
 
-  void projectPDF(varList myVar, int bins=20){
+  void projectPDF(varList myVar, int bins=20, bool istoy=false){
     RooPlot* plot = varContainer[myVar]->frame(bins);
-    data->plotOn(plot);
+
+    if ( istoy ) 
+      toyData->plotOn(plot);
+    else 
+      data->plotOn(plot);
     scalar->PDF->plotOn(plot);
     
     plot->Draw();
