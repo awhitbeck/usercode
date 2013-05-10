@@ -3,40 +3,44 @@
 // run by root -l -b testfit.C
 // 
 
-void testfit() {
+void testfit(int ntoysperjob = 1, int seed_index=2) {
 
   gROOT->ProcessLine(".x  loadLib.C");
+  
+  int random_seed = seed_index+487563; 
+  RooRandom::randomGenerator()->SetSeed(random_seed);
   bool debug = false;
 
   // 
-  // inputs 
+  // specify inputs 
+  // you need to go through these following settings and verify all the 
+  // initial values
   // 
   bool loadData = false; 
   bool fitData = false;
   bool drawprojections = false;
-  bool puretoy = true;
-  int nBins = 20; 
-  
+  bool dopuretoy = true;
+
   float mH = 126.;
   float phase0m=0;
   float phase0p=270;
   
   TString modeName = Form("0Mf01ph%.0fHiggs0PHf01ph%.0f", phase0m, phase0p);
-  // TString modeName = Form("0PHf05ph%.0f", phase0p);
   TString fileName = Form("datafiles/Higgs%sToZZTo4L_M-126_8TeV_POWHEG-JHUgenV3_false_2e2mu.root", modeName.Data());
   TString treeName = "SelectedTree";
-
-
+  
   // initial values 
+  // these are based on the default file listed above
+
   double fa2Val = 0.1;
   double phia2Val = -TMath::Pi()/2.;
   double fa3Val = 0.1;
   double phia3Val = 0;
   
   double g2Re = 0.;
-  double g2Im = 0.;
+  double g2Im = -0.57;
   double g4Re = 0.;
-  double g4Im = 0.;
+  double g4Im = 0.88;
   
   // 
   // Get Playground class started
@@ -91,13 +95,12 @@ void testfit() {
   // 
   // Do puretoy experiments 
   // 
-  if ( puretoy ) {
+  if ( dopuretoy ) {
     
-    int ntoys = 1;
     float lumi = 300; // in unit of fb
     float nsignalperfb = 1; 
     
-    TFile *toyresults = new TFile("toyresults.root", "RECREATE");
+    TFile *toyresults = new TFile(Form("toyresults_%i.root", random_seed), "RECREATE");
     gROOT->cd();
     
     TH1F *h_fa2 = new TH1F("h_fa2", "h_fa2", 100, 0, 1);
@@ -113,7 +116,7 @@ void testfit() {
     TH1F *h_phia3_pull = new TH1F("h_phia3_pull", "h_phia3_pull", 100, -5, 5);
     
     // do toys
-    for (int i = 0; i < ntoys; i++) {
+    for (int i = 0; i < ntoysperjob; i++) {
       
       if  ( i%100 == 0 )    
 	std::cout << "doing toy " << i << "\n";
