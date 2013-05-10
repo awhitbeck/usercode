@@ -11,6 +11,7 @@ void testfit() {
   // 
   // inputs 
   // 
+  bool loadData = false; 
   bool fitData = false;
   bool drawprojections = false;
   bool puretoy = true;
@@ -42,7 +43,8 @@ void testfit() {
   // 
   int parameterization = 2; 
   Playground test(mH, debug, parameterization);
-  test.loadTree(fileName, treeName);
+  if ( loadData ) 
+    test.loadTree(fileName, treeName);
   ScalarPdfFactory *scalar = test.scalar;
 
   // 
@@ -91,7 +93,7 @@ void testfit() {
   // 
   if ( puretoy ) {
     
-    int ntoys = 1000;
+    int ntoys = 1;
     float lumi = 300; // in unit of fb
     float nsignalperfb = 1; 
     
@@ -113,7 +115,8 @@ void testfit() {
     // do toys
     for (int i = 0; i < ntoys; i++) {
       
-      std::cout << "doing toy " << i << "\n";
+      if  ( i%100 == 0 )    
+	std::cout << "doing toy " << i << "\n";
 
       // set initial values
       scalar->fa2->setVal(fa2Val);
