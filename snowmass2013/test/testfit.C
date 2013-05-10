@@ -3,7 +3,7 @@
 // run by root -l -b testfit.C
 // 
 
-void testfit(int ntoysperjob = 1, int seed_index=2) {
+void testfit(bool pureToys=true, int ntoysperjob = 10, int seed_index=2) {
 
   gROOT->ProcessLine(".x  loadLib.C");
   
@@ -16,7 +16,7 @@ void testfit(int ntoysperjob = 1, int seed_index=2) {
   // you need to go through these following settings and verify all the 
   // initial values
   // 
-  bool loadData = false; 
+  bool loadData = true; 
   bool fitData = false;
   bool drawprojections = false;
   bool dopuretoy = true;
@@ -26,10 +26,10 @@ void testfit(int ntoysperjob = 1, int seed_index=2) {
   float phase0p=270;
   
   TString modeName = Form("0Mf01ph%.0fHiggs0PHf01ph%.0f", phase0m, phase0p);
-  TString fileName = Form("datafiles/Higgs%sToZZTo4L_M-126_8TeV_POWHEG-JHUgenV3_false_2e2mu.root", modeName.Data());
+  TString fileName = Form("POWHEG_JHUGen_2e2mu/Higgs%sToZZTo4L_M-126_8TeV_POWHEG-JHUgenV3_false_2e2mu.root", modeName.Data());
   TString treeName = "SelectedTree";
   
-  // initial values 
+  //cout << "initial values" << endl;
   // these are based on the default file listed above
 
   double fa2Val = 0.1;
@@ -43,17 +43,20 @@ void testfit(int ntoysperjob = 1, int seed_index=2) {
   double g4Im = 0.88;
   
   // 
-  // Get Playground class started
+  //cout << "Get Playground class started" << endl;
   // 
   int parameterization = 2; 
   Playground test(mH, debug, parameterization);
   if ( loadData ) 
     test.loadTree(fileName, treeName);
+  
+  if(debug) cout << test.data << endl;
   ScalarPdfFactory *scalar = test.scalar;
 
   // 
-  // define the parameters to be fitted and the initial values
+  //cout << "define the parameters to be fitted and the initial values" << endl;
   // 
+
 
   if ( parameterization == 2 ) {
     
@@ -97,7 +100,7 @@ void testfit(int ntoysperjob = 1, int seed_index=2) {
   // 
   if ( dopuretoy ) {
     
-    float lumi = 300; // in unit of fb
+    float lumi = 30; // in unit of fb
     float nsignalperfb = 1; 
     
     TFile *toyresults = new TFile(Form("toyresults_%i.root", random_seed), "RECREATE");
@@ -127,7 +130,9 @@ void testfit(int ntoysperjob = 1, int seed_index=2) {
       scalar->phia2->setVal(phia2Val);
       scalar->phia3->setVal(phia3Val);
 
-      test.generate(lumi*nsignalperfb, true);
+      test.generate(lumi*nsignalperfb, pureToys);
+
+      cout << "fitting data" << endl;
 
       RooFitResult *toyfitresults = test.fitData(true);
       RooRealVar *r_fa2 = (RooRealVar *) toyfitresults->floatParsFinal().find("fa2");
