@@ -8,7 +8,7 @@
   gROOT->LoadMacro("../src/ScalarPdfFactory.cc+");
   gROOT->LoadMacro("../src/Playground.cc+");
 
-  gROOT->ProcessLine(".L  ~/tdrstyle.C");
+  gROOT->ProcessLine(".L  tdrstyle.C");
   setTDRStyle();  
 
 }
