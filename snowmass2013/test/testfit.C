@@ -1,9 +1,8 @@
-//
-// This script makes a fit and draws the projections after fit when required
+/// This script makes a fit and draws the projections after fit when required
 // run by root -l -b testfit.C
 // 
 
-void testfit(bool pureToys=true, int ntoysperjob = 10, int seed_index=2) {
+void testfit(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
 
   gROOT->ProcessLine(".x  loadLib.C");
   
@@ -129,8 +128,8 @@ void testfit(bool pureToys=true, int ntoysperjob = 10, int seed_index=2) {
       scalar->fa3->setVal(fa3Val);
       scalar->phia2->setVal(phia2Val);
       scalar->phia3->setVal(phia3Val);
-
-      test.generate(lumi*nsignalperfb, pureToys);
+      
+      if(test.generate(lumi*nsignalperfb, pureToys)!=Playground::kNoError) break;
 
       cout << "fitting data" << endl;
 
