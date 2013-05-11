@@ -19,7 +19,7 @@ test.fitData()
 
 =========================
 
-#submitting jobs to hhpc batch system - - - 
+#submitting jobs to hhpc batch system by hand- - - 
 #from the test directory
 
 #pureToys -> true=pure toys, false=embedded toys
@@ -30,3 +30,7 @@ qsub submitPBSJobTemplate.pbs -v "pureToys=false,ntoysperjob=1000,seed_index=2"
 
 #jobs can also be submitted with no arguments.  By default the 
 #job will run 1000 embedded toysA
+
+#submitting jobs to hhpc batch system by hand- - - 
+# see submitToys help documentation
+python submitToys.py -h 
