@@ -15,3 +15,18 @@ root -l -n loadLib.C
 Playground test(126.) 
 test.loadTree("root://eoscms.cern.ch//eos/cms/store/cmst3/user/mmozer/Higgs/Prophecy/root/prophecy_inputemu_126_unweighted.root","newTree")
 test.fitData()      
+
+
+=========================
+
+#submitting jobs to hhpc batch system - - - 
+#from the test directory
+
+#pureToys -> true=pure toys, false=embedded toys
+#ntoysperjob -> number of toys to run
+#seed_index -> controls random numbers (and output file name)
+
+qsub submitPBSJobTemplate.pbs -v "pureToys=false,ntoysperjob=1000,seed_index=2"
+
+#jobs can also be submitted with no arguments.  By default the 
+#job will run 1000 embedded toysA
