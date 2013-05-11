@@ -4,6 +4,7 @@
 # are directive lines passed to the qsub command automatically.
 # DO NOT REMOVE THE POUND SIGN! A PBS line without a pound sign is
 # technically a syntax error and will cause the PBS script to not work 
+
 # properly!  Lines that begin with #PBS are NOT COMMENTS! They are DIRECTIVE
 # lines and WILL be parsed by the scheduler unless REMOVED!
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -53,12 +54,14 @@
 # !!!!!!!!!!!!!!!! NOTE !!!!!!!!!!!!!!!!!
 # path of output file
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#PBS -o /home/whitbeck/CMMSW_2_2_11/src/HiggsAnalysis/HiggsToZZ4Leptons/test/PBSoutput.txt
+#PBS -o /scratch0/hep/whitbeck/4lHelicity/SnowmassStudies/HEAD_May9_1319/snowmass2013/test/
 
 ### MUST REMEMBER THIS!!!!
 
 # The batch job directory (will vanish after job end):
 set curdir = `pwd`
+
+source /home/ntran/ROOTdistributions/myROOT528_fromSource/root/bin/thisroot.sh
 
 # tells the scheduler to put all output files into the directory where
 # we spawned from
@@ -68,7 +71,31 @@ cd $PBS_O_WORKDIR
 echo what is the workdir...$PBS_O_WORKDIR
 echo what is the curdir....$curdir
 
-.//home/whitbeck/4lHelicity/generatorJHU/graviton/graviton Collider=1 Process=0 OffHZZ=011 VegasNc1=500 PChannel=0 DecayMode=0 DataFile=Batch
+#Default parameters of testfit:
+#bool pureToys=false 
+#int ntoysperjob = 1000#
+#int seed_index=2
+
+if [ $pureToys == "" ]
+    then 
+    pureToys=false
+fi
+
+if [ $ntoysperjob == "" ]
+    then 
+    ntoysperjob=10
+fi
+
+if [ $seed_index == "" ]
+    then 
+    seed_index=1
+fi
+
+echo "pureToys: " $pureToys
+echo "ntoysperjob: " $ntoysperjob
+echo "seed_index: " $seed_index
+
+root -l -n -b -q loadLib.C "testfit.C(${pureToy},${ntoysperjob},${seed_index})"
 
 # shell based output redirection using < > will probably not work consistently.
 # I've tested it extensively, and gotten mixed results with it on a consistent 
