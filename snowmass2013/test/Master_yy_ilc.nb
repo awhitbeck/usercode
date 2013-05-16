@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       157,          7]
-NotebookDataLength[     41768,        964]
-NotebookOptionsPosition[     40954,        934]
-NotebookOutlinePosition[     41311,        950]
-CellTagsIndexPosition[     41268,        947]
+NotebookDataLength[     42511,        979]
+NotebookOptionsPosition[     41697,        949]
+NotebookOutlinePosition[     42054,        965]
+CellTagsIndexPosition[     42011,        962]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -97,6 +97,17 @@ Cell[BoxData[
      "calculation", " ", "compared", " ", "to", " ", "R1", " ", "to", " ", 
      "fit", " ", "the", " ", "data", " ", "more"}], "*)"}], 
    "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{"R2Val", " ", "=", " ", 
+     RowBox[{
+     "1", " ", "corresponds", " ", "to", " ", "RL", " ", "in", " ", "the", 
+      " ", "Madgraph", " ", "generator"}]}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{"R2Val", " ", "=", " ", 
+     RowBox[{
+      RowBox[{"-", "1"}], " ", "corresponds", " ", "to", " ", "LR", " ", "in",
+       " ", "the", " ", "Madgraph", " ", "generator"}]}], "*)"}], 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", 
    RowBox[{
     RowBox[{
      RowBox[{"Bhel", "[", "\[Chi]_", "]"}], ":=", " ", 
@@ -593,7 +604,9 @@ txt\>\""}], ";"}], "\[IndentingNewLine]"}]}]], "Input",
    3.5777174004887877`*^9, 3.5777174171465816`*^9}, {3.577717613121306*^9, 
    3.577717616767064*^9}, {3.5777182725110197`*^9, 3.577718281844098*^9}, {
    3.577720507248664*^9, 3.577720515779401*^9}, {3.577720561331766*^9, 
-   3.577720572699362*^9}}],
+   3.577720572699362*^9}, {3.577720803504283*^9, 3.5777208122227497`*^9}, {
+   3.5777208501488113`*^9, 3.577720880461035*^9}, {3.5777209271595297`*^9, 
+   3.577720960322049*^9}}],
 
 Cell[BoxData["\.08"], "Output",
  CellChangeTimes->{
@@ -602,7 +615,9 @@ Cell[BoxData["\.08"], "Output",
    3.577636109180458*^9}, 3.57763675727815*^9, 3.577637000159444*^9, 
    3.577713185993751*^9, 3.5777170954243507`*^9, {3.577717173175604*^9, 
    3.577717180420896*^9}, {3.5777172130423527`*^9, 3.577717249860227*^9}, 
-   3.577717370752721*^9, 3.5777174212581177`*^9, 3.5777176175392647`*^9}]
+   3.577717370752721*^9, 3.5777174212581177`*^9, 3.5777176175392647`*^9, {
+   3.577720806451219*^9, 3.577720816507984*^9}, {3.5777208563177958`*^9, 
+   3.5777208851411743`*^9}}]
 }, Open  ]],
 
 Cell[BoxData[
@@ -950,21 +965,21 @@ CellTagsIndex->{}
 (*NotebookFileOutline
 Notebook[{
 Cell[CellGroupData[{
-Cell[579, 22, 24926, 573, 1209, "Input"],
-Cell[25508, 597, 485, 7, 28, "Output"]
+Cell[579, 22, 25565, 586, 1260, "Input"],
+Cell[26147, 610, 589, 9, 28, "Output"]
 }, Open  ]],
-Cell[26008, 607, 2380, 32, 63, "Input"],
-Cell[28391, 641, 1652, 30, 114, "Input"],
-Cell[30046, 673, 583, 8, 28, "Input"],
-Cell[30632, 683, 1647, 34, 114, "Input"],
-Cell[32282, 719, 92, 1, 28, "Input"],
-Cell[32377, 722, 1807, 41, 131, "Input"],
-Cell[34187, 765, 1700, 38, 97, "Input"],
-Cell[35890, 805, 1905, 45, 114, "Input"],
-Cell[37798, 852, 2402, 55, 148, "Input"],
+Cell[26751, 622, 2380, 32, 63, "Input"],
+Cell[29134, 656, 1652, 30, 114, "Input"],
+Cell[30789, 688, 583, 8, 28, "Input"],
+Cell[31375, 698, 1647, 34, 114, "Input"],
+Cell[33025, 734, 92, 1, 28, "Input"],
+Cell[33120, 737, 1807, 41, 131, "Input"],
+Cell[34930, 780, 1700, 38, 97, "Input"],
+Cell[36633, 820, 1905, 45, 114, "Input"],
+Cell[38541, 867, 2402, 55, 148, "Input"],
 Cell[CellGroupData[{
-Cell[40225, 911, 466, 11, 46, "Input"],
-Cell[40694, 924, 244, 7, 44, "Output"]
+Cell[40968, 926, 466, 11, 46, "Input"],
+Cell[41437, 939, 244, 7, 44, "Output"]
 }, Open  ]]
 }
 ]
