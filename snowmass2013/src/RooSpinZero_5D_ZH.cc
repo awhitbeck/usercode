@@ -65,14 +65,15 @@ using namespace TMath;
 
  Double_t RooSpinZero_5D_ZH::evaluate() const 
  { 
-   // the beta and gamma are velocities of the Z in the C.O.M
-   Double_t betaValSquared =(pow(sqrts,2)-(pow(mH+mZ,2)))*(pow(sqrts,2)-(pow(mH-mZ,2)))/pow(pow(sqrts,2)-mH*mH+mZ*mZ,2);
-   Double_t gamma = 1./sqrt(1-betaValSquared);
-   
+
    // these amplitudes are calculated based on comparing equations to the PRD paper
-   // http://prd.aps.org/pdf/PRD/v49/i1/p79_1
+   // the beta and gamma are velocities of the Z in the C.O.M
+   // Double_t betaValSquared =(pow(sqrts,2)-(pow(mH+mZ,2)))*(pow(sqrts,2)-(pow(mH-mZ,2)))/pow(pow(sqrts,2)-mH*mH+mZ*mZ,2);
+   // Double_t gamma = 1./sqrt(1-betaValSquared);
+      // http://prd.aps.org/pdf/PRD/v49/i1/p79_1
    // Double_t f00 = gamma*gamma/(2+gamma*gamma);
 
+   // below calcualtions are based on the H->ZZ amplitudes 
    Double_t x = pow((mH*mH-sqrts*sqrts-mZ*mZ)/(2.*sqrts*mZ),2)-1;
    Double_t f00 = (1+x)/(3+x);
    Double_t fp0 = (1.-f00)/2.;
@@ -142,9 +143,9 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
 	 double value = 0.;
 	 value += (-8*f00*(-1 + Power(hs,2))*Power(Pi(),2))/3.;
 
-	 value += (4*fp0*Power(Pi(),2)*(1 + Power(hs,2) + 2*hs*R2Val))/3.;
+	 value += (4*fp0*Power(Pi(),2)*(1 + Power(hs,2) - 2*hs*R2Val))/3.;
 
-	 value += (4*fm0*Power(Pi(),2)*(1 + Power(hs,2) - 2*hs*R2Val))/3.;
+	 value += (4*fm0*Power(Pi(),2)*(1 + Power(hs,2) + 2*hs*R2Val))/3.;
 
 	 return value;
 
@@ -160,9 +161,9 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
 	 
 	 value += (16*fm0*Pi())/9.;
 	 
-	 value += (Sqrt(f00)*Sqrt(fp0)*Power(Pi(),3)*R1Val*R2Val*Cos(Phi1 - phip0))/4.;
+	 value += -(Sqrt(f00)*Sqrt(fp0)*Power(Pi(),3)*R1Val*R2Val*Cos(Phi1 - phip0))/4.;
 
-	 value += (Sqrt(f00)*Sqrt(fm0)*Power(Pi(),3)*R1Val*R2Val*Cos(Phi1 + phim0))/4.;
+	 value += -(Sqrt(f00)*Sqrt(fm0)*Power(Pi(),3)*R1Val*R2Val*Cos(Phi1 + phim0))/4.;
 
 	 value += (8*sqrt(fm0)*sqrt(fp0)*Pi()*Cos(2*Phi1 - phim0 + phip0))/9.;
 	 
