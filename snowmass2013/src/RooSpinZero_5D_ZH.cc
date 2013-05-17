@@ -71,7 +71,10 @@ using namespace TMath;
    
    // these amplitudes are calculated based on comparing equations to the PRD paper
    // http://prd.aps.org/pdf/PRD/v49/i1/p79_1
-   Double_t f00 = gamma*gamma/(2+gamma*gamma);
+   // Double_t f00 = gamma*gamma/(2+gamma*gamma);
+
+   Double_t x = pow((mH*mH-sqrts*sqrts-mZ*mZ)/(2.*sqrts*mZ),2)-1;
+   Double_t f00 = (1+x)/(3+x);
    Double_t fp0 = (1.-f00)/2.;
    Double_t fm0 = fp0;
    
@@ -120,7 +123,9 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
 
    // these amplitudes are calculated based on comparing equations to the PRD paper
    // http://prd.aps.org/pdf/PRD/v49/i1/p79_1
-   Double_t f00 = gamma*gamma/(2+gamma*gamma);
+   // Double_t f00 = gamma*gamma/(2+gamma*gamma);
+   Double_t x = pow((mH*mH-sqrts*sqrts-mZ*mZ)/(2.*sqrts*mZ),2)-1;
+   Double_t f00 = (1+x)/(3+x);
    Double_t fp0 = (1.-f00)/2.;
    Double_t fm0 = fp0;
    
