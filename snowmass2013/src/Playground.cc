@@ -10,13 +10,18 @@
 #include "TChain.h"
 #include "vector"
 
+namespace PlaygroundHelpers{
+
+  enum ERRORcode {kNoError,kFileLoadFailure,kNotEnoughEvents,kDataEmpty};
+  enum varList {kz1mass,kz2mass,kcosthetastar,kcostheta1,kcostheta2,kphi,kphi1,kmzz};
+}
+
+using namespace PlaygroundHelpers;
+
 class Playground{
 
 public:
     
-  enum ERRORcode {kNoError,kFileLoadFailure,kNotEnoughEvents};
-  enum varList {kz1mass,kz2mass,kcosthetastar,kcostheta1,kcostheta2,kphi,kphi1,kmzz};
-
   bool debug;
 
   RooRealVar* z1mass;  
@@ -34,19 +39,17 @@ public:
   RooDataSet* data;
   RooDataSet* toyData;
 
-  Playground(){};
-
   Playground(double mH, bool debug_=false, int parameterization_=2){
     
     debug=debug_;
 
-    z1mass = new RooRealVar("Z1Mass","m_{Z1}",90.,12.,120.);
-    z2mass = new RooRealVar("Z2Mass","m_{Z2}",25.,12.,120.);
+    z1mass = new RooRealVar("z1mass","m_{Z1}",90.,12.,120.);
+    z2mass = new RooRealVar("z2mass","m_{Z2}",25.,12.,120.);
     costhetastar = new RooRealVar("costhetastar","cos#theta*",0.,-1.,1.);
-    costheta1 = new RooRealVar("helcosthetaZ1","cos#theta_{1}",0.,-1.,1.);
-    costheta2 = new RooRealVar("helcosthetaZ2","cos#theta_{2}",0.,-1.,1.);
-    phi = new RooRealVar("helphi","#Phi",0.,-TMath::Pi(),TMath::Pi());
-    phi1 = new RooRealVar("phistarZ1","#Phi_{1}",0.,-TMath::Pi(),TMath::Pi());
+    costheta1 = new RooRealVar("costheta1","cos#theta_{1}",0.,-1.,1.);
+    costheta2 = new RooRealVar("costheta2","cos#theta_{2}",0.,-1.,1.);
+    phi = new RooRealVar("phi","#Phi",0.,-TMath::Pi(),TMath::Pi());
+    phi1 = new RooRealVar("phistar1","#Phi_{1}",0.,-TMath::Pi(),TMath::Pi());
       
     mzz = new RooRealVar("ZZMass","m_{ZZ}",mH,100,1000);
 
@@ -83,6 +86,8 @@ public:
     
    ~Playground(){
 
+    delete scalar;
+
     delete z1mass;
     delete z2mass;
     delete costhetastar;
@@ -92,7 +97,6 @@ public:
     delete phi1;
     delete mzz;
     
-    delete scalar;
     if(data) delete data;
     if(toyData) delete toyData;
 
@@ -159,16 +163,26 @@ public:
     
   };
 
-  void projectPDF(varList myVar, int bins=20, bool istoy=false){
+  int projectPDF(varList myVar, int bins=20, bool istoy=false){
+
+    if(debug) cout << "Playground::projectionPDF()" << endl;
     RooPlot* plot = varContainer[myVar]->frame(bins);
 
-    if ( istoy ) 
+    if(debug) cout << "RooPlot: " << plot << endl;
+
+    if ( istoy ) {
+      if( !toyData ) return kDataEmpty; 
       toyData->plotOn(plot);
-    else 
+    }else{
+      if( !data ) return kDataEmpty;
       data->plotOn(plot);
+    }
+
     scalar->PDF->plotOn(plot);
     
     plot->Draw();
+
+    return kNoError;
 
   }
 };

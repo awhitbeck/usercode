@@ -2,6 +2,8 @@
 // run by root -l -b testfit.C
 // 
 
+using namespace PlaygroundHelpers;
+
 void testfit(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
 
   gROOT->ProcessLine(".x  loadLib.C");
@@ -129,7 +131,7 @@ void testfit(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
       scalar->phia2->setVal(phia2Val);
       scalar->phia3->setVal(phia3Val);
       
-      if(test.generate(lumi*nsignalperfb, pureToys)!=Playground::kNoError) break;
+      if(test.generate(lumi*nsignalperfb, pureToys)!=kNoError) break;
 
       cout << "fitting data" << endl;
 
@@ -181,25 +183,25 @@ void testfit(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
     c1->Divide(4,2);
 
     c1->cd(1);
-    test.projectPDF(Playground::kz1mass);
+    test.projectPDF(kz1mass);
     
     c1->cd(2);
-    test.projectPDF(Playground::kz2mass);
+    test.projectPDF(kz2mass);
 
     c1->cd(3);
-    test.projectPDF(Playground::kcosthetastar);
+    test.projectPDF(kcosthetastar);
     
     c1->cd(4);
-    test.projectPDF(Playground::kphi1);
+    test.projectPDF(kphi1);
     
     c1->cd(6);
-    test.projectPDF(Playground::kcostheta1);
+    test.projectPDF(kcostheta1);
     
     c1->cd(7);
-    test.projectPDF(Playground::kcostheta2);
+    test.projectPDF(kcostheta2);
     
     c1->cd(8);
-    test.projectPDF(Playground::kphi);
+    test.projectPDF(kphi);
 
     c1->SaveAs(Form("projection_afterfit_%s.eps", modeName.Data()));
     c1->SaveAs(Form("projection_afterfit_%s.png", modeName.Data()));

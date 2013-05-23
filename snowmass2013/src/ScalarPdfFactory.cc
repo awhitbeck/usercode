@@ -74,32 +74,32 @@ public:
 
   ~ScalarPdfFactory(){
 
-    if(a1Val){
-      delete a1Val;
-      delete phi1Val;
-      delete a2Val;
-      delete phi2Val;
-      delete a3Val;
-      delete phi3Val;
-      
-      delete g1Val;
-      delete g2Val;
-      delete g3Val;
-      delete g4Val;
-      
-      delete g1ValIm;
-      delete g2ValIm;
-      delete g3ValIm;
-      delete g4ValIm;
-      
-      delete fa2;
-      delete fa3;
-      delete phia2;
-      delete phia3;
-    }
+    delete PDF;
+    
+    delete a1Val;
+    delete phi1Val;
+    delete a2Val;
+    delete phi2Val;
+    delete a3Val;
+    delete phi3Val;
+    
+    delete g1Val;
+    delete g2Val;
+    delete g3Val;
+    delete g4Val;
+    
+    delete g1ValIm;
+    delete g2ValIm;
+    delete g3ValIm;
+    delete g4ValIm;
 
+    delete fa2;
+    delete fa3;
+    delete phia2;
+    delete phia3;
+    
   };
-
+  
   void makeSMHiggs(){
 
     parameterization=1;
