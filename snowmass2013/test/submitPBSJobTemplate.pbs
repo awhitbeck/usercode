@@ -61,6 +61,7 @@
 # The batch job directory (will vanish after job end):
 set curdir = `pwd`
 
+source /scratch1/hep/cms/cmsset_default.sh
 source /home/ntran/ROOTdistributions/myROOT528_fromSource/root/bin/thisroot.sh
 
 # tells the scheduler to put all output files into the directory where
@@ -71,31 +72,11 @@ cd $PBS_O_WORKDIR
 echo what is the workdir...$PBS_O_WORKDIR
 echo what is the curdir....$curdir
 
-#Default parameters of testfit:
-#bool pureToys=false 
-#int ntoysperjob = 1000#
-#int seed_index=2
-
-if [ $pureToys == "" ]
-    then 
-    pureToys=false
-fi
-
-if [ $ntoysperjob == "" ]
-    then 
-    ntoysperjob=10
-fi
-
-if [ $seed_index == "" ]
-    then 
-    seed_index=1
-fi
-
 echo "pureToys: " $pureToys
 echo "ntoysperjob: " $ntoysperjob
 echo "seed_index: " $seed_index
 
-root -l -n -b -q loadLib.C "testfit.C(${pureToy},${ntoysperjob},${seed_index})"
+root -l -n -b -q loadLib.C "testfit.C(${pureToys},${ntoysperjob},${seed_index})"
 
 # shell based output redirection using < > will probably not work consistently.
 # I've tested it extensively, and gotten mixed results with it on a consistent 

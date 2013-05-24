@@ -1,6 +1,7 @@
 /// This script makes a fit and draws the projections after fit when required
 // run by root -l -b testfit.C
 // 
+#include "../src/Playground.cc"
 
 using namespace PlaygroundHelpers;
 
@@ -10,7 +11,7 @@ void testfit(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
   
   int random_seed = seed_index+487563; 
   RooRandom::randomGenerator()->SetSeed(random_seed);
-  bool debug = false;
+  bool debug = true;
 
   // 
   // specify inputs 
@@ -176,6 +177,8 @@ void testfit(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
   // 
   // Draw projetions of the loaded data
   // 
+
+  toyresults->Close();
 
   if ( drawprojections ) {
     
