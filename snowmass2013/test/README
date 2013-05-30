@@ -1,0 +1,6 @@
+1) Read the ILC LHE files
+
+./converterilclhe.sh  lhefiles/events_yfz_test.lhe
+
+The script is the readOutAngles_ILC.C.
+
