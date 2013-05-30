@@ -29,6 +29,12 @@ using namespace TMath;
 			RooAbsReal& _sqrts,
 			RooAbsReal& _mH,
     	                RooAbsReal& _mZ,
+			RooAbsReal& _a1,
+			RooAbsReal& _a2,
+			RooAbsReal& _a3,
+			RooAbsReal& _phia1,
+			RooAbsReal& _phia2,
+			RooAbsReal& _phia3,
 			RooAbsReal& _R1Val,
                         RooAbsReal& _R2Val) :
    RooAbsPdf(name,title), 
@@ -40,6 +46,12 @@ using namespace TMath;
    sqrts("sqrts","sqrts",this,_sqrts),
    mH("mH","mH",this,_mH),
    mZ("mZ","mZ",this,_mZ),
+   a1("a1","a1",this,_a1),
+   a2("a2","a2",this,_a2),
+   a3("a3","a3",this,_a3),
+   phia1("phia1","phia1",this,_phia1),
+   phia2("phia2","phia2",this,_phia2),
+   phia3("phia3","phia3",this,_phia3),
    R1Val("R1Val","R1Val",this,_R1Val),
    R2Val("R2Val","R2Val",this,_R2Val)
  { 
@@ -56,6 +68,12 @@ using namespace TMath;
    sqrts("sqrts",this,other.sqrts),
    mH("mH",this,other.mH),
    mZ("mZ",this,other.mZ),
+   a1("a1",this,other.a1),
+   a2("a2",this,other.a2),
+   a3("a3",this,other.a3),
+   phia1("phia1",this,other.phia1),
+   phia2("phia2",this,other.phia2),
+   phia3("phia3",this,other.phia3),
    R1Val("R1Val",this,other.R1Val),
    R2Val("R2Val",this,other.R2Val)
  { 
@@ -75,28 +93,45 @@ using namespace TMath;
 
    // below calcualtions are based on the H->ZZ amplitudes 
    Double_t x = pow((mH*mH-sqrts*sqrts-mZ*mZ)/(2.*sqrts*mZ),2)-1;
-   Double_t f00 = (1+x)/(3+x);
-   Double_t fp0 = (1.-f00)/2.;
-   Double_t fm0 = fp0;
    
-   Double_t phi00 = TMath::Pi();
-   Double_t phip0 = 0.-phi00;
-   Double_t phim0 = 0.-phi00;
+   Double_t A00Real = - (a1*cos(phia1)*sqrt(1+x) + a2*cos(phia2)*(mZ*sqrts)/(mH*mH)*x);
+   Double_t A00Imag = a1*sin(phia1)*sqrt(1+x) + a2*sin(phia2)*(mZ*sqrts)/(mH*mH)*x;
 
+   Double_t Ap0Real = a1*cos(phia1) - a3*sin(phia3)*(mZ*sqrts)/(mH*mH)*sqrt(x);
+   Double_t Ap0Imag = a1*sin(phia1) + a3*cos(phia3)*(mZ*sqrts)/(mH*mH)*sqrt(x);
+
+   Double_t Am0Real = a1*cos(phia1) + a3*sin(phia3)*(mZ*sqrts)/(mH*mH)*sqrt(x);
+   Double_t Am0Imag = a1*sin(phia1) - a3*cos(phia3)*(mZ*sqrts)/(mH*mH)*sqrt(x);
+
+   Double_t f00 = A00Real*A00Real + A00Imag*A00Imag;
+   Double_t fp0 = Ap0Real*Ap0Real + Ap0Imag*Ap0Imag;
+   Double_t fm0 = Am0Real*Am0Real + Am0Imag*Am0Imag;
+   
+   Double_t ftotal = f00 + fp0 + fm0;
+   
+   // normalize to the total
+   f00 = f00 / ftotal;
+   fp0 = fp0 / ftotal;
+   fm0 = fm0 / ftotal;
+   
+   Double_t phi00=atan2(A00Imag,A00Real);
+   Double_t phip0=atan2(Ap0Imag,Ap0Real)-phi00;
+   Double_t phim0=atan2(Am0Imag,Am0Real)-phi00;
+   
    Double_t value = 0;
    
 
-   value += (f00*(-1 + Power(h1,2))*(-1 + Power(hs,2)))/4.;
+   value += (f00*(-1 + Power(h1,2))*(-1 + Power(h2,2)))/4.;
 
-   value += (fp0*(1 + Power(h1,2) + 2*h1*R1Val)*(1 + Power(hs,2) - 2*hs*R2Val))/16.;
+   value += (fp0*(1 + Power(h1,2) + 2*h1*R1Val)*(1 + Power(h2,2) + 2*h2*R2Val))/16.;
 
-   value += (fm0*(1 + Power(h1,2) - 2*h1*R1Val)*(1 + Power(hs,2) + 2*hs*R2Val))/16.;
+   value += (fm0*(1 + Power(h1,2) - 2*h1*R1Val)*(1 + Power(h2,2) - 2*h2*R2Val))/16.;
 
-   value += (Sqrt(f00)*Sqrt(fp0)*Sqrt(1 - Power(h1,2))*Sqrt(1 - Power(hs,2))*(h1 + R1Val)*(hs - R2Val)*Cos(Phi1 - phip0))/4.;
+   value += (Sqrt(f00)*Sqrt(fp0)*Sqrt(1 - Power(h1,2))*Sqrt(1 - Power(h2,2))*(h1 - R1Val)*(h2 - R2Val)*Cos(Phi1 + phip0))/4.;
 
-   value += (Sqrt(f00)*Sqrt(fm0)*Sqrt(1 - Power(h1,2))*Sqrt(1 - Power(hs,2))*(h1 - R1Val)*(hs + R2Val)*Cos(Phi1 + phim0))/4.;
+   value += (Sqrt(f00)*Sqrt(fm0)*Sqrt(1 - Power(h1,2))*Sqrt(1 - Power(h2,2))*(h1 + R1Val)*(h2 - R2Val)*Cos(Phi1 - phim0))/4.;
 
-   value += (Sqrt(fm0)*Sqrt(fp0)*(-1 + Power(h1,2))*(-1 + Power(hs,2))*Cos(2*Phi1 + phim0 - phip0))/8.;
+   value += (Sqrt(fm0)*Sqrt(fp0)*(-1 + Power(h1,2))*(-1 + Power(h2,2))*Cos(2*Phi1 - phim0 + phip0))/8.;
 
 
    return value ; 
@@ -125,15 +160,34 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
    // these amplitudes are calculated based on comparing equations to the PRD paper
    // http://prd.aps.org/pdf/PRD/v49/i1/p79_1
    // Double_t f00 = gamma*gamma/(2+gamma*gamma);
+  
+    // below calcualtions are based on the H->ZZ amplitudes 
    Double_t x = pow((mH*mH-sqrts*sqrts-mZ*mZ)/(2.*sqrts*mZ),2)-1;
-   Double_t f00 = (1+x)/(3+x);
-   Double_t fp0 = (1.-f00)/2.;
-   Double_t fm0 = fp0;
    
-   Double_t phi00 = TMath::Pi();
-   Double_t phip0 = 0.-phi00;
-   Double_t phim0 = 0.-phi00;
+   Double_t A00Real = - (a1*cos(phia1)*sqrt(1+x) + a2*cos(phia2)*(mZ*sqrts)/(mH*mH)*x);
+   Double_t A00Imag = a1*sin(phia1)*sqrt(1+x) + a2*sin(phia2)*(mZ*sqrts)/(mH*mH)*x;
+
+   Double_t Ap0Real = a1*cos(phia1) - a3*sin(phia3)*(mZ*sqrts)/(mH*mH)*sqrt(x);
+   Double_t Ap0Imag = a1*sin(phia1) + a3*cos(phia3)*(mZ*sqrts)/(mH*mH)*sqrt(x);
+
+   Double_t Am0Real = a1*cos(phia1) + a3*sin(phia3)*(mZ*sqrts)/(mH*mH)*sqrt(x);
+   Double_t Am0Imag = a1*sin(phia1) - a3*cos(phia3)*(mZ*sqrts)/(mH*mH)*sqrt(x);
+
+   Double_t f00 = A00Real*A00Real + A00Imag*A00Imag;
+   Double_t fp0 = Ap0Real*Ap0Real + Ap0Imag*Ap0Imag;
+   Double_t fm0 = Am0Real*Am0Real + Am0Imag*Am0Imag;
+
+   Double_t ftotal = f00 + fp0 + fm0;
    
+   // normalize to the total
+   f00 = f00 / ftotal;
+   fp0 = fp0 / ftotal;
+   fm0 = fm0 / ftotal;
+   
+   Double_t phi00=atan2(A00Imag,A00Real);
+   Double_t phip0=atan2(Ap0Imag,Ap0Real)-phi00;
+   Double_t phim0=atan2(Am0Imag,Am0Real)-phi00;
+
    switch(code)
      {
        // projections to hs
@@ -141,11 +195,13 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
        {
 
 	 double value = 0.;
-	 value += (-8*f00*(-1 + Power(hs,2))*Power(Pi(),2))/3.;
 
-	 value += (4*fp0*Power(Pi(),2)*(1 + Power(hs,2) - 2*hs*R2Val))/3.;
+	 value += (16*f00*Power(Pi(),2))/9.;
+	 
+	 value += (16*fp0*Power(Pi(),2))/9.;
+	 
+	 value += (16*fm0*Power(Pi(),2))/9.;
 
-	 value += (4*fm0*Power(Pi(),2)*(1 + Power(hs,2) + 2*hs*R2Val))/3.;
 
 	 return value;
 
@@ -155,18 +211,13 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
        {
 
 	 double value = 0.;
-	 value += (16*f00*Pi())/9.;
 
+	 value += (16*f00*Pi())/9.;
+	 
 	 value += (16*fp0*Pi())/9.;
 	 
 	 value += (16*fm0*Pi())/9.;
-	 
-	 value += -(Sqrt(f00)*Sqrt(fp0)*Power(Pi(),3)*R1Val*R2Val*Cos(Phi1 - phip0))/4.;
 
-	 value += -(Sqrt(f00)*Sqrt(fm0)*Power(Pi(),3)*R1Val*R2Val*Cos(Phi1 + phim0))/4.;
-
-	 value += (8*sqrt(fm0)*sqrt(fp0)*Pi()*Cos(2*Phi1 - phim0 + phip0))/9.;
-	 
 	 return value;
 
        }
@@ -177,11 +228,11 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
 
 	 double value = 0.;
 	 
-	 value += (16*f00*Power(Pi(),2))/9.;
-	 
-	 value += (16*fp0*Power(Pi(),2))/9.;
-	 
-	 value += (16*fm0*Power(Pi(),2))/9.;
+	 value += (-8*f00*(-1 + Power(h2,2))*Power(Pi(),2))/3.;
+
+	 value += (4*fp0*Power(Pi(),2)*(1 + Power(h2,2) + 2*h2*R2Val))/3.;
+
+	 value += (4*fm0*Power(Pi(),2)*(1 + Power(h2,2) - 2*h2*R2Val))/3.;
 	 
 	 return value;
 
@@ -209,11 +260,17 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
 	 double value = 0.;
 	 
 	 value += (16*f00*Pi())/9.;
-	 
+
 	 value += (16*fp0*Pi())/9.;
 	 
 	 value += (16*fm0*Pi())/9.;
+	 
+	 value += -(Sqrt(f00)*Sqrt(fp0)*Power(Pi(),3)*R1Val*R2Val*Cos(Phi + phip0))/4.;
 
+	 value += -(Sqrt(f00)*Sqrt(fm0)*Power(Pi(),3)*R1Val*R2Val*Cos(Phi - phim0))/4.;
+
+	 value += (8*sqrt(fm0)*sqrt(fp0)*Pi()*Cos(2*Phi - phim0 + phip0))/9.;
+	 
 	 return value;
 
        }

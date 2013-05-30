@@ -25,6 +25,12 @@ public:
 	      RooAbsReal& _sqrts,
 	      RooAbsReal& _mH,
 	      RooAbsReal& _mZ,
+	      RooAbsReal& _a1,
+	      RooAbsReal& _a2,
+	      RooAbsReal& _a3,
+	      RooAbsReal& _phi1,
+	      RooAbsReal& _phi2,
+	      RooAbsReal& _phi3,
 	      RooAbsReal& _R1val,
 	      RooAbsReal& _R2Val);
 
@@ -46,6 +52,12 @@ protected:
   RooRealProxy sqrts ;
   RooRealProxy mH ;
   RooRealProxy mZ ;
+  RooRealProxy a1 ;
+  RooRealProxy a2 ;
+  RooRealProxy a3 ;
+  RooRealProxy phia1 ;
+  RooRealProxy phia2 ;
+  RooRealProxy phia3 ;
   RooRealProxy R1Val ;
   RooRealProxy R2Val ;
 
