@@ -35,6 +35,7 @@ void readOutAngles_ILC(std::string filename, bool debug = false) {
     Float_t m_zhmass, m_zmass, m_hmass;
     Float_t m_ptlplus, m_etalplus, m_philplus;
     Float_t m_ptlminus, m_etalminus, m_philminus;
+    Float_t m_wt; 
 
     
     tree->Branch("ZHMass", &m_zhmass, "ZHMass/F");
@@ -54,7 +55,7 @@ void readOutAngles_ILC(std::string filename, bool debug = false) {
     tree->Branch("ptlminus"     , &m_ptlminus, "ptlminus/F");
     tree->Branch("etalminus"    , &m_etalminus,"etalminus/F");
     tree->Branch("philminus"    , &m_philminus,"philminus/F");
-
+    tree->Branch("wt"           , &m_wt, "wt/F");
 
         
     int ctr = 0;
@@ -62,8 +63,15 @@ void readOutAngles_ILC(std::string filename, bool debug = false) {
     std::vector <float> listOfMom;
     int idup[4], istup[4], mothup[4][2], icolup[4][2];
     float pup[4][5], vtimup[4], spinup[4];
+    int nparticle, para;
+    double weight, m_V, alpha_qed, alpha_s; 
+    // has to use double as some weight is E-38, which exceeds the float
 
     while (!fin.eof() && fin.good()){
+
+      fin  >> nparticle >> para >> weight >> m_V >> alpha_qed >> alpha_s; 
+      if ( debug ) 
+	std::cout << nparticle << "\t" << para << "\t" <<  weight << "\t" << m_V << "\t" <<  alpha_qed  << "\t" <<  alpha_s << "\n"; 
 
       for (int a = 0; a < 4; a++){
 	fin >> idup[a] >> istup[a] >> mothup[a][0] >> mothup[a][1] >> icolup[a][0] >> icolup[a][1];
@@ -117,11 +125,12 @@ void readOutAngles_ILC(std::string filename, bool debug = false) {
       double angle_costheta1, angle_costheta2, angle_phi, angle_costhetastar, angle_phistar1, angle_phistar2, angle_phistar12, angle_phi1, angle_phi2;
       calculateAngles( pZstar, pZ, p_lminus, p_lplus, pH, p_b, p_bbar, angle_costheta1, angle_costheta2, angle_phi, angle_costhetastar, angle_phistar1, angle_phistar2, angle_phistar12, angle_phi1, angle_phi2);
       
-      m_costheta1 = float(angle_costheta1);
-      m_costheta2 = float(angle_costheta2);
-      m_phi = float(angle_phi);
-      m_costhetastar = float(angle_costhetastar);
-      m_phistar1 = float(angle_phistar1);
+      // replace the angles 
+      m_costheta1 = float(angle_costhetastar);
+      m_costheta2 = float(angle_costheta1);
+      m_phi = float(angle_phistar1);
+      m_costhetastar = float(angle_costheta2);
+      m_phistar1 = float(angle_phi);
       
       m_zhmass = float(pZstar.M());
       m_zmass = float(pZ.M());
@@ -135,6 +144,7 @@ void readOutAngles_ILC(std::string filename, bool debug = false) {
       m_etalminus = p_lminus.Eta();
       m_philminus = p_lminus.Phi();
       
+      m_wt = weight;
       
       tree->Fill();
 			  
