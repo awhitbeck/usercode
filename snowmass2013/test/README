@@ -1,6 +1,29 @@
+ILC related study instructions
+
+0) Check out the package,
+
+cvs co -d snowmass2013 UserCode/Whitbeck/snowmass2013
+
 1) Read the ILC LHE files
 
-./converterilclhe.sh  lhefiles/events_yfz_test.lhe
+cd snowmass2013/
+mkdir -p lhefiles/
+**Copy example file from hep here**
+./converterilclhe.sh  lhefiles/100k_events.lhe
 
-The script is the readOutAngles_ILC.C.
+Note, 
+--  **Example of input lhe file is at hep,
+/home/yzhou49/LCGen/ZXGen_development_20130530/events/100k_events.lhe
+-- The script is the readOutAngles_ILC.C.
+-- The output is at lhefiles/100k_events_false.root
 
+2) Plot angular distributions
+
+mkdir -p plots/
+root -l -b plotPdf_5D_ZH.C
+gv plots/ZH_mH126_sqrts250_unpolar_JHU.eps
+
+3) Plot other variables in the command line with weight
+
+root -l lhefiles/100k_events_false.root
+SelectedTree->Draw("ZMass","wt")
