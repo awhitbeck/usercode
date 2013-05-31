@@ -17,9 +17,9 @@ using namespace RooFit ;
 // set this to true if you want to draw the ee->ZZ 
 bool drawbkg = false;
 // set this to true if you are using the JHUGen one with weights
-bool weightedevents = false;
+bool weightedevents = true;
 // set this to true if you are drawing the 0-
-bool zerominus = false;
+bool zerominus = true;
 
 void plotPdf_5D_ZH(float mH = 126, float sqrtsVal = 250.) {
     
@@ -46,7 +46,7 @@ void plotPdf_5D_ZH(float mH = 126, float sqrtsVal = 250.) {
     
     TString fileName = "lhefiles/ee_ZsmH_llbb_false.root";
     if ( weightedevents ) {
-      fileName = "lhefiles/BW_events_1M_false.root";
+      fileName = "lhefiles/100k_events_false.root";
       if ( zerominus )
 	fileName = "lhefiles/puseduscalar_100k_events_false.root";
     }
