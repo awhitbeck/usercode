@@ -143,6 +143,9 @@ public:
     
     if(!myChain || myChain->GetEntries()<=0) return kFileLoadFailure;
 
+    if(data)
+      data=0;
+
     data = new RooDataSet("data","data",myChain,RooArgSet(*z1mass,*z2mass,*costhetastar,*costheta1,*costheta2,*phi,*phi1),"");
 
     if(debug)
