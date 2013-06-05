@@ -38,10 +38,13 @@ public:
 
   RooDataSet* data;
   RooDataSet* toyData;
+  int embedTracker;
 
   Playground(double mH, bool debug_=false, int parameterization_=2){
     
     debug=debug_;
+
+    embedTracker=0;
 
     z1mass = new RooRealVar("z1mass","m_{Z1}",90.,12.,120.);
     z2mass = new RooRealVar("z2mass","m_{Z2}",25.,12.,120.);
@@ -51,7 +54,7 @@ public:
     phi = new RooRealVar("phi","#Phi",0.,-TMath::Pi(),TMath::Pi());
     phi1 = new RooRealVar("phistar1","#Phi_{1}",0.,-TMath::Pi(),TMath::Pi());
       
-    mzz = new RooRealVar("ZZMass","m_{ZZ}",mH,100,1000);
+    mzz = new RooRealVar("zzmass","m_{ZZ}",mH,100,1000);
 
     varContainer.push_back(z1mass);
     varContainer.push_back(z2mass);
@@ -111,23 +114,23 @@ public:
       toyData = scalar->PDF->generate(RooArgSet(*z1mass,*z2mass,*costhetastar,*costheta1,*costheta2,*phi1,*phi),nEvents);
     else{
 
-      if(debug) cout << "Playground::generate() - drawing a random number of events from Playground::data ... note events will be removed from this dataset!" << endl;
-      
       RooArgSet *tempEvent;
-      if(toyData) delete toyData;
+      //if(toyData) delete toyData;
       toyData = new RooDataSet("toyData","toyData",RooArgSet(*z1mass,*z2mass,*costhetastar,*costheta1,*costheta2,*phi,*phi1));
 
-      if(nEvents>data->sumEntries()){
+      if(nEvents+embedTracker > data->sumEntries()){
 	cout << "Playground::generate() - ERROR!!! Playground::data does not have enough events to fill toy!!!!  bye :) " << endl;
 	toyData = NULL;
 	return kNotEnoughEvents;
       }
 
       for(int iEvent=0; iEvent<nEvents; iEvent++){
-	if(debug) cout << "generating event: " << iEvent << endl;
-	tempEvent = (RooArgSet*) data->get(0);
+
+	if(debug) cout << "generating event: " << iEvent << " embedTracker: " << embedTracker << endl;
+	tempEvent = (RooArgSet*) data->get(embedTracker);
 	toyData->add(*tempEvent);
-	data->reduce(*tempEvent);
+	embedTracker++;
+
       }
 	
     }
@@ -155,13 +158,13 @@ public:
   
   };
 
-  RooFitResult* fitData(bool istoy = false){
+  RooFitResult* fitData(bool istoy = false, int PrintLevel = 1){
 
     if ( istoy )  {
-      return (scalar->PDF->fitTo(*toyData, RooFit::PrintLevel(-1), RooFit::Save(true)));
+      return ((scalar->PDF)->fitTo(*toyData, RooFit::PrintLevel(PrintLevel), RooFit::Save(true)));
     }
     else  {
-      return ((scalar->PDF)->fitTo(*data, RooFit::Save(true))); 
+      return ((scalar->PDF)->fitTo(*data, RooFit::PrintLevel(PrintLevel), RooFit::Save(true))); 
     }
     
   };
