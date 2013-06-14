@@ -132,7 +132,7 @@ using namespace TMath;
 
 
    // below calcualtions are based on the H->ZZ amplitudes 
-   double s=(mX*mX-sqrts*sqrts-mZ*mZ)/2.;
+   double s=-(mX*mX-sqrts*sqrts-mZ*mZ)/2.;
    double kappa=s/(1000*1000);
    
    double a1=0,a2=0,a3=0,a1Im=0,a2Im=0,a3Im=0;
@@ -269,7 +269,7 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
    // Double_t f00 = gamma*gamma/(2+gamma*gamma);
   
     // below calcualtions are based on the H->ZZ amplitudes 
-   double s=(mX*mX-sqrts*sqrts-mZ*mZ)/2.;
+   double s=-(mX*mX-sqrts*sqrts-mZ*mZ)/2.;
    double kappa=s/(1000*1000);
    
    double a1=0,a2=0,a3=0,a1Im=0,a2Im=0,a3Im=0;
