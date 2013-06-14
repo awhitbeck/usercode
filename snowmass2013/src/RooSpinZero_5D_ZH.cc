@@ -21,22 +21,35 @@ using namespace TMath;
  ClassImp(RooSpinZero_5D_ZH) 
 
  RooSpinZero_5D_ZH::RooSpinZero_5D_ZH(const char *name, const char *title, 
-                        RooAbsReal& _h1,
-                        RooAbsReal& _h2,
-                        RooAbsReal& _hs,
-                        RooAbsReal& _Phi,
-			RooAbsReal& _Phi1,
-			RooAbsReal& _sqrts,
-			RooAbsReal& _mH,
-    	                RooAbsReal& _mZ,
-			RooAbsReal& _a1,
-			RooAbsReal& _a2,
-			RooAbsReal& _a3,
-			RooAbsReal& _phia1,
-			RooAbsReal& _phia2,
-			RooAbsReal& _phia3,
-			RooAbsReal& _R1Val,
-                        RooAbsReal& _R2Val) :
+				      RooAbsReal& _h1,
+				      RooAbsReal& _h2,
+				      RooAbsReal& _hs,
+				      RooAbsReal& _Phi,
+				      RooAbsReal& _Phi1,
+				      RooAbsReal& _sqrts,
+				      RooAbsReal& _mX,
+				      RooAbsReal& _mZ,
+				      RooAbsReal& _R1Val,
+				      RooAbsReal& _R2Val,
+				      int _parameterization,
+				      RooAbsReal& _a1Val,
+				      RooAbsReal& _phi1Val,
+				      RooAbsReal& _a2Val,
+				      RooAbsReal& _phi2Val,
+				      RooAbsReal& _a3Val,
+				      RooAbsReal& _phi3Val,
+				      RooAbsReal& _g1Val,
+				      RooAbsReal& _g2Val,
+				      RooAbsReal& _g3Val,
+				      RooAbsReal& _g4Val,
+				      RooAbsReal& _g1ValIm,
+				      RooAbsReal& _g2ValIm,
+				      RooAbsReal& _g3ValIm,
+				      RooAbsReal& _g4ValIm,
+				      RooAbsReal& _fa2,
+				      RooAbsReal& _fa3,
+				      RooAbsReal& _phia2,
+				      RooAbsReal& _phia3 ):
    RooAbsPdf(name,title), 
    h1("h1","h1",this,_h1),
    h2("h2","h2",this,_h2),
@@ -44,16 +57,29 @@ using namespace TMath;
    Phi("Phi","Phi",this,_Phi),
    Phi1("Phi1","Phi1",this,_Phi1),
    sqrts("sqrts","sqrts",this,_sqrts),
-   mH("mH","mH",this,_mH),
+   mX("mX","mX",this,_mX),
    mZ("mZ","mZ",this,_mZ),
-   a1("a1","a1",this,_a1),
-   a2("a2","a2",this,_a2),
-   a3("a3","a3",this,_a3),
-   phia1("phia1","phia1",this,_phia1),
-   phia2("phia2","phia2",this,_phia2),
-   phia3("phia3","phia3",this,_phia3),
    R1Val("R1Val","R1Val",this,_R1Val),
-   R2Val("R2Val","R2Val",this,_R2Val)
+   R2Val("R2Val","R2Val",this,_R2Val),
+   parameterization(_parameterization),
+   a1Val("a1Val","a1Val",this,_a1Val),
+   phi1Val("phi1Val","phi1Val",this,_phi1Val),
+   a2Val("a2Val","a2Val",this,_a2Val),
+   phi2Val("phi2Val","phi2Val",this,_phi2Val),
+   a3Val("a3Val","a3Val",this,_a3Val),
+   phi3Val("phi3Val","phi3Val",this,_phi3Val),
+   g1Val("g1Val","g1Val",this,_g1Val),
+   g2Val("g2Val","g2Val",this,_g2Val),
+   g3Val("g3Val","g3Val",this,_g3Val),
+   g4Val("g4Val","g4Val",this,_g4Val),
+   g1ValIm("g1ValIm","g1ValIm",this,_g1ValIm),
+   g2ValIm("g2ValIm","g2ValIm",this,_g2ValIm),
+   g3ValIm("g3ValIm","g3ValIm",this,_g3ValIm),
+   g4ValIm("g4ValIm","g4ValIm",this,_g4ValIm),
+   fa2("fa2","fa2",this,_fa2),
+   fa3("fa3","fa3",this,_fa3),
+   phia2("phia2","phia2",this,_phia2),
+   phia3("phia3","phia3",this,_phia3)
  { 
  } 
 
@@ -66,16 +92,29 @@ using namespace TMath;
    Phi("Phi",this,other.Phi),
    Phi1("Phi1",this,other.Phi1),
    sqrts("sqrts",this,other.sqrts),
-   mH("mH",this,other.mH),
+   mX("mX",this,other.mX),
    mZ("mZ",this,other.mZ),
-   a1("a1",this,other.a1),
-   a2("a2",this,other.a2),
-   a3("a3",this,other.a3),
-   phia1("phia1",this,other.phia1),
-   phia2("phia2",this,other.phia2),
-   phia3("phia3",this,other.phia3),
    R1Val("R1Val",this,other.R1Val),
-   R2Val("R2Val",this,other.R2Val)
+   R2Val("R2Val",this,other.R2Val),
+   parameterization(other.parameterization),
+   a1Val("a1Val",this,other.a1Val),
+   phi1Val("phi1Val",this,other.phi1Val),
+   a2Val("a2Val",this,other.a2Val),
+   phi2Val("phi2Val",this,other.phi2Val),
+   a3Val("a3Val",this,other.a3Val),
+   phi3Val("phi3Val",this,other.phi3Val),
+   g1Val("g1Val",this,other.g1Val),
+   g2Val("a2Val",this,other.g2Val),
+   g3Val("g3Val",this,other.g3Val),
+   g4Val("g4Val",this,other.g4Val),
+   g1ValIm("g1ValIm",this,other.g1ValIm),
+   g2ValIm("a2ValIm",this,other.g2ValIm),
+   g3ValIm("g3ValIm",this,other.g3ValIm),
+   g4ValIm("g4ValIm",this,other.g4ValIm),
+   fa2("fa2",this,other.fa2),
+   fa3("fa3",this,other.fa3),
+   phia2("phia2",this,other.phia2),
+   phia3("phia3",this,other.phia3)
  { 
  } 
 
@@ -86,22 +125,90 @@ using namespace TMath;
 
    // these amplitudes are calculated based on comparing equations to the PRD paper
    // the beta and gamma are velocities of the Z in the C.O.M
-   // Double_t betaValSquared =(pow(sqrts,2)-(pow(mH+mZ,2)))*(pow(sqrts,2)-(pow(mH-mZ,2)))/pow(pow(sqrts,2)-mH*mH+mZ*mZ,2);
+   // Double_t betaValSquared =(pow(sqrts,2)-(pow(mX+mZ,2)))*(pow(sqrts,2)-(pow(mX-mZ,2)))/pow(pow(sqrts,2)-mX*mX+mZ*mZ,2);
    // Double_t gamma = 1./sqrt(1-betaValSquared);
       // http://prd.aps.org/pdf/PRD/v49/i1/p79_1
    // Double_t f00 = gamma*gamma/(2+gamma*gamma);
 
+
    // below calcualtions are based on the H->ZZ amplitudes 
-   Double_t x = pow((mH*mH-sqrts*sqrts-mZ*mZ)/(2.*sqrts*mZ),2)-1;
+   double s=(mX*mX-sqrts*sqrts-mZ*mZ)/2.;
+   double kappa=s/(1000*1000);
    
-   Double_t A00Real = - (a1*cos(phia1)*sqrt(1+x) + a2*cos(phia2)*(mZ*sqrts)/(mH*mH)*x);
-   Double_t A00Imag = a1*sin(phia1)*sqrt(1+x) + a2*sin(phia2)*(mZ*sqrts)/(mH*mH)*x;
+   double a1=0,a2=0,a3=0,a1Im=0,a2Im=0,a3Im=0;
+   double g1(1.0), g1Im(0.), g2(0.), g2Im(0.), g3(0.), g3Im(0.), g4(0.), g4Im(0.);
+   
+   if(parameterization==0){
+     a1=a1Val;
+     a1Im=phi1Val;
+     a2=a2Val;
+     a2Im=phi2Val;
+     a3=a3Val;
+     a3Im=phi3Val;
+   } else {
+     
+    // 
+    // Important, the PDF has an emphirical fix
+    // Forcing the couplings to be its conjugate 
+    // to agree with the generator shapes
+    // 
+    if(parameterization==1){
+      // 
+      // place holder, not correct
+      // 
+      double nanval = sqrt(1 - fa2 - fa3);
+      if (nanval != nanval) return 1e-9;
 
-   Double_t Ap0Real = a1*cos(phia1) - a3*sin(phia3)*(mZ*sqrts)/(mH*mH)*sqrt(x);
-   Double_t Ap0Imag = a1*sin(phia1) + a3*cos(phia3)*(mZ*sqrts)/(mH*mH)*sqrt(x);
+      // convert fraction and phase to g1,g2...etc
+      double sigma_1=2.0418442;   // numbers coming from JHUGen
+      double sigma_2=0.77498928;
+      double sigma_4=0.32711197;
+      
+      double g1Mag = 1.;
+      double g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma_1/sigma_2); 
+      double g4Mag = sqrt(fa3/(1.-fa2-fa3))*sqrt(sigma_1/sigma_4); 
+      
+      g1   = g1Mag;
+      g1Im = 0.0;
+      g2   = g2Mag*cos(phia2);
+      g2Im = - g2Mag*sin(phia2);
+      g3   = 0.0;
+      g3Im = 0.0;
+      g4   = g4Mag*cos(phia3);
+      g4Im = - g4Mag*sin(phia3);
+      
+    }else if(parameterization==2){
+      
+      g1   = g1Val;
+      g1Im = - g1ValIm;
+      g2   = g2Val;
+      g2Im = - g2ValIm;
+      g3   = g3Val;
+      g3Im = - g3ValIm;
+      g4   = g4Val;
+      g4Im = - g4ValIm;
+    }
+    
+    a1 = g1*mZ*mZ/(mX*mX) + g2*2.*s/(mX*mX) + g3*kappa*s/(mX*mX);
+    a1Im = g1Im*mZ*mZ/(mX*mX) + g2Im*2.*s/(mX*mX) + g3Im*kappa*s/(mX*mX);
+    a2 = -2.*g2 - g3*kappa;
+    a2Im = -2.*g2Im - g3Im*kappa;
+    a3 = -2.*g4;
+    a3Im = -2.*g4Im;
 
-   Double_t Am0Real = a1*cos(phia1) + a3*sin(phia3)*(mZ*sqrts)/(mH*mH)*sqrt(x);
-   Double_t Am0Imag = a1*sin(phia1) - a3*cos(phia3)*(mZ*sqrts)/(mH*mH)*sqrt(x);
+  }
+  
+
+   Double_t x = pow((mX*mX-sqrts*sqrts-mZ*mZ)/(2.*sqrts*mZ),2)-1;
+   
+   Double_t A00Real = - (a1*sqrt(1+x) + a2*(mZ*sqrts)/(mX*mX)*x);
+   Double_t A00Imag = a1Im*sqrt(1+x) + a2Im*(mZ*sqrts)/(mX*mX)*x;
+
+   Double_t Ap0Real = a1 - a3Im*(mZ*sqrts)/(mX*mX)*sqrt(x);
+   Double_t Ap0Imag = a1Im + a3*(mZ*sqrts)/(mX*mX)*sqrt(x);
+
+   Double_t Am0Real = a1 + a3Im*(mZ*sqrts)/(mX*mX)*sqrt(x);
+   Double_t Am0Imag = a1Im - a3*(mZ*sqrts)/(mX*mX)*sqrt(x);
 
    Double_t f00 = A00Real*A00Real + A00Imag*A00Imag;
    Double_t fp0 = Ap0Real*Ap0Real + Ap0Imag*Ap0Imag;
@@ -154,7 +261,7 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
 {
    
     // the beta and gamma are velocities of the Z in the C.O.M
-   Double_t betaValSquared =(pow(sqrts,2)-(pow(mH+mZ,2)))*(pow(sqrts,2)-(pow(mH-mZ,2)))/pow(pow(sqrts,2)-mH*mH+mZ*mZ,2);
+   Double_t betaValSquared =(pow(sqrts,2)-(pow(mX+mZ,2)))*(pow(sqrts,2)-(pow(mX-mZ,2)))/pow(pow(sqrts,2)-mX*mX+mZ*mZ,2);
    Double_t gamma = 1./sqrt(1-betaValSquared);
 
    // these amplitudes are calculated based on comparing equations to the PRD paper
@@ -162,16 +269,82 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
    // Double_t f00 = gamma*gamma/(2+gamma*gamma);
   
     // below calcualtions are based on the H->ZZ amplitudes 
-   Double_t x = pow((mH*mH-sqrts*sqrts-mZ*mZ)/(2.*sqrts*mZ),2)-1;
+   double s=(mX*mX-sqrts*sqrts-mZ*mZ)/2.;
+   double kappa=s/(1000*1000);
    
-   Double_t A00Real = - (a1*cos(phia1)*sqrt(1+x) + a2*cos(phia2)*(mZ*sqrts)/(mH*mH)*x);
-   Double_t A00Imag = a1*sin(phia1)*sqrt(1+x) + a2*sin(phia2)*(mZ*sqrts)/(mH*mH)*x;
+   double a1=0,a2=0,a3=0,a1Im=0,a2Im=0,a3Im=0;
+   double g1(1.0), g1Im(0.), g2(0.), g2Im(0.), g3(0.), g3Im(0.), g4(0.), g4Im(0.);
+   
+   if(parameterization==0){
+     a1=a1Val;
+     a1Im=phi1Val;
+     a2=a2Val;
+     a2Im=phi2Val;
+     a3=a3Val;
+     a3Im=phi3Val;
+   } else {
+     // 
+     // Important, the PDF has an emphirical fix
+     // Forcing the couplings to be its conjugate 
+     // to agree with the generator shapes
+     // 
+     if(parameterization==1){
+       // 
+       // place holder, not correct
+       // 
+       double nanval = sqrt(1 - fa2 - fa3);
+       if (nanval != nanval) return 1e-9;
+       
+       // convert fraction and phase to g1,g2...etc
+       double sigma_1=2.0418442;   // numbers coming from JHUGen
+       double sigma_2=0.77498928;
+       double sigma_4=0.32711197;
+       
+       double g1Mag = 1.;
+       double g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma_1/sigma_2); 
+       double g4Mag = sqrt(fa3/(1.-fa2-fa3))*sqrt(sigma_1/sigma_4); 
+       
+       g1   = g1Mag;
+       g1Im = 0.0;
+       g2   = g2Mag*cos(phia2);
+       g2Im = - g2Mag*sin(phia2);
+       g3   = 0.0;
+       g3Im = 0.0;
+       g4   = g4Mag*cos(phia3);
+       g4Im = - g4Mag*sin(phia3);
+       
+     }else if(parameterization==2) {
+       
+       g1   = g1Val;
+       g1Im = - g1ValIm;
+       g2   = g2Val;
+       g2Im = - g2ValIm;
+       g3   = g3Val;
+       g3Im = - g3ValIm;
+       g4   = g4Val;
+       g4Im = - g4ValIm;
+     }
+     
+     a1 = g1*mZ*mZ/(mX*mX) + g2*2.*s/(mX*mX) + g3*kappa*s/(mX*mX);
+     a1Im = g1Im*mZ*mZ/(mX*mX) + g2Im*2.*s/(mX*mX) + g3Im*kappa*s/(mX*mX);
+     a2 = -2.*g2 - g3*kappa;
+     a2Im = -2.*g2Im - g3Im*kappa;
+     a3 = -2.*g4;
+     a3Im = -2.*g4Im;
+     
+   }
+   
+   
+   Double_t x = pow((mX*mX-sqrts*sqrts-mZ*mZ)/(2.*sqrts*mZ),2)-1;
+   
+   Double_t A00Real = - (a1*sqrt(1+x) + a2*(mZ*sqrts)/(mX*mX)*x);
+   Double_t A00Imag = a1Im*sqrt(1+x) + a2Im*(mZ*sqrts)/(mX*mX)*x;
 
-   Double_t Ap0Real = a1*cos(phia1) - a3*sin(phia3)*(mZ*sqrts)/(mH*mH)*sqrt(x);
-   Double_t Ap0Imag = a1*sin(phia1) + a3*cos(phia3)*(mZ*sqrts)/(mH*mH)*sqrt(x);
+   Double_t Ap0Real = a1 - a3Im*(mZ*sqrts)/(mX*mX)*sqrt(x);
+   Double_t Ap0Imag = a1Im + a3*(mZ*sqrts)/(mX*mX)*sqrt(x);
 
-   Double_t Am0Real = a1*cos(phia1) + a3*sin(phia3)*(mZ*sqrts)/(mH*mH)*sqrt(x);
-   Double_t Am0Imag = a1*sin(phia1) - a3*cos(phia3)*(mZ*sqrts)/(mH*mH)*sqrt(x);
+   Double_t Am0Real = a1 + a3Im*(mZ*sqrts)/(mX*mX)*sqrt(x);
+   Double_t Am0Imag = a1Im - a3*(mZ*sqrts)/(mX*mX)*sqrt(x);
 
    Double_t f00 = A00Real*A00Real + A00Imag*A00Imag;
    Double_t fp0 = Ap0Real*Ap0Real + Ap0Imag*Ap0Imag;
