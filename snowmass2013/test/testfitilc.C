@@ -3,6 +3,8 @@
 // 
 #include "../src/PlaygroundZH.cc"
 
+using namespace PlaygroundZHhelpers;
+
 void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
 
   gROOT->ProcessLine(".x  loadLib.C");
@@ -182,13 +184,7 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
   if ( drawprojections ) {
     
     TCanvas *c1 = new TCanvas("c1","c1",1500, 800);
-    c1->Divide(4,2);
-
-    c1->cd(1);
-    test.projectPDF(kz1mass);
-    
-    c1->cd(2);
-    test.projectPDF(kz2mass);
+    c1->Divide(3,2);
 
     c1->cd(3);
     test.projectPDF(kcosthetastar);
