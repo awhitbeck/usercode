@@ -1,5 +1,5 @@
 /// This script makes a fit and draws the projections after fit when required
-// run by root -l -b testfit.C
+// run by root -l -b loadlib.C testfitilc.C
 // 
 #include "../src/PlaygroundZH.cc"
 
@@ -7,7 +7,7 @@ using namespace PlaygroundZHhelpers;
 
 void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
 
-  gROOT->ProcessLine(".x  loadLib.C");
+  //   gROOT->ProcessLine(".x  loadLib.C");
   
   int random_seed = seed_index+487563; 
   RooRandom::randomGenerator()->SetSeed(random_seed);
@@ -183,22 +183,22 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
 
   if ( drawprojections ) {
     
-    TCanvas *c1 = new TCanvas("c1","c1",1500, 800);
+    TCanvas *c1 = new TCanvas("c1","c1",1000, 800);
     c1->Divide(3,2);
 
-    c1->cd(3);
+    c1->cd(1);
     test.projectPDF(kcosthetastar);
     
-    c1->cd(4);
+    c1->cd(2);
     test.projectPDF(kphi1);
     
-    c1->cd(6);
+    c1->cd(4);
     test.projectPDF(kcostheta1);
     
-    c1->cd(7);
+    c1->cd(5);
     test.projectPDF(kcostheta2);
     
-    c1->cd(8);
+    c1->cd(6);
     test.projectPDF(kphi);
 
     TString fitName = "nofit";
