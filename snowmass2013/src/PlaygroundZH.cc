@@ -48,7 +48,7 @@ public:
     costheta1 = new RooRealVar("costheta1","cos#theta_{1}",0.,-1.,1.);
     costheta2 = new RooRealVar("costheta2","cos#theta_{2}",0.,-1.,1.);
     phi = new RooRealVar("phi","#Phi",0.,-TMath::Pi(),TMath::Pi());
-    phi1 = new RooRealVar("phi1","#Phi_{1}",0.,-TMath::Pi(),TMath::Pi());
+    phi1 = new RooRealVar("phistar1","#Phi_{1}",0.,-TMath::Pi(),TMath::Pi());
 
     mX = new RooRealVar("mX","mX",mH);
       
@@ -141,7 +141,7 @@ public:
     if(data)
       data=0;
 
-    data = new RooDataSet("data","data",myChain,RooArgSet(*costhetastar,*costheta1,*costheta2,*phi,*phi1),"");
+    data = new RooDataSet("data","data",myChain,RooArgSet(*costheta1,*costheta2,*costhetastar,*phi1,*phi),"");
 
     if(debug)
       cout << "Number of events in data: " << data->numEntries() << endl;
