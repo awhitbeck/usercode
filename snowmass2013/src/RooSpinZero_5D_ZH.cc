@@ -147,11 +147,6 @@ using namespace TMath;
      a3Im=phi3Val;
    } else {
      
-    // 
-    // Important, the PDF has an emphirical fix
-    // Forcing the couplings to be its conjugate 
-    // to agree with the generator shapes
-    // 
     if(parameterization==1){
       // 
       // place holder, not correct
@@ -180,13 +175,13 @@ using namespace TMath;
     }else if(parameterization==2){
       
       g1   = g1Val;
-      g1Im = - g1ValIm;
-      g2   = g2Val;
-      g2Im = - g2ValIm;
+      g1Im =  g1ValIm;
+      g2   =  - g2Val;
+      g2Im =  - g2ValIm;
       g3   = g3Val;
-      g3Im = - g3ValIm;
+      g3Im =  g3ValIm;
       g4   = g4Val;
-      g4Im = - g4ValIm;
+      g4Im =  g4ValIm;
     }
     
     a1 = g1*mZ*mZ/(mX*mX) + g2*2.*s/(mX*mX) + g3*kappa*s/(mX*mX);
@@ -202,7 +197,7 @@ using namespace TMath;
    Double_t x = pow((mX*mX-sqrts*sqrts-mZ*mZ)/(2.*sqrts*mZ),2)-1;
    
    Double_t A00Real = - (a1*sqrt(1+x) + a2*(mZ*sqrts)/(mX*mX)*x);
-   Double_t A00Imag = a1Im*sqrt(1+x) + a2Im*(mZ*sqrts)/(mX*mX)*x;
+   Double_t A00Imag = - (a1Im*sqrt(1+x) + a2Im*(mZ*sqrts)/(mX*mX)*x);
 
    Double_t Ap0Real = a1 - a3Im*(mZ*sqrts)/(mX*mX)*sqrt(x);
    Double_t Ap0Imag = a1Im + a3*(mZ*sqrts)/(mX*mX)*sqrt(x);
@@ -316,13 +311,13 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
      }else if(parameterization==2) {
        
        g1   = g1Val;
-       g1Im = - g1ValIm;
-       g2   = g2Val;
+       g1Im = g1ValIm;
+       g2   = - g2Val;
        g2Im = - g2ValIm;
        g3   = g3Val;
-       g3Im = - g3ValIm;
+       g3Im = g3ValIm;
        g4   = g4Val;
-       g4Im = - g4ValIm;
+       g4Im = g4ValIm;
      }
      
      a1 = g1*mZ*mZ/(mX*mX) + g2*2.*s/(mX*mX) + g3*kappa*s/(mX*mX);
@@ -331,14 +326,14 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
      a2Im = -2.*g2Im - g3Im*kappa;
      a3 = -2.*g4;
      a3Im = -2.*g4Im;
-     
+
    }
    
    
    Double_t x = pow((mX*mX-sqrts*sqrts-mZ*mZ)/(2.*sqrts*mZ),2)-1;
    
    Double_t A00Real = - (a1*sqrt(1+x) + a2*(mZ*sqrts)/(mX*mX)*x);
-   Double_t A00Imag = a1Im*sqrt(1+x) + a2Im*(mZ*sqrts)/(mX*mX)*x;
+   Double_t A00Imag = - (a1Im*sqrt(1+x) + a2Im*(mZ*sqrts)/(mX*mX)*x);
 
    Double_t Ap0Real = a1 - a3Im*(mZ*sqrts)/(mX*mX)*sqrt(x);
    Double_t Ap0Imag = a1Im + a3*(mZ*sqrts)/(mX*mX)*sqrt(x);
