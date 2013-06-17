@@ -17,6 +17,8 @@
 
 using namespace TMath;
 
+enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMparameterizations=3};
+
 
  ClassImp(RooSpinZero_5D_ZH) 
 
@@ -138,7 +140,7 @@ using namespace TMath;
    double a1=0,a2=0,a3=0,a1Im=0,a2Im=0,a3Im=0;
    double g1(1.0), g1Im(0.), g2(0.), g2Im(0.), g3(0.), g3Im(0.), g4(0.), g4Im(0.);
    
-   if(parameterization==0){
+  if(parameterization==kMagPhase_As){
      a1=a1Val;
      a1Im=phi1Val;
      a2=a2Val;
@@ -147,7 +149,7 @@ using namespace TMath;
      a3Im=phi3Val;
    } else {
      
-    if(parameterization==1){
+    if(parameterization==kFracPhase_Gs){
       // 
       // place holder, not correct
       // 
@@ -155,13 +157,14 @@ using namespace TMath;
       if (nanval != nanval) return 1e-9;
 
       // convert fraction and phase to g1,g2...etc
-      double sigma_1=2.0418442;   // numbers coming from JHUGen
-      double sigma_2=0.77498928;
-      double sigma_4=0.32711197;
+      // ILC numbers at 250 GeV at mH= 125 GeV (narrow Z width approximation)
+      Double_t sigma1_e = 0.981396; // was 0.94696 at 126 GeV
+      Double_t sigma2_e = 33.4674;  // was 32.1981 at 126 GeV
+      Double_t sigma4_e = 7.9229;   // was 7.45502 at 126 GeV
       
       double g1Mag = 1.;
-      double g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma_1/sigma_2); 
-      double g4Mag = sqrt(fa3/(1.-fa2-fa3))*sqrt(sigma_1/sigma_4); 
+      double g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma1_e/sigma2_e); 
+      double g4Mag = sqrt(fa3/(1.-fa2-fa3))*sqrt(sigma1_e/sigma4_e); 
       
       g1   = g1Mag;
       g1Im = 0.0;
@@ -171,9 +174,10 @@ using namespace TMath;
       g3Im = 0.0;
       g4   = g4Mag*cos(phia3);
       g4Im = - g4Mag*sin(phia3);
+
       
-    }else if(parameterization==2){
-      
+    }else if(parameterization==kRealImag_Gs){
+
       g1   = g1Val;
       g1Im =  g1ValIm;
       g2   =  - g2Val;
@@ -270,7 +274,8 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
    double a1=0,a2=0,a3=0,a1Im=0,a2Im=0,a3Im=0;
    double g1(1.0), g1Im(0.), g2(0.), g2Im(0.), g3(0.), g3Im(0.), g4(0.), g4Im(0.);
    
-   if(parameterization==0){
+   
+   if(parameterization==kMagPhase_As){
      a1=a1Val;
      a1Im=phi1Val;
      a2=a2Val;
@@ -278,12 +283,8 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
      a3=a3Val;
      a3Im=phi3Val;
    } else {
-     // 
-     // Important, the PDF has an emphirical fix
-     // Forcing the couplings to be its conjugate 
-     // to agree with the generator shapes
-     // 
-     if(parameterization==1){
+     
+     if(parameterization==kFracPhase_Gs){
        // 
        // place holder, not correct
        // 
@@ -291,33 +292,35 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
        if (nanval != nanval) return 1e-9;
        
        // convert fraction and phase to g1,g2...etc
-       double sigma_1=2.0418442;   // numbers coming from JHUGen
-       double sigma_2=0.77498928;
-       double sigma_4=0.32711197;
+       // ILC numbers at 250 GeV at mH= 125 GeV (narrow Z width approximation)
+       Double_t sigma1_e = 0.981396; // was 0.94696 at 126 GeV
+       Double_t sigma2_e = 33.4674;  // was 32.1981 at 126 GeV
+       Double_t sigma4_e = 7.9229;   // was 7.45502 at 126 GeV
        
        double g1Mag = 1.;
-       double g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma_1/sigma_2); 
-       double g4Mag = sqrt(fa3/(1.-fa2-fa3))*sqrt(sigma_1/sigma_4); 
+       double g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma1_e/sigma2_e); 
+       double g4Mag = sqrt(fa3/(1.-fa2-fa3))*sqrt(sigma1_e/sigma4_e); 
        
        g1   = g1Mag;
        g1Im = 0.0;
-       g2   = g2Mag*cos(phia2);
+       g2   = -g2Mag*cos(phia2);
        g2Im = - g2Mag*sin(phia2);
        g3   = 0.0;
        g3Im = 0.0;
        g4   = g4Mag*cos(phia3);
-       g4Im = - g4Mag*sin(phia3);
+       g4Im =  g4Mag*sin(phia3);
        
-     }else if(parameterization==2) {
+       
+     }else if(parameterization==kRealImag_Gs){
        
        g1   = g1Val;
-       g1Im = g1ValIm;
-       g2   = - g2Val;
-       g2Im = - g2ValIm;
+       g1Im =  g1ValIm;
+       g2   =  - g2Val;
+       g2Im =  - g2ValIm;
        g3   = g3Val;
-       g3Im = g3ValIm;
+       g3Im =  g3ValIm;
        g4   = g4Val;
-       g4Im = g4ValIm;
+       g4Im =  g4ValIm;
      }
      
      a1 = g1*mZ*mZ/(mX*mX) + g2*2.*s/(mX*mX) + g3*kappa*s/(mX*mX);
@@ -326,9 +329,8 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
      a2Im = -2.*g2Im - g3Im*kappa;
      a3 = -2.*g4;
      a3Im = -2.*g4Im;
-
+     
    }
-   
    
    Double_t x = pow((mX*mX-sqrts*sqrts-mZ*mZ)/(2.*sqrts*mZ),2)-1;
    
