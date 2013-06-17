@@ -44,8 +44,14 @@ python submitToys.py -h
 # number of toys to run and the number of
 # events per toys as parameters, e.g.:
 
-# run 100 toys with 50 evts/toy
-root -l -n loadLib.C "embeddedToys.C(50,100)"
+# run 100 toys with 21 evts/toy using embedded
+# toys which are saved to embeddedToys_test.root
+root -l -n loadLib.C "embeddedToys.C(21,100,false,\"embeddedToys_test.root\")"
 
-# toys take 1-2 seconds each and don't seem to 
-# crash even over 1000 trials. 
+# run 100 toys with 21 evts/toy using pure
+# toys which are saved to pureToys_test.root
+root -l -n loadLib.C "embeddedToys.C(21,100,true,\"pureToys_test.root\")"
+
+# embedded toys take 1-2 seconds each and don't 
+# seem to crash even over 1000 trials. Pure 
+# toys seem to take ~7 seconds for 21 events.
