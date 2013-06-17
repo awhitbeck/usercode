@@ -1,14 +1,45 @@
+#include "../src/Playground.cc"
 
+using namespace PlaygroundHelpers;
 
+bool runPureToys=false;
+TString outputFileName = "embeddedToys_test.root";
 
 void embeddedToys(int nEvts=50, int nToys=100){
   
   Playground myPG(126.,true);
 
-  TH1F* fa3 = new TH1F("hist",";f_{a3};Number of Toys",30,0,1);
-  TH1F* fa2 = new TH1F("hist",";f_{a2};Number of Toys",30,0,1);
+  // load tree to draw toys from
+  myPG.loadTree("/scratch0/hep/cyou/AllSamples/JHUGen_v3.1.7/0+/rootfiles/SMHiggsToZZTo4L_M-125_14TeV_2e2mu.root","SelectedTree");
 
-  myPG.loadTree("../../../../datafiles/8TeV_H126_SMHiggs_2e2mu.root","angles");
+  // initialize tree to save toys to 
+  TTree* results = new TTree("results","toy results");
+  
+  double fa3,fa3Error;
+  double fa2,fa2Error;
+  double phia2, phia2Error;
+  double phia3, phia3Error;
+
+  results->Branch("fa3",&fa3,"fa3/D");
+  results->Branch("fa3Error",&fa3Error,"fa3Error/D");
+  results->Branch("fa2",&fa2,"fa2/D");
+  results->Branch("fa2Error",&fa2Error,"fa2Error/D");
+
+  results->Branch("phia3",&phia3,"phia3/D");
+  results->Branch("phia3Error",&phia3Error,"phia3Error/D");
+  results->Branch("phia2",&phia2,"phia2/D");
+  results->Branch("phia2Error",&phia2Error,"phia2Error/D");
+  //---------------------------------
+
+
+  // configure parameter for which ones
+  // you would like to fit
+  myPG.scalar->fa2->setConstant(kTRUE);
+  myPG.scalar->fa3->setConstant(kFALSE);
+  myPG.scalar->phia2->setConstant(kTRUE);
+  myPG.scalar->phia3->setConstant(kFALSE);
+  //-----------------------------------
+
 
   for(int i = 0 ; i<nToys ; i++){
 
@@ -22,22 +53,33 @@ void embeddedToys(int nEvts=50, int nToys=100){
     cout << "=======================" << endl;
     cout << "=========" << i << "========" << endl;
 
-    if(myPG.generate(nEvts,false)==0){
+    if(myPG.generate(nEvts,runPureToys)==kNoError){
+
+      // perform fit
       myPG.fitData(true);
 
-      fa2->Fill(myPG.scalar->fa2->getVal());
-      fa3->Fill(myPG.scalar->fa3->getVal());
+      // get fit results and store to be 
+      // saved to TTree
+      fa2 = myPG.scalar->fa2->getVal();
+      fa2Error = myPG.scalar->fa2->getError();
+      fa3 = myPG.scalar->fa3->getVal();
+      fa3Error = myPG.scalar->fa3->getError();
+
+      phia2 = myPG.scalar->phia2->getVal();
+      phia2Error = myPG.scalar->phia2->getError();
+      phia3 = myPG.scalar->phia3->getVal();
+      phia3Error = myPG.scalar->phia3->getError();
+
+      // fill TTree
+      results->Fill();
+
     }
 
   }
 
-  TCanvas* can = new TCanvas("can","can",600,300);
-  can->Divide(2,1);
-  can->cd(1);
-  fa2->Draw();
-  can->cd(2);
-  fa3->Draw();
-
-  //myPG.projectPDF(PlaygroundHelpers::kcosthetastar,20,false);
+  // write tree to output file (ouputFileName set at top)
+  TFile *outputFile = new TFile(outputFileName,"RECREATE");
+  results->Write();
+  outputFile->Close();
 
 }
