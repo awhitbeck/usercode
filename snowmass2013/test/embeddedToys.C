@@ -2,10 +2,9 @@
 
 using namespace PlaygroundHelpers;
 
-bool runPureToys=false;
-TString outputFileName = "embeddedToys_test.root";
-
-void embeddedToys(int nEvts=50, int nToys=100){
+void embeddedToys(int nEvts=50, int nToys=100,
+		  bool runPureToys=false,
+		  TString outputFileName = "embeddedToys_test.root"){
   
   Playground myPG(126.,true);
 
