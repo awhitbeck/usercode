@@ -34,3 +34,18 @@ qsub submitPBSJobTemplate.pbs -v "pureToys=false,ntoysperjob=1000,seed_index=2"
 #submitting jobs to hhpc batch system by hand- - - 
 # see submitToys help documentation
 python submitToys.py -h 
+
+
+#==============================
+
+#Running embedded toys can be done using 
+# embeddedToys.C by simply modifying the
+# root files that is loaded.  It takes the
+# number of toys to run and the number of
+# events per toys as parameters, e.g.:
+
+# run 100 toys with 50 evts/toy
+root -l -n loadLib.C "embeddedToys.C(50,100)"
+
+# toys take 1-2 seconds each and don't seem to 
+# crash even over 1000 trials. 
