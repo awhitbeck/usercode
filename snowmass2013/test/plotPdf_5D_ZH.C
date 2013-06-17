@@ -18,12 +18,8 @@ using namespace RooFit ;
 bool drawbkg = false;
 // set this to true if you are using the JHUGen one with weights
 bool weightedevents = false;
-bool drawsm = true;
-bool drawhminus = false;
-bool drawhplus = false;
 
-
-void plotPdf_5D_ZH(float mH = 126, float sqrtsVal = 250.) {
+void plotPdf_5D_ZH(float mH = 125, float sqrtsVal = 250.) {
     
     gROOT->ProcessLine(".L ~/tdrstyle.C");
     setTDRStyle();
@@ -42,17 +38,19 @@ void plotPdf_5D_ZH(float mH = 126, float sqrtsVal = 250.) {
 
     double r1val = 0;
 
-    // 
-    // Read input file
-    // 
+    // these values define the generator couplings
+    TString modeName = "unpol_0p_g1_p_ig2_p_g4";
+    TString fileName = Form("Events_20130615/%s_1M_false.root", modeName.Data());
+    double g1Gen = 1;
+    double g1ImGen = 0.;
+    double g2Gen = 0; 
+    double g2ImGen = 0.573510;
+    double g3Gen = 0.;
+    double g3ImGen = 0.;
+    double g4Gen = 0.883158;
+    double g4ImGen = 0;
+
     
-    TString fileName = "lhefiles/ee_ZsmH_llbb_false.root";
-    if ( drawsm ) 
-      fileName = "lhefiles/unweighted_unpol_0plus_2M_false.root";
-    if ( drawhminus )
-      fileName = "lhefiles/unweighted_unpol_0minus_2M_false.root";
-    if ( drawhplus ) 
-      fileName = "lhefiles/unweighted_unpol_g02_2M_false.root";
     if ( drawbkg ) {
       fileName = ("lhefiles/ee_ZZ_llbb_false.root");
     } 
@@ -66,6 +64,9 @@ void plotPdf_5D_ZH(float mH = 126, float sqrtsVal = 250.) {
     }
     */
 
+    // 
+    // Read input file
+    // 
     TFile *fin = new TFile(fileName);
     TTree* tin = (TTree*) fin->Get("SelectedTree");
     
@@ -95,15 +96,15 @@ void plotPdf_5D_ZH(float mH = 126, float sqrtsVal = 250.) {
     RooRealVar* a3Val  = new RooRealVar("a3Val","a3Val",0.);
     RooRealVar* phi3Val= new RooRealVar("phi3Val","phi3Val",0.);
            
-    RooRealVar* g1Val  = new RooRealVar("g1Val","g1Val",1.);
-    RooRealVar* g2Val  = new RooRealVar("g2Val","g2Val",0.);
-    RooRealVar* g3Val  = new RooRealVar("g3Val","g3Val",0.);
-    RooRealVar* g4Val  = new RooRealVar("g4Val","g4Val",0.);
+    RooRealVar* g1Val  = new RooRealVar("g1Val","g1Val",g1Gen);
+    RooRealVar* g2Val  = new RooRealVar("g2Val","g2Val",g2Gen);
+    RooRealVar* g3Val  = new RooRealVar("g3Val","g3Val",g3Gen);
+    RooRealVar* g4Val  = new RooRealVar("g4Val","g4Val",g4Gen);
 
-    RooRealVar* g1ValIm  = new RooRealVar("g1ValIm","g1ValIm",0.);
-    RooRealVar* g2ValIm  = new RooRealVar("g2ValIm","g2ValIm",0.);
-    RooRealVar* g3ValIm  = new RooRealVar("g3ValIm","g3ValIm",0.);
-    RooRealVar* g4ValIm  = new RooRealVar("g4ValIm","g4ValIm",0.);
+    RooRealVar* g1ValIm  = new RooRealVar("g1ValIm","g1ValIm",g1ImGen);
+    RooRealVar* g2ValIm  = new RooRealVar("g2ValIm","g2ValIm",g2ImGen);
+    RooRealVar* g3ValIm  = new RooRealVar("g3ValIm","g3ValIm",g3ImGen);
+    RooRealVar* g4ValIm  = new RooRealVar("g4ValIm","g4ValIm",g4ImGen);
 
     RooRealVar* fa2  = new RooRealVar("fa2","f_{g2}",0.,0.,1.0);
     RooRealVar* fa3  = new RooRealVar("fa3","f_{g4}",0.,0.,1.0);
@@ -118,18 +119,6 @@ void plotPdf_5D_ZH(float mH = 126, float sqrtsVal = 250.) {
 						     *g1Val, *g2Val, *g3Val, *g4Val, *g1ValIm, *g2ValIm, *g3ValIm, *g4ValIm,
 						     *fa2, *fa3, *phia2, *phia3);
     
-    if ( drawhminus) {
-      g1Val->setVal(0.);
-      g2Val->setVal(0.);
-      g4Val->setVal(1.);
-    }
-
-    if ( drawhplus ) {
-      g1Val->setVal(0.);
-      g2Val->setVal(1.);
-      g4Val->setVal(0.);
-    }
-
     // get the data
     if ( weightedevents ) {
       RooDataSet dataTMP("dataTMP","dataTMP",tin,RooArgSet(*h1,*h2,*Phi,*hs,*Phi1,*wt));
@@ -187,9 +176,6 @@ void plotPdf_5D_ZH(float mH = 126, float sqrtsVal = 250.) {
     czz->cd(6);
     phiframe->Draw();
     
-    TString modeName = "sm";
-    if ( drawhminus ) modeName = "hminus";
-    if ( drawhplus ) modeName = "hplus";
     
     TString beamPolarName = "unpolar";
     if ( r1val < 0. ) beamPolarName = Form("RL_minus%.0f", TMath::Abs(r1val*100.));
