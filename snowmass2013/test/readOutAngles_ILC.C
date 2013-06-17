@@ -23,7 +23,7 @@ void readOutAngles_ILC(std::string filename, bool debug = false) {
     std::cout << "Processing " << filenameT << std::endl;
     fin.open(filenameT.c_str());
     
-    int maxEvents = 100000;
+    int maxEvents = 10000000;
 	
     char oname[250];
     sprintf(oname,"%s.root",filename.c_str());
