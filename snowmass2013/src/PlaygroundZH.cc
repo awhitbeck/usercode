@@ -11,7 +11,7 @@
 namespace PlaygroundZHhelpers{
 
   enum ERRORcode {kNoError,kFileLoadFailure,kNotEnoughEvents,kDataEmpty};
-  enum varList {kcosthetastar,kcostheta1,kcostheta2,kphi,kphi1};
+  enum varList {kcostheta1,kcostheta2,kcosthetastar,kphi,kphi1};
 }
 
 using namespace PlaygroundZHhelpers;
@@ -22,9 +22,9 @@ public:
     
   bool debug;
 
-  RooRealVar* costhetastar;  
   RooRealVar* costheta1;
   RooRealVar* costheta2;  
+  RooRealVar* costhetastar;  
   RooRealVar* phi;
   RooRealVar* phi1;
 
@@ -44,21 +44,21 @@ public:
 
     embedTracker=0;
 
-    costhetastar = new RooRealVar("costhetastar","cos#theta*",0.,-1.,1.);
     costheta1 = new RooRealVar("costheta1","cos#theta_{1}",0.,-1.,1.);
     costheta2 = new RooRealVar("costheta2","cos#theta_{2}",0.,-1.,1.);
+    costhetastar = new RooRealVar("costhetastar","cos#theta*",0.,-1.,1.);
     phi = new RooRealVar("phi","#Phi",0.,-TMath::Pi(),TMath::Pi());
     phi1 = new RooRealVar("phistar1","#Phi_{1}",0.,-TMath::Pi(),TMath::Pi());
 
     mX = new RooRealVar("mX","mX",mH);
       
-    varContainer.push_back(costhetastar);
     varContainer.push_back(costheta1);
     varContainer.push_back(costheta2);
+    varContainer.push_back(costhetastar);
     varContainer.push_back(phi);
     varContainer.push_back(phi1);
 
-    scalar = new ScalarPdfFactoryZH(costhetastar,costheta1,costheta2,phi,phi1,mX,parameterization_);
+    scalar = new ScalarPdfFactoryZH(costheta1,costheta2,costhetastar,phi,phi1,mX,parameterization_);
 
     scalar->makeParamsConst(true);
 
@@ -84,9 +84,9 @@ public:
 
     delete scalar;
 
-    delete costhetastar;
     delete costheta1;
     delete costheta2;
+    delete costhetastar;
     delete phi;
     delete phi1;
     
@@ -102,13 +102,15 @@ public:
     if(debug)
       cout << "PlaygroundZH::generate()" << endl;
 
-    if(pure)
-      toyData = scalar->PDF->generate(RooArgSet(*costhetastar,*costheta1,*costheta2,*phi,*phi1),nEvents);
-    else{
+    if(pure) {
+      if ( debug ) 
+	std::cout << "Generating pure toy\n";  
+      toyData = scalar->PDF->generate(RooArgSet(*costheta1,*costheta2,*costhetastar,*phi,*phi1),nEvents);
+    }  else{
 
       RooArgSet *tempEvent;
       //if(toyData) delete toyData;
-      toyData = new RooDataSet("toyData","toyData",RooArgSet(*costhetastar,*costheta1,*costheta2,*phi,*phi1));
+      toyData = new RooDataSet("toyData","toyData",RooArgSet(*costheta1,*costheta2,*costhetastar,*phi,*phi1));
 
       if(nEvents+embedTracker > data->sumEntries()){
 	cout << "PlaygroundZH::generate() - ERROR!!! PlaygroundZH::data does not have enough events to fill toy!!!!  bye :) " << endl;
@@ -141,7 +143,7 @@ public:
     if(data)
       data=0;
 
-    data = new RooDataSet("data","data",myChain,RooArgSet(*costheta1,*costheta2,*costhetastar,*phi1,*phi),"");
+    data = new RooDataSet("data","data",myChain,RooArgSet(*costheta1,*costheta2,*costhetastar,*phi,*phi1),"");
 
     if(debug)
       cout << "Number of events in data: " << data->numEntries() << endl;
@@ -171,6 +173,7 @@ public:
     if ( istoy ) {
       if( !toyData ) return kDataEmpty; 
       toyData->plotOn(plot);
+      if ( debug ) std::cout << "Drawing toy dataset\n";  
     }else{
       if( !data ) return kDataEmpty;
       data->plotOn(plot);
