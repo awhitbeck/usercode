@@ -72,7 +72,7 @@ public:
     phia2  = new RooRealVar("phia2","#phi_{g2}",0.,-2.*TMath::Pi(),2*TMath::Pi());
     phia3  = new RooRealVar("phia3","#phi_{g4}",0.,-2.*TMath::Pi(),2*TMath::Pi());
 
-    R1Val  = new RooRealVar("R1Val","R1Val",0.);
+    R1Val  = new RooRealVar("R1Val","R1Val",-0.15);
     R2Val  = new RooRealVar("R2Val","R2Val",0.15);
 
     PDF = new RooSpinZero_5D_ZH("PDF","PDF",*h1,*h2,*hs,*Phi,*Phi1,*sqrts,*mX,*mZ,*R1Val,*R2Val,parameterization,*a1Val,*phi1Val,*a2Val,*phi2Val,*a3Val,*phi3Val,*g1Val,*g2Val,*g3Val,*g4Val,*g1ValIm,*g2ValIm,*g3ValIm,*g4ValIm,*fa2,*fa3,*phia2,*phia3);
