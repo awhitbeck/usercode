@@ -11,22 +11,20 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
   
   int random_seed = seed_index+487563; 
   RooRandom::randomGenerator()->SetSeed(random_seed);
-  bool debug = false;
+  bool debug = true;
 
   // 
   // specify inputs 
   // you need to go through these following settings and verify all the 
   // initial values
   // 
-  bool loadData = true;
+  bool loadData = false;
   bool fitData = false;
-  bool drawprojections = false;
-  bool dotoys = true;
+  bool drawprojections = true;
+  bool testsingletoy = true;
+  bool dotoys = false;
 
   float mH = 125.;
-  float phase0m=0;
-  float phase0p=270;
-  
   TString modeName = Form("g1_p_g4_100k");
   TString fileName = Form("Events_20130618/unpol_%s_false.root", modeName.Data());
   TString treeName = "SelectedTree";
@@ -56,12 +54,6 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
   if(debug) cout << test.data << endl;
   test.calcfractionphase(g1Re, g1Im, g2Re, g2Im, g4Re, g4Im, fa2Val, fa3Val, phia2Val, phia3Val);
   
-  double fa2Val = 0.;
-  double phia2Val = 0;
-  double fa3Val = 0.;
-  double phia3Val = 0;
-
-
   ScalarPdfFactoryZH *scalar = test.scalar;
 
   // 
@@ -106,7 +98,11 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
   if ( fitData ) { 
     RooFitResult *fitresults = test.fitData();
   }
-
+  
+  if ( testsingletoy ) {
+    int nEvents = 50000;
+    if(test.generate(nEvents, true)!=kNoError) break;
+  }
   // 
   // Do puretoy experiments 
   // 
@@ -190,27 +186,25 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
   // Draw projetions of the loaded data
   // 
 
-
-
   if ( drawprojections ) {
 
     TCanvas *c1 = new TCanvas("c1","c1",1000, 800);
     c1->Divide(3,2);
 
     c1->cd(1);
-    test.projectPDF(kcosthetastar, 20, dotoys);
+    test.projectPDF(kcosthetastar, 20, testsingletoy);
     
     c1->cd(2);
-    test.projectPDF(kphi1, 20, dotoys);
+    test.projectPDF(kphi1, 20, testsingletoy);
     
     c1->cd(4);
-    test.projectPDF(kcostheta1, 20, dotoys);
+    test.projectPDF(kcostheta1, 20, testsingletoy);
     
     c1->cd(5);
-    test.projectPDF(kcostheta2, 20, dotoys);
+    test.projectPDF(kcostheta2, 20, testsingletoy);
     
     c1->cd(6);
-    test.projectPDF(kphi, 20, dotoys);
+    test.projectPDF(kphi, 20, testsingletoy);
 
     TString fitName = "nofit";
     if ( fitData ) 
