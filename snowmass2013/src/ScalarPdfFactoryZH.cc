@@ -41,7 +41,7 @@ public:
 
   ScalarPdfFactoryZH(){};
     
-  ScalarPdfFactoryZH(RooRealVar* h1,RooRealVar* h1,RooRealVar* hs,RooRealVar* Phi,RooRealVar* Phi1, RooRealVar* mX, int para) {
+  ScalarPdfFactoryZH(RooRealVar* h1,RooRealVar* h2,RooRealVar* hs,RooRealVar* Phi,RooRealVar* Phi1, RooRealVar* mX, int para) {
 
 
     // Parameters
