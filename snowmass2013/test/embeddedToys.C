@@ -2,14 +2,29 @@
 
 using namespace PlaygroundHelpers;
 
+enum sample {kScalar_fa3p0,kScalar_fa3p1,kScalar_fa3p5,kNumSamples};
+TString sampleName[kNumSamples] = {"fa3p0","fa3p1","fa3p5"};
+enum freeParams {kfa3Only,kfa3phia3Only,kNumScenarios};
+TString scenario[kNumScenarios] = {"fa3_free","fa3_phia3_free"};
+
+TString inputFileNames[kNumSamples] = {"/scratch0/hep/cyou/AllSamples/JHUGen_v3.1.7/0+/rootfiles/SMHiggsToZZTo4L_M-125_14TeV_2e2mu.root",
+				       "/scratch0/hep/cyou/AllSamples/JHUGen_v3.1.7/0-_f01/ph0/rootfiles/Higgs0Mf01ph0ToZZTo4L_M-125_14TeV_2e2mu.root",
+				       "/scratch0/hep/cyou/AllSamples/JHUGen_v3.1.7/0-_f05/ph0/rootfiles/Higgs0Mf05ph0ToZZTo4L_M-125_14TeV_2e2mu.root"};
+
+bool fa3Constant [kNumScenarios]   = {false,false};
+bool fa2Constant [kNumScenarios]   = {true,true};
+bool phia3Constant [kNumScenarios] = {true,false};
+bool phia2Constant [kNumScenarios] = {true,true};
+
 void embeddedToys(int nEvts=50, int nToys=100,
 		  bool runPureToys=false,
-		  TString outputFileName = "embeddedToys_test.root"){
+		  sample mySample = kScalar_fa3p0, 
+		  freeParams myParams = kfa3Only){
   
-  Playground myPG(126.,true);
+  Playground myPG(125.);
 
   // load tree to draw toys from
-  myPG.loadTree("/scratch0/hep/cyou/AllSamples/JHUGen_v3.1.7/0+/rootfiles/SMHiggsToZZTo4L_M-125_14TeV_2e2mu.root","SelectedTree");
+  myPG.loadTree(inputFileNames[mySample],"SelectedTree");
 
   // initialize tree to save toys to 
   TTree* results = new TTree("results","toy results");
@@ -33,10 +48,10 @@ void embeddedToys(int nEvts=50, int nToys=100,
 
   // configure parameter for which ones
   // you would like to fit
-  myPG.scalar->fa2->setConstant(kTRUE);
-  myPG.scalar->fa3->setConstant(kFALSE);
-  myPG.scalar->phia2->setConstant(kTRUE);
-  myPG.scalar->phia3->setConstant(kFALSE);
+  myPG.scalar->fa2->setConstant(fa2Constant[myParams]);
+  myPG.scalar->fa3->setConstant(fa3Constant[myParams]);
+  myPG.scalar->phia2->setConstant(phia2Constant[myParams]);
+  myPG.scalar->phia3->setConstant(phia3Constant[myParams]);
   //-----------------------------------
 
 
@@ -55,7 +70,7 @@ void embeddedToys(int nEvts=50, int nToys=100,
     if(myPG.generate(nEvts,runPureToys)==kNoError){
 
       // perform fit
-      myPG.fitData(true);
+      myPG.fitData(true,-1);
 
       // get fit results and store to be 
       // saved to TTree
@@ -76,8 +91,11 @@ void embeddedToys(int nEvts=50, int nToys=100,
 
   }
 
+  char nEvtsString[100];
+  sprintf(nEvtsString,"_%iEvts",nEvts);
+
   // write tree to output file (ouputFileName set at top)
-  TFile *outputFile = new TFile(outputFileName,"RECREATE");
+  TFile *outputFile = new TFile("embeddedToys_"+sampleName[mySample]+"_"+scenario[myParams]+nEvtsString+".root","RECREATE");
   results->Write();
   outputFile->Close();
 
