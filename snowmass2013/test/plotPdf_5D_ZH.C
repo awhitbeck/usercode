@@ -18,6 +18,8 @@ using namespace RooFit ;
 bool drawbkg = false;
 // set this to true if you are using the JHUGen one with weights
 bool weightedevents = false;
+void calcfractionphase(double g1Re,  double g1Im,  double g2Re,   double g2Im,  double g4Re,  double g4Im, 
+		  double & fa2, double & fa3, double & phia2, double & phia3);
 
 void plotPdf_5D_ZH(float mH = 125, float sqrtsVal = 250.) {
     
@@ -36,34 +38,40 @@ void plotPdf_5D_ZH(float mH = 125, float sqrtsVal = 250.) {
     // 1 for e+_L e-_R configuration
     // -1 for e+_R e-_L configuration
 
-    double r1val = 0;
+    double P_ele = 0.;
+    TString beamPolarName = "unpol";
+    if ( P_ele == -1. ) beamPolarName = Form("LL");
+    if ( P_ele  == 1. ) beamPolarName = Form("RR");
+    
+    double r1 = -0.15; // this is related to the Z->ll decay
+    double r1val = (r1 + P_ele ) / (1 + r1*P_ele); 
 
+    
+    
     // these values define the generator couplings
-    TString modeName = "unpol_0p_g1_p_ig2_p_g4";
-    TString fileName = Form("Events_20130615/%s_1M_false.root", modeName.Data());
+    TString modeName = "g1_p_g4";
+    TString fileName = Form("Events_20130618/%s_%s_100k_false.root", beamPolarName.Data(), modeName.Data());
+    //TString fileName = "lhefiles/ee_ZsmH_llbb_false.root";
     double g1Gen = 1;
     double g1ImGen = 0.;
-    double g2Gen = 0; 
-    double g2ImGen = 0.573510;
+    double g2Gen = 0; // 0.57351; // 0.5471; 
+    double g2ImGen = 0.; //0.57351;
     double g3Gen = 0.;
     double g3ImGen = 0.;
-    double g4Gen = 0.883158;
-    double g4ImGen = 0;
+    double g4Gen = 0.83256; // 0.883158;
+    double g4ImGen = 0; // 0.83256;
+    
+    double fa2Gen = 0.;
+    double phia2Gen = 0.;
+    double fa3Gen = 0.;
+    double phia3Gen = 0.;
 
+    calcfractionphase(g1Gen, g1ImGen, g2Gen, g2ImGen, g4Gen, g4ImGen, fa2Gen, fa3Gen, phia2Gen, phia3Gen);
     
     if ( drawbkg ) {
       fileName = ("lhefiles/ee_ZZ_llbb_false.root");
     } 
     
-    /*
-    else {
-      if ( r1val == 1. ) 
-	fileName = "lhefiles/ee_ZsmH_llbb_LR_false.root";
-      if ( r1val == -1. ) 
-	fileName = "lhefiles/ee_ZsmH_llbb_RL_false.root";
-    }
-    */
-
     // 
     // Read input file
     // 
@@ -88,7 +96,9 @@ void plotPdf_5D_ZH(float mH = 125, float sqrtsVal = 250.) {
     RooRealVar* R2Val = new RooRealVar("R2Val","R2Val", 0.15);
 
     // amplitude parameters
-    int para = 2; 
+    // int para = kFracPhase_Gs;  // chose from kMagPhase_As, kRealImag_Gs, kFracPhase_Gs;
+    int para = kRealImag_Gs;  // chose from kFracPhase_Gs, kMagPhase_As;
+     
     RooRealVar* a1Val  = new RooRealVar("a1Val","a1Val",0.);
     RooRealVar* phi1Val= new RooRealVar("phi1Val","phi1Val",0.);
     RooRealVar* a2Val  = new RooRealVar("a2Val","a2Val",0.);
@@ -106,10 +116,10 @@ void plotPdf_5D_ZH(float mH = 125, float sqrtsVal = 250.) {
     RooRealVar* g3ValIm  = new RooRealVar("g3ValIm","g3ValIm",g3ImGen);
     RooRealVar* g4ValIm  = new RooRealVar("g4ValIm","g4ValIm",g4ImGen);
 
-    RooRealVar* fa2  = new RooRealVar("fa2","f_{g2}",0.,0.,1.0);
-    RooRealVar* fa3  = new RooRealVar("fa3","f_{g4}",0.,0.,1.0);
-    RooRealVar* phia2  = new RooRealVar("phia2","#phi_{g2}",0.,-2.*TMath::Pi(),2*TMath::Pi());
-    RooRealVar* phia3  = new RooRealVar("phia3","#phi_{g4}",0.,-2.*TMath::Pi(),2*TMath::Pi());
+    RooRealVar* fa2  = new RooRealVar("fa2","f_{g2}",fa2Gen,0.,1.0);
+    RooRealVar* fa3  = new RooRealVar("fa3","f_{g4}",fa3Gen,0.,1.0);
+    RooRealVar* phia2  = new RooRealVar("phia2","#phi_{g2}",phia2Gen,-2.*TMath::Pi(),2*TMath::Pi());
+    RooRealVar* phia3  = new RooRealVar("phia3","#phi_{g4}",phia3Gen,-2.*TMath::Pi(),2*TMath::Pi());
 
     // set the PDF
     RooSpinZero_5D_ZH *myPDF = new RooSpinZero_5D_ZH("myPDF","myPDF",
@@ -177,9 +187,6 @@ void plotPdf_5D_ZH(float mH = 125, float sqrtsVal = 250.) {
     phiframe->Draw();
     
     
-    TString beamPolarName = "unpolar";
-    if ( r1val < 0. ) beamPolarName = Form("RL_minus%.0f", TMath::Abs(r1val*100.));
-    if ( r1val > 0. ) beamPolarName = Form("RL_plus%.0f", TMath::Abs(r1val*100.));
     
 
 
@@ -192,3 +199,28 @@ void plotPdf_5D_ZH(float mH = 125, float sqrtsVal = 250.) {
     czz->SaveAs(Form("%s.png", plotName.Data()));
     
 }
+
+
+void calcfractionphase(double g1Re,  double g1Im,  double g2Re,   double g2Im,  double g4Re,  double g4Im, 
+		       double & fa2, double & fa3, double & phia2, double & phia3) 
+{
+
+  // ILC numbers at 250 GeV at mH= 125 GeV (narrow Z width approximation)
+  Double_t sigma1_e = 0.981396; // was 0.94696 at 126 GeV
+  Double_t sigma2_e = 33.4674;  // was 32.1981 at 126 GeV
+  Double_t sigma4_e = 7.9229;   // was 7.45502 at 126 GeV
+  
+  Double_t g1 = sqrt(g1Re*g1Re + g1Im*g1Im);
+  Double_t g2 = sqrt(g2Re*g2Re + g2Im*g2Im);
+  Double_t g4 = sqrt(g4Re*g4Re + g4Im*g4Im);
+
+  fa2 = sigma2_e*g2*g2 / (  sigma1_e*g1*g1 + sigma2_e*g2*g2 + sigma4_e*g4*g4 );
+  phia2 = atan2(g2Im, g2Re);
+  fa3 = sigma4_e*g4*g4 / (  sigma1_e*g1*g1 + sigma2_e*g2*g2 + sigma4_e*g4*g4 );
+  phia3 = atan2(g4Im, g4Re);
+  
+  std::cout << "fa2 = " << fa2 << "\t with phase " << phia2 << "\n"; 
+  std::cout << "fa3 = " << fa3 << "\t with phase " << phia3 << "\n"; 
+  
+}
+
