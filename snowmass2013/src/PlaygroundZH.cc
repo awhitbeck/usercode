@@ -183,6 +183,29 @@ public:
     return kNoError;
 
   }
+
+
+void calcfractionphase(double g1Re,  double g1Im,  double g2Re,   double g2Im,  double g4Re,  double g4Im, 
+		       double & fa2, double & fa3, double & phia2, double & phia3) 
+  {
+    // ILC numbers at 250 GeV at mH= 125 GeV (narrow Z width approximation)
+    Double_t sigma1_e = 0.981396; // was 0.94696 at 126 GeV
+    Double_t sigma2_e = 33.4674;  // was 32.1981 at 126 GeV
+    Double_t sigma4_e = 7.9229;   // was 7.45502 at 126 GeV
+    
+    Double_t g1 = sqrt(g1Re*g1Re + g1Im*g1Im);
+    Double_t g2 = sqrt(g2Re*g2Re + g2Im*g2Im);
+    Double_t g4 = sqrt(g4Re*g4Re + g4Im*g4Im);
+    
+    fa2 = sigma2_e*g2*g2 / (  sigma1_e*g1*g1 + sigma2_e*g2*g2 + sigma4_e*g4*g4 );
+    phia2 = atan2(g2Im, g2Re);
+    fa3 = sigma4_e*g4*g4 / (  sigma1_e*g1*g1 + sigma2_e*g2*g2 + sigma4_e*g4*g4 );
+    phia3 = atan2(g4Im, g4Re);
+    
+    std::cout << "fa2 = " << fa2 << "\t with phase " << phia2 << "\n"; 
+    std::cout << "fa3 = " << fa3 << "\t with phase " << phia3 << "\n"; 
+  }
+  
 };
 
 #endif
