@@ -184,8 +184,8 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
       g2Im =  - g2ValIm;
       g3   = g3Val;
       g3Im =  g3ValIm;
-      g4   = g4Val;
-      g4Im =  g4ValIm;
+      g4   = - g4Val;
+      g4Im = - g4ValIm;
     }
     
     a1 = g1*mZ*mZ/(mX*mX) + g2*2.*s/(mX*mX) + g3*kappa*s/(mX*mX);
@@ -313,14 +313,14 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
        
      }else if(parameterization==kRealImag_Gs){
        
-       g1   = g1Val;
+       g1   =  g1Val;
        g1Im =  g1ValIm;
        g2   =  - g2Val;
        g2Im =  - g2ValIm;
        g3   = g3Val;
-       g3Im =  g3ValIm;
-       g4   = g4Val;
-       g4Im =  g4ValIm;
+       g3Im = g3ValIm;
+       g4   = - g4Val;
+       g4Im = - g4ValIm;
      }
      
      a1 = g1*mZ*mZ/(mX*mX) + g2*2.*s/(mX*mX) + g3*kappa*s/(mX*mX);
