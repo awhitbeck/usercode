@@ -46,15 +46,15 @@ public:
 
     embedTracker=0;
 
-    z1mass = new RooRealVar("z1mass","m_{Z1}",90.,12.,120.);
-    z2mass = new RooRealVar("z2mass","m_{Z2}",25.,12.,120.);
+    z1mass = new RooRealVar("Z1Mass","m_{Z1}",90.,12.,120.);
+    z2mass = new RooRealVar("Z2Mass","m_{Z2}",25.,12.,120.);
     costhetastar = new RooRealVar("costhetastar","cos#theta*",0.,-1.,1.);
-    costheta1 = new RooRealVar("costheta1","cos#theta_{1}",0.,-1.,1.);
-    costheta2 = new RooRealVar("costheta2","cos#theta_{2}",0.,-1.,1.);
-    phi = new RooRealVar("phi","#Phi",0.,-TMath::Pi(),TMath::Pi());
-    phi1 = new RooRealVar("phistar1","#Phi_{1}",0.,-TMath::Pi(),TMath::Pi());
+    costheta1 = new RooRealVar("helcosthetaZ1","cos#theta_{1}",0.,-1.,1.);
+    costheta2 = new RooRealVar("helcosthetaZ2","cos#theta_{2}",0.,-1.,1.);
+    phi = new RooRealVar("helphi","#Phi",0.,-TMath::Pi(),TMath::Pi());
+    phi1 = new RooRealVar("phistarZ1","#Phi_{1}",0.,-TMath::Pi(),TMath::Pi());
       
-    mzz = new RooRealVar("zzmass","m_{ZZ}",mH,100,1000);
+    mzz = new RooRealVar("ZZMass","m_{ZZ}",mH,100,1000);
 
     varContainer.push_back(z1mass);
     varContainer.push_back(z2mass);

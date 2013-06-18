@@ -171,9 +171,9 @@ Double_t RooSpinZero_7DComplex::evaluate() const
       if (nanval != nanval) return 1e-9;
 
       // convert fraction and phase to g1,g2...etc
-      double sigma_1=2.0418442;   // numbers coming from JHUGen
-      double sigma_2=0.77498928;
-      double sigma_4=0.32711197;
+      double sigma_1=1.860351; // was 2.03971 at 126 GeV
+      double sigma_2=0.672859; // was 0.77517 at 126 GeV
+      double sigma_4=0.284353; // was 0.32689 at 126 GeV
       
       double g1Mag = 1.;
       double g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma_1/sigma_2); 
@@ -325,9 +325,9 @@ Double_t RooSpinZero_7DComplex::analyticalIntegral(Int_t code, const char* range
       if (nanval != nanval) return 1e-9;
       
       // convert fraction and phase to g1,g2...etc
-      double sigma_1=2.0418442;   // numbers coming from JHUGen
-      double sigma_2=0.77498928;
-      double sigma_4=0.32711197;
+      double sigma_1=1.860351; // was 2.03971 at 126 GeV
+      double sigma_2=0.672859; // was 0.77517 at 126 GeV
+      double sigma_4=0.284353; // was 0.32689 at 126 GeV
       
       double g1Mag = 1.;
       double g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma_1/sigma_2); 
@@ -507,10 +507,10 @@ Double_t RooSpinZero_7DComplex::analyticalIntegral(Int_t code, const char* range
       {
         double value = 0.;
 
-        value += (g1*g1+g1Im*g1Im)*2.37727e9;
-	value += (g2*g2+g2Im*g2Im)*9.86079e8;
-	value += (g4*g4+g4Im*g4Im)*4.08027e8;
-        value += sqrt(g1*g1+g1Im*g1Im)*g2*2.65195e9;
+        value += (g1*g1+g1Im*g1Im)*2.07146e9;     // for 126. use -> 2.37727e9;
+	value += (g2*g2+g2Im*g2Im)*8.21207e8;     //              -> 9.86079e8;
+	value += (g4*g4+g4Im*g4Im)*3.39973e8;     //              -> 4.08027e8;
+        value += sqrt(g1*g1+g1Im*g1Im)*g2*2.25963e9; //           -> 2.65195e9;
 
 	// fudge factor of /2 to make the normalization of plots ready 
 	// this does not affect the fitting
