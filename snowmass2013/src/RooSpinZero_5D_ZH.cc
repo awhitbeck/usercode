@@ -168,17 +168,17 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
       
       g1   = g1Mag;
       g1Im = 0.0;
-      g2   = g2Mag*cos(phia2);
+      g2   = - g2Mag*cos(phia2);
       g2Im = - g2Mag*sin(phia2);
       g3   = 0.0;
       g3Im = 0.0;
-      g4   = g4Mag*cos(phia3);
+      g4   = - g4Mag*cos(phia3);
       g4Im = - g4Mag*sin(phia3);
 
       
     }else if(parameterization==kRealImag_Gs){
 
-      g1   = g1Val;
+      g1   =  g1Val;
       g1Im =  g1ValIm;
       g2   =  - g2Val;
       g2Im =  - g2ValIm;
@@ -303,13 +303,13 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
        
        g1   = g1Mag;
        g1Im = 0.0;
-       g2   = -g2Mag*cos(phia2);
+       g2   = - g2Mag*cos(phia2);
        g2Im = - g2Mag*sin(phia2);
        g3   = 0.0;
        g3Im = 0.0;
-       g4   = g4Mag*cos(phia3);
-       g4Im =  g4Mag*sin(phia3);
-       
+       g4   = - g4Mag*cos(phia3);
+       g4Im = - g4Mag*sin(phia3);
+              
        
      }else if(parameterization==kRealImag_Gs){
        
