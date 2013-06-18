@@ -150,9 +150,7 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
    } else {
      
     if(parameterization==kFracPhase_Gs){
-      // 
-      // place holder, not correct
-      // 
+
       double nanval = sqrt(1 - fa2 - fa3);
       if (nanval != nanval) return 1e-9;
 
