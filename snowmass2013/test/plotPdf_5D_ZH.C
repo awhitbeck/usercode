@@ -49,17 +49,17 @@ void plotPdf_5D_ZH(float mH = 125, float sqrtsVal = 250.) {
     
     
     // these values define the generator couplings
-    TString modeName = "g1_p_g4";
-    TString fileName = Form("Events_20130618/%s_%s_100k_false.root", beamPolarName.Data(), modeName.Data());
+    TString modeName = "g1_p_ig4";
+    TString fileName = Form("Events_20130618/unweighted_%s_%s_1M_false.root", beamPolarName.Data(), modeName.Data());
     //TString fileName = "lhefiles/ee_ZsmH_llbb_false.root";
-    double g1Gen = 1;
+    double g1Gen =   1;
     double g1ImGen = 0.;
-    double g2Gen = 0; // 0.57351; // 0.5471; 
-    double g2ImGen = 0.; //0.57351;
-    double g3Gen = 0.;
+    double g2Gen =   0 ; // 0.54071;
+    double g2ImGen = 0; // 0.54071; 
+    double g3Gen =   0.;
     double g3ImGen = 0.;
-    double g4Gen = 0.83256; // 0.883158;
-    double g4ImGen = 0; // 0.83256;
+    double g4Gen =   0; // 0.83265; 
+    double g4ImGen = 0.83265;
     
     double fa2Gen = 0.;
     double phia2Gen = 0.;
