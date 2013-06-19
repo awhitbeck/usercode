@@ -1,0 +1,33 @@
+#!/bin/sh
+
+### MUST REMEMBER THIS!!!!
+ntoys=3000
+nevts=21
+sample=kScalar_fa3p5
+#params=kfa3Only
+#params=kfa3phia3Only
+params=kAllFree
+
+
+# The batch job directory (will vanish after job end):
+curdir=`pwd`
+workdir=/afs/cern.ch/user/s/sbologne/workspace/multidimFit_newSamples/ZZMatrixElement/snowmass2013/test
+
+# printing
+echo what is the workdir...$workdir
+echo what is the curdir....$curdir
+
+source /afs/cern.ch/sw/lcg/app/releases/ROOT/5.28.00/slc4_amd64_gcc34/root/bin/thisroot.sh
+
+# tells the scheduler to put all output files into the directory where
+# we spawned from
+cd $workdir
+
+echo "ntoys: " $ntoys
+echo "nevts: " $nevts
+echo "sample: " $sample
+echo "params: " $params
+
+
+root -l -n -b -q loadLib.C "embeddedToys.C(${nevts},${ntoys},false,${sample},${params})"
+
