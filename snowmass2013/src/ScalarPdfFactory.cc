@@ -1,7 +1,7 @@
 #ifndef SCALAR_PDF_FACTORY
 #define SCALAR_PDF_FACTORY
 
-#include "RooSpinZero_7DComplex.h"
+#include "RooSpinZero_7DComplex_withAccep.h"
 #include "AngularPdfFactory.cc"
 #include "TF1.h"
 #include "TMath.h"
@@ -9,143 +9,205 @@
 class ScalarPdfFactory: public AngularPdfFactory{
 
 public:
+
+  RooSpinZero_7DComplex_withAccep::measurables _measurables;
+  RooSpinZero_7DComplex_withAccep::modelParameters _modelParams;
+  RooSpinZero_7DComplex_withAccep::accepParameters _accepParams;
     
-  RooRealVar* a1Val;  
-  RooRealVar* phi1Val;
-  RooRealVar* a2Val;  
-  RooRealVar* phi2Val;
-  RooRealVar* a3Val;  
-  RooRealVar* phi3Val;
-
-  int parameterization;
-  RooRealVar* g1Val;
-  RooRealVar* g2Val;
-  RooRealVar* g3Val;
-  RooRealVar* g4Val;
-  RooRealVar* g1ValIm;
-  RooRealVar* g2ValIm;
-  RooRealVar* g3ValIm;
-  RooRealVar* g4ValIm;
-  RooRealVar* fa2;
-  RooRealVar* fa3;
-  RooRealVar* phia2;
-  RooRealVar* phia3;
-
-  RooSpinZero_7DComplex* PDF;
+  RooSpinZero_7DComplex_withAccep* PDF;
 
   ScalarPdfFactory(){};
     
   ScalarPdfFactory(RooRealVar* m1,RooRealVar* m2,RooRealVar* hs,RooRealVar* h1,RooRealVar* h2,RooRealVar* Phi,RooRealVar* Phi1,RooRealVar* mZZ, int para) {
 
-    // Parameters
-    mZ     = new RooRealVar("mZ","mZ",91.188);
-    gamZ   = new RooRealVar("gamZ","gamZ",2.5);
+    _measurables.m1   = m1;
+    _measurables.m2   = m2;
+    _measurables.h1   = h1;
+    _measurables.h2   = h2;
+    _measurables.hs   = hs;
+    _measurables.Phi  = Phi;
+    _measurables.Phi1 = Phi1;
+    _modelParams.mX   = mZZ;
+    
+    // model parameters
+    _modelParams.mZ = new RooRealVar("mZ","mZ",91.188);
+    _modelParams.gamZ= new RooRealVar("gamZ","gamZ",2.5);
+
+    _modelParams.a1Val = new RooRealVar("a1Val","a1Val",0.);
+    _modelParams.phi1Val = new RooRealVar("phi1Val","phi1Val",0.);
+    _modelParams.a2Val = new RooRealVar("a2Val","a2Val",0.);
+    _modelParams.phi2Val = new RooRealVar("phi2Val","phi2Val",0.);
+    _modelParams.a3Val = new RooRealVar("a3Val","a3Val",0.);
+    _modelParams.phi3Val = new RooRealVar("phi3Val","phi3Val",0.);
            
-    a1Val  = new RooRealVar("a1Val","a1Val",0.);
-    phi1Val= new RooRealVar("phi1Val","phi1Val",0.);
-    a2Val  = new RooRealVar("a2Val","a2Val",0.);
-    phi2Val= new RooRealVar("phi2Val","phi2Val",0.);
-    a3Val  = new RooRealVar("a3Val","a3Val",0.);
-    phi3Val= new RooRealVar("phi3Val","phi3Val",0.);
-           
-    parameterization = para;
+    _modelParams.parameterization = para;
+    
+    _modelParams.g1Val = new RooRealVar("g1Val","g1Val",1.);
+    _modelParams.g2Val = new RooRealVar("g2Val","g2Val",0.);
+    _modelParams.g3Val = new RooRealVar("g3Val","g3Val",0.);
+    _modelParams.g4Val = new RooRealVar("g4Val","g4Val",0.);
 
-    g1Val  = new RooRealVar("g1Val","g1Val",1.);
-    g2Val  = new RooRealVar("g2Val","g2Val",0.);
-    g3Val  = new RooRealVar("g3Val","g3Val",0.);
-    g4Val  = new RooRealVar("g4Val","g4Val",0.);
+    _modelParams.g1ValIm = new RooRealVar("g1ValIm","g1ValIm",0.);
+    _modelParams.g2ValIm = new RooRealVar("g2ValIm","g2ValIm",0.);
+    _modelParams.g3ValIm = new RooRealVar("g3ValIm","g3ValIm",0.);
+    _modelParams.g4ValIm = new RooRealVar("g4ValIm","g4ValIm",0.);
 
-    g1ValIm  = new RooRealVar("g1ValIm","g1ValIm",0.);
-    g2ValIm  = new RooRealVar("g2ValIm","g2ValIm",0.);
-    g3ValIm  = new RooRealVar("g3ValIm","g3ValIm",0.);
-    g4ValIm  = new RooRealVar("g4ValIm","g4ValIm",0.);
+    _modelParams.fa2 = new RooRealVar("fa2","f_{g2}",0.,0.,1.0);
+    _modelParams.fa3 = new RooRealVar("fa3","f_{g4}",0.,0.,1.0);
+    _modelParams.phia2 = new RooRealVar("phia2","#phi_{g2}",0.,-2.*TMath::Pi(),2*TMath::Pi());
+    _modelParams.phia3 = new RooRealVar("phia3","#phi_{g4}",0.,-2.*TMath::Pi(),2*TMath::Pi());
+    _modelParams.R1Val = new RooRealVar("R1Val","R1Val",0.15);
+    _modelParams.R2Val = new RooRealVar("R2Val","R2Val",0.15);
 
-    fa2  = new RooRealVar("fa2","f_{g2}",0.,0.,1.0);
-    fa3  = new RooRealVar("fa3","f_{g4}",0.,0.,1.0);
-    phia2  = new RooRealVar("phia2","#phi_{g2}",0.,-2.*TMath::Pi(),2*TMath::Pi());
-    phia3  = new RooRealVar("phia3","#phi_{g4}",0.,-2.*TMath::Pi(),2*TMath::Pi());
+    // acceptance parameters
+    _accepParams.aPhi = new RooRealVar("aPhi","aPhi",1.);
+    _accepParams.bPhi = new RooRealVar("bPhi","bPhi",4.52722e-03);
+    _accepParams.cPhi = new RooRealVar("cPhi","cPhi",0.);
+    _accepParams.dPhi = new RooRealVar("dPhi","dPhi",0.);
+    _accepParams.ePhi = new RooRealVar("ePhi","ePhi",0.);
 
-    R1Val  = new RooRealVar("R1Val","R1Val",0.15);
-    R2Val  = new RooRealVar("R2Val","R2Val",0.15);
+    _accepParams.aPhi1 = new RooRealVar("aPhi1","aPhi1",1.); 
+    _accepParams.bPhi1 = new RooRealVar("bPhi1","bPhi1",-1.29138e-02);
+    _accepParams.cPhi1 = new RooRealVar("cPhi1","cPhi1",-1.64682e-01);
+    _accepParams.dPhi1 = new RooRealVar("dPhi1","dPhi1",0.);
+    _accepParams.ePhi1 = new RooRealVar("ePhi1","ePhi1",0.);
 
-    PDF = new RooSpinZero_7DComplex("PDF","PDF",*m1,*m2,*h1,*h2,*hs,*Phi,*Phi1,*a1Val,*phi1Val,*a2Val,*phi2Val,*a3Val,*phi3Val,parameterization,*g1Val,*g2Val,*g3Val,*g4Val,*g1ValIm,*g2ValIm,*g3ValIm,*g4ValIm,*fa2,*fa3,*phia2,*phia3,*mZ,*gamZ,*mZZ,*R1Val,*R2Val);
+    _accepParams.aH1 = new RooRealVar("aH1","aH1",1.);
+    _accepParams.bH1 = new RooRealVar("bH1","bH1",2.42861e-02);
+    _accepParams.cH1 = new RooRealVar("cH1","cH1",0.);
+    _accepParams.dH1 = new RooRealVar("dH1","dH1",0.);
+    _accepParams.eH1 = new RooRealVar("eH1","eH1",0.);
+
+    _accepParams.aH2 = new RooRealVar("aH2","aH2",1.);
+    _accepParams.bH2 = new RooRealVar("bH2","bH2",-3.74663e-01);
+    _accepParams.cH2 = new RooRealVar("cH2","cH2",0.);
+    _accepParams.dH2 = new RooRealVar("dH2","dH2",0.);
+    _accepParams.eH2 = new RooRealVar("eH2","eH2",0.);
+
+    _accepParams.aHs = new RooRealVar("aHs","aHs",1.);
+    _accepParams.bHs = new RooRealVar("bHs","bHs",-1.55533e-01);
+    _accepParams.cHs = new RooRealVar("cHs","cHs",0.);
+    _accepParams.dHs = new RooRealVar("dHs","dHs",0.);
+    _accepParams.eHs = new RooRealVar("eHs","eHs",0.);
+
+    PDF = new RooSpinZero_7DComplex_withAccep("PDF","PDF",
+					      _measurables,
+					      _modelParams,
+					      _accepParams);
+
+    //std::cout << "ScalarPdfFactory::ScalarPdfFactory - done " << std::endl;
 
   };
 
   ~ScalarPdfFactory(){
 
-    delete PDF;
-    
-    delete a1Val;
-    delete phi1Val;
-    delete a2Val;
-    delete phi2Val;
-    delete a3Val;
-    delete phi3Val;
-    
-    delete g1Val;
-    delete g2Val;
-    delete g3Val;
-    delete g4Val;
-    
-    delete g1ValIm;
-    delete g2ValIm;
-    delete g3ValIm;
-    delete g4ValIm;
+    //std::cout << "~ScalarPdfFactory" << std::endl;
 
-    delete fa2;
-    delete fa3;
-    delete phia2;
-    delete phia3;
-    
+    delete _modelParams.a1Val;
+    delete _modelParams.phi1Val;
+    delete _modelParams.a2Val;
+    delete _modelParams.phi2Val;
+    delete _modelParams.a3Val;
+    delete _modelParams.phi3Val;
+    delete _modelParams.g1Val;
+    delete _modelParams.g2Val;
+    delete _modelParams.g3Val;
+    delete _modelParams.g4Val;
+    delete _modelParams.g1ValIm;
+    delete _modelParams.g2ValIm;
+    delete _modelParams.g3ValIm;
+    delete _modelParams.g4ValIm;			
+    delete _modelParams.fa2;
+    delete _modelParams.fa3;
+    delete _modelParams.phia2;
+    delete _modelParams.phia3;
+
+    delete _modelParams.R1Val;
+    delete _modelParams.R2Val;
+
+    delete _modelParams.mZ;
+    delete _modelParams.gamZ;
+
+    delete _accepParams.aPhi;
+    delete _accepParams.bPhi;
+    delete _accepParams.cPhi;
+    delete _accepParams.dPhi;
+    delete _accepParams.ePhi;
+    delete _accepParams.aPhi1;
+    delete _accepParams.bPhi1;
+    delete _accepParams.cPhi1;
+    delete _accepParams.dPhi1;
+    delete _accepParams.ePhi1;
+    delete _accepParams.aH1;
+    delete _accepParams.bH1;
+    delete _accepParams.cH1;
+    delete _accepParams.dH1;
+    delete _accepParams.eH1;
+    delete _accepParams.aH2;
+    delete _accepParams.bH2;
+    delete _accepParams.cH2;
+    delete _accepParams.dH2;
+    delete _accepParams.eH2;
+    delete _accepParams.aHs;
+    delete _accepParams.bHs;
+    delete _accepParams.cHs;
+    delete _accepParams.dHs;
+    delete _accepParams.eHs;
+
   };
-  
+
   void makeSMHiggs(){
 
-    parameterization=1;
+    //std::cout << "ScalarPdfFactory::makeSMHiggs()" << std::endl;
 
-    g1Val->setVal(1.0);
-    g2Val->setVal(0.0);
-    g3Val->setVal(0.0);
-    g4Val->setVal(0.0);
+    _modelParams.parameterization=1;
 
-    g1ValIm->setVal(0.0);
-    g2ValIm->setVal(0.0);
-    g3ValIm->setVal(0.0);
-    g4ValIm->setVal(0.0);
+    _modelParams.g1Val->setVal(1.0);
+    _modelParams.g2Val->setVal(0.0);
+    _modelParams.g3Val->setVal(0.0);
+    _modelParams.g4Val->setVal(0.0);
+    
+    _modelParams.g1ValIm->setVal(0.0);
+    _modelParams.g2ValIm->setVal(0.0);
+    _modelParams.g3ValIm->setVal(0.0);
+    _modelParams.g4ValIm->setVal(0.0);
 
   };
 
   void makeLGHiggs(){          
 
-    parameterization=1;
+    //std::cout << "ScalarPdfFactory::makeLGHiggs()" << std::endl;
 
-    g1Val->setVal(0.0);        // need to calculate the proper normalizations
-    g2Val->setVal(1.0);
-    g3Val->setVal(0.0);
-    g4Val->setVal(0.0);
+    _modelParams.parameterization=1;
 
-    g1ValIm->setVal(0.0);        // need to calculate the proper normalizations
-    g2ValIm->setVal(0.0);
-    g3ValIm->setVal(0.0);
-    g4ValIm->setVal(0.0);
+    _modelParams.g1Val->setVal(0.0);        // need to calculate the proper normalizations
+    _modelParams.g2Val->setVal(1.0);
+    _modelParams.g3Val->setVal(0.0);
+    _modelParams.g4Val->setVal(0.0);
+    
+    _modelParams.g1ValIm->setVal(0.0);        // need to calculate the proper normalizations
+    _modelParams.g2ValIm->setVal(0.0);
+    _modelParams.g3ValIm->setVal(0.0);
+    _modelParams.g4ValIm->setVal(0.0);
 
     };
 
 
   void makePSHiggs(){
 
-    parameterization=1;
+    //std::cout << "ScalarPdfFactory::makePSHiggs()" << std::endl;
 
-    g1Val->setVal(0.0);
-    g2Val->setVal(0.0);
-    g3Val->setVal(0.0);
-    g4Val->setVal(1.0);
+    _modelParams.parameterization=1;
 
-    g1ValIm->setVal(0.0);
-    g2ValIm->setVal(0.0);
-    g3ValIm->setVal(0.0);
-    g4ValIm->setVal(0.0);
+    _modelParams.g1Val->setVal(0.0);
+    _modelParams.g2Val->setVal(0.0);
+    _modelParams.g3Val->setVal(0.0);
+    _modelParams.g4Val->setVal(1.0);
+    
+    _modelParams.g1ValIm->setVal(0.0);
+    _modelParams.g2ValIm->setVal(0.0);
+    _modelParams.g3ValIm->setVal(0.0);
+    _modelParams.g4ValIm->setVal(0.0);
     
     
   };
@@ -153,64 +215,131 @@ public:
   void makeCustom(double a1, double a2, double a3,
 		  double phi1, double phi2, double phi3){
 
-    parameterization=0;
+    //std::cout << "ScalarPdfFactory::makeCustom()" << std::endl;
 
-    a1Val->setVal(a1);
-    phi1Val->setVal(phi1);
-    a2Val->setVal(a2);
-    phi2Val->setVal(phi2);
-    a3Val->setVal(a3);
-    phi3Val->setVal(phi3);
+    _modelParams.parameterization=0;
 
+    _modelParams.a1Val->setVal(a1);
+    _modelParams.phi1Val->setVal(phi1);
+    _modelParams.a2Val->setVal(a2);
+    _modelParams.phi2Val->setVal(phi2);
+    _modelParams.a3Val->setVal(a3);
+    _modelParams.phi3Val->setVal(phi3);
+    
   };
 
   void makeParamsConst(bool yesNo=true){
+   
+    //std::cout << "ScalarPdfFactory::makeParamsConst()" << std::endl;
+
     if(yesNo){
-      a1Val->setConstant(kTRUE);
-      phi1Val->setConstant(kTRUE);
-      a2Val->setConstant(kTRUE);
-      phi2Val->setConstant(kTRUE);
-      a3Val->setConstant(kTRUE);
-      phi3Val->setConstant(kTRUE);
-      g1Val->setConstant(kTRUE);
-      g2Val->setConstant(kTRUE);
-      g3Val->setConstant(kTRUE);
-      g4Val->setConstant(kTRUE);
-      g1ValIm->setConstant(kTRUE);
-      g2ValIm->setConstant(kTRUE);
-      g3ValIm->setConstant(kTRUE);
-      g4ValIm->setConstant(kTRUE);
-      fa2->setConstant(kTRUE);
-      fa3->setConstant(kTRUE);
-      phia2->setConstant(kTRUE);
-      phia3->setConstant(kTRUE);
-      gamZ->setConstant(kTRUE);
-      mZ->setConstant(kTRUE);
-      R1Val->setConstant(kTRUE);
-      R2Val->setConstant(kTRUE);
+      _modelParams.a1Val->setConstant(kTRUE);
+      _modelParams.phi1Val->setConstant(kTRUE);
+      _modelParams.a2Val->setConstant(kTRUE);
+      _modelParams.phi2Val->setConstant(kTRUE);
+      _modelParams.a3Val->setConstant(kTRUE);
+      _modelParams.phi3Val->setConstant(kTRUE);
+      _modelParams.g1Val->setConstant(kTRUE);
+      _modelParams.g2Val->setConstant(kTRUE);
+      _modelParams.g3Val->setConstant(kTRUE);
+      _modelParams.g4Val->setConstant(kTRUE);
+      _modelParams.g1ValIm->setConstant(kTRUE);
+      _modelParams.g2ValIm->setConstant(kTRUE);
+      _modelParams.g3ValIm->setConstant(kTRUE);
+      _modelParams.g4ValIm->setConstant(kTRUE);
+      _modelParams.fa2->setConstant(kTRUE);
+      _modelParams.fa3->setConstant(kTRUE);
+      _modelParams.phia2->setConstant(kTRUE);
+      _modelParams.phia3->setConstant(kTRUE);
+      _modelParams.gamZ->setConstant(kTRUE);
+      _modelParams.mZ->setConstant(kTRUE);
+      _modelParams.R1Val->setConstant(kTRUE);
+      _modelParams.R2Val->setConstant(kTRUE);
+
+      _accepParams.aPhi->setConstant(kTRUE);
+      _accepParams.bPhi->setConstant(kTRUE);
+      _accepParams.cPhi->setConstant(kTRUE);
+      _accepParams.dPhi->setConstant(kTRUE);
+      _accepParams.ePhi->setConstant(kTRUE);
+
+      _accepParams.aPhi1->setConstant(kTRUE);
+      _accepParams.bPhi1->setConstant(kTRUE);
+      _accepParams.cPhi1->setConstant(kTRUE);
+      _accepParams.dPhi1->setConstant(kTRUE);
+      _accepParams.ePhi1->setConstant(kTRUE);
+
+      _accepParams.aH1->setConstant(kTRUE);
+      _accepParams.bH1->setConstant(kTRUE);
+      _accepParams.cH1->setConstant(kTRUE);
+      _accepParams.dH1->setConstant(kTRUE);
+      _accepParams.eH1->setConstant(kTRUE);
+
+      _accepParams.aH2->setConstant(kTRUE);
+      _accepParams.bH2->setConstant(kTRUE);
+      _accepParams.cH2->setConstant(kTRUE);
+      _accepParams.dH2->setConstant(kTRUE);
+      _accepParams.eH2->setConstant(kTRUE);
+
+      _accepParams.aHs->setConstant(kTRUE);
+      _accepParams.bHs->setConstant(kTRUE);
+      _accepParams.cHs->setConstant(kTRUE);
+      _accepParams.dHs->setConstant(kTRUE);
+      _accepParams.eHs->setConstant(kTRUE);
+
     }else{
-      a1Val->setConstant(kFALSE);
-      phi1Val->setConstant(kFALSE);
-      a2Val->setConstant(kFALSE);
-      phi2Val->setConstant(kFALSE);
-      a3Val->setConstant(kFALSE);
-      phi3Val->setConstant(kFALSE);
-      g1Val->setConstant(kFALSE);
-      g2Val->setConstant(kFALSE);
-      g3Val->setConstant(kFALSE);
-      g4Val->setConstant(kFALSE);
-      g1ValIm->setConstant(kFALSE);
-      g2ValIm->setConstant(kFALSE);
-      g3ValIm->setConstant(kFALSE);
-      g4ValIm->setConstant(kFALSE);
-      fa2->setConstant(kFALSE);
-      fa3->setConstant(kFALSE);
-      phia2->setConstant(kFALSE);
-      phia3->setConstant(kFALSE);
-      gamZ->setConstant(kFALSE);
-      mZ->setConstant(kFALSE);
-      R1Val->setConstant(kFALSE);
-      R2Val->setConstant(kFALSE);
+      _modelParams.a1Val->setConstant(kFALSE);
+      _modelParams.phi1Val->setConstant(kFALSE);
+      _modelParams.a2Val->setConstant(kFALSE);
+      _modelParams.phi2Val->setConstant(kFALSE);
+      _modelParams.a3Val->setConstant(kFALSE);
+      _modelParams.phi3Val->setConstant(kFALSE);
+      _modelParams.g1Val->setConstant(kFALSE);
+      _modelParams.g2Val->setConstant(kFALSE);
+      _modelParams.g3Val->setConstant(kFALSE);
+      _modelParams.g4Val->setConstant(kFALSE);
+      _modelParams.g1ValIm->setConstant(kFALSE);
+      _modelParams.g2ValIm->setConstant(kFALSE);
+      _modelParams.g3ValIm->setConstant(kFALSE);
+      _modelParams.g4ValIm->setConstant(kFALSE);
+      _modelParams.fa2->setConstant(kFALSE);
+      _modelParams.fa3->setConstant(kFALSE);
+      _modelParams.phia2->setConstant(kFALSE);
+      _modelParams.phia3->setConstant(kFALSE);
+      _modelParams.gamZ->setConstant(kFALSE);
+      _modelParams.mZ->setConstant(kFALSE);
+      _modelParams.R1Val->setConstant(kFALSE);
+      _modelParams.R2Val->setConstant(kFALSE);
+
+      _accepParams.aPhi->setConstant(kFALSE);
+      _accepParams.bPhi->setConstant(kFALSE);
+      _accepParams.cPhi->setConstant(kFALSE);
+      _accepParams.dPhi->setConstant(kFALSE);
+      _accepParams.ePhi->setConstant(kFALSE);
+
+      _accepParams.aPhi1->setConstant(kFALSE);
+      _accepParams.bPhi1->setConstant(kFALSE);
+      _accepParams.cPhi1->setConstant(kFALSE);
+      _accepParams.dPhi1->setConstant(kFALSE);
+      _accepParams.ePhi1->setConstant(kFALSE);
+
+      _accepParams.aH1->setConstant(kFALSE);
+      _accepParams.bH1->setConstant(kFALSE);
+      _accepParams.cH1->setConstant(kFALSE);
+      _accepParams.dH1->setConstant(kFALSE);
+      _accepParams.eH1->setConstant(kFALSE);
+
+      _accepParams.aH2->setConstant(kFALSE);
+      _accepParams.bH2->setConstant(kFALSE);
+      _accepParams.cH2->setConstant(kFALSE);
+      _accepParams.dH2->setConstant(kFALSE);
+      _accepParams.eH2->setConstant(kFALSE);
+
+      _accepParams.aHs->setConstant(kFALSE);
+      _accepParams.bHs->setConstant(kFALSE);
+      _accepParams.cHs->setConstant(kFALSE);
+      _accepParams.dHs->setConstant(kFALSE);
+      _accepParams.eHs->setConstant(kFALSE);
+
     }
   };
 

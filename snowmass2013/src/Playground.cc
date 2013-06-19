@@ -1,7 +1,7 @@
 #ifndef PLAYGROUND
 #define PLAYGROUND
 
-#include "RooSpinZero_7DComplex.h"
+#include "RooSpinZero_7DComplex_withAccep.h"
 #include "RooPlot.h"
 #include "AngularPdfFactory.cc"
 #include "ScalarPdfFactory.cc"
@@ -69,25 +69,27 @@ public:
     mzz->setConstant(kTRUE);
     scalar->makeParamsConst(true);
 
-    // float these parameters by default
+    //std::cout << "float these parameters by default" << std::endl;
     if ( parameterization_ == 2 ) {
         
-      scalar->fa2->setConstant(kFALSE);
-      scalar->phia2->setConstant(kFALSE);
-      scalar->fa3->setConstant(kFALSE);
-      scalar->phia3->setConstant(kFALSE);
+      scalar->_modelParams.fa2->setConstant(kFALSE);
+      scalar->_modelParams.phia2->setConstant(kFALSE);
+      scalar->_modelParams.fa3->setConstant(kFALSE);
+      scalar->_modelParams.phia3->setConstant(kFALSE);
     }
     
     if ( parameterization_ == 1 ) {
-      scalar->g2Val->setConstant(kFALSE);
-      scalar->g2ValIm->setConstant(kFALSE);
-      scalar->g4Val->setConstant(kFALSE);
-      scalar->g4ValIm->setConstant(kFALSE);
+      scalar->_modelParams.g2Val->setConstant(kFALSE);
+      scalar->_modelParams.g2ValIm->setConstant(kFALSE);
+      scalar->_modelParams.g4Val->setConstant(kFALSE);
+      scalar->_modelParams.g4ValIm->setConstant(kFALSE);
     }
 
   }
     
    ~Playground(){
+
+    //std::cout << "~Playground" << std::endl;
 
     delete scalar;
 
@@ -138,6 +140,13 @@ public:
     return kNoError;
 
   };
+
+  int loadTree(RooDataSet* _data){
+
+    data = _data;
+    return kNoError;
+
+  }
 
   int loadTree(TString fileName, TString treeName){
 
