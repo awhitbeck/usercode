@@ -56,8 +56,8 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
    h1("h1","h1",this,_h1),
    h2("h2","h2",this,_h2),
    hs("hs","hs",this,_hs),
-   Phi("Phi","Phi",this,_Phi),
    Phi1("Phi1","Phi1",this,_Phi1),
+   Phi("Phi","Phi",this,_Phi),
    sqrts("sqrts","sqrts",this,_sqrts),
    mX("mX","mX",this,_mX),
    mZ("mZ","mZ",this,_mZ),
@@ -91,8 +91,8 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
    h1("h1",this,other.h1),
    h2("h2",this,other.h2),
    hs("hs",this,other.hs),
-   Phi("Phi",this,other.Phi),
    Phi1("Phi1",this,other.Phi1),
+   Phi("Phi",this,other.Phi),
    sqrts("sqrts",this,other.sqrts),
    mX("mX",this,other.mX),
    mZ("mZ",this,other.mZ),
@@ -152,7 +152,7 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
     if(parameterization==kFracPhase_Gs){
 
       double nanval = sqrt(1 - fa2 - fa3);
-      if (nanval != nanval) return 1e-9;
+      if (nanval != nanval) return 0.0;
 
       // convert fraction and phase to g1,g2...etc
       // ILC numbers at 250 GeV at mH= 125 GeV (narrow Z width approximation)
@@ -231,11 +231,11 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
 
    value += (fm0*(1 + Power(h1,2) - 2*h1*R1Val)*(1 + Power(h2,2) - 2*h2*R2Val))/16.;
 
-   value += (Sqrt(f00)*Sqrt(fp0)*Sqrt(1 - Power(h1,2))*Sqrt(1 - Power(h2,2))*(h1 - R1Val)*(h2 - R2Val)*Cos(Phi1 + phip0))/4.;
+   value += (Sqrt(f00)*Sqrt(fp0)*Sqrt(1 - Power(h1,2))*Sqrt(1 - Power(h2,2))*(h1 - R1Val)*(h2 - R2Val)*Cos(Phi + phip0))/4.;
 
-   value += (Sqrt(f00)*Sqrt(fm0)*Sqrt(1 - Power(h1,2))*Sqrt(1 - Power(h2,2))*(h1 + R1Val)*(h2 - R2Val)*Cos(Phi1 - phim0))/4.;
+   value += (Sqrt(f00)*Sqrt(fm0)*Sqrt(1 - Power(h1,2))*Sqrt(1 - Power(h2,2))*(h1 + R1Val)*(h2 - R2Val)*Cos(Phi - phim0))/4.;
 
-   value += (Sqrt(fm0)*Sqrt(fp0)*(-1 + Power(h1,2))*(-1 + Power(h2,2))*Cos(2*Phi1 - phim0 + phip0))/8.;
+   value += (Sqrt(fm0)*Sqrt(fp0)*(-1 + Power(h1,2))*(-1 + Power(h2,2))*Cos(2*Phi - phim0 + phip0))/8.;
 
 
    return value ; 
@@ -244,12 +244,12 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
 Int_t RooSpinZero_5D_ZH::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const
 {
   
-  if (matchArgs(allVars,analVars,RooArgSet(*h1.absArg(),*h2.absArg(),*hs.absArg(),*Phi.absArg(),*Phi1.absArg()))) return 6 ;
-  if (matchArgs(allVars,analVars,h1,h2,Phi,Phi1)) return 1 ;
-  if (matchArgs(allVars,analVars,h1,h2,hs,Phi)) return 2 ;
-  if (matchArgs(allVars,analVars,h1,hs,Phi,Phi1)) return 3 ;
-  if (matchArgs(allVars,analVars,h2,hs,Phi,Phi1)) return 4 ;
-  if (matchArgs(allVars,analVars,h1,h2,hs,Phi1)) return 5 ;
+  //if (matchArgs(allVars,analVars,RooArgSet(*h1.absArg(),*h2.absArg(),*hs.absArg(),*Phi1.absArg(),*Phi.absArg()))) return 6 ;
+  //if (matchArgs(allVars,analVars,h1,h2,Phi1,Phi)) return 1 ;
+  //if (matchArgs(allVars,analVars,h1,h2,hs,Phi1)) return 5 ;
+  //if (matchArgs(allVars,analVars,h1,hs,Phi1,Phi)) return 3 ;
+  //if (matchArgs(allVars,analVars,h2,hs,Phi1,Phi)) return 4 ;
+  //if (matchArgs(allVars,analVars,h1,h2,hs,Phi)) return 2 ;
   
   return 0 ;
 }
@@ -287,7 +287,7 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
        // place holder, not correct
        // 
        double nanval = sqrt(1 - fa2 - fa3);
-       if (nanval != nanval) return 1e-9;
+       if (nanval != nanval) return 0.0;
        
        // convert fraction and phase to g1,g2...etc
        // ILC numbers at 250 GeV at mH= 125 GeV (narrow Z width approximation)
