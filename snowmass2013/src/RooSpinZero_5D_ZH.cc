@@ -227,9 +227,9 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
 
    value += (f00*(-1 + Power(h1,2))*(-1 + Power(h2,2)))/4.;
 
-   value += (fp0*(1 + Power(h1,2) + 2*h1*R1Val)*(1 + Power(h2,2) + 2*h2*R2Val))/16.;
+   value += (fp0*(1 + Power(h1,2) - 2*h1*R1Val)*(1 + Power(h2,2) + 2*h2*R2Val))/16.;
 
-   value += (fm0*(1 + Power(h1,2) - 2*h1*R1Val)*(1 + Power(h2,2) - 2*h2*R2Val))/16.;
+   value += (fm0*(1 + Power(h1,2) + 2*h1*R1Val)*(1 + Power(h2,2) - 2*h2*R2Val))/16.;
 
    value += -(Sqrt(f00)*Sqrt(fp0)*Sqrt(1 - Power(h1,2))*Sqrt(1 - Power(h2,2))*(h1 - R1Val)*(h2 + R2Val)*Cos(Phi + phip0))/4.;
 
