@@ -81,7 +81,15 @@ aHs("aHs","aHs",this,*_accepParams.aHs),
 bHs("bHs","bHs",this,*_accepParams.bHs),
 cHs("cHs","cHs",this,*_accepParams.cHs),
 dHs("dHs","dHs",this,*_accepParams.dHs),
-eHs("eHs","eHs",this,*_accepParams.eHs)
+eHs("eHs","eHs",this,*_accepParams.eHs),
+aM1("aM1","aM1",this,*_accepParams.aM1),
+bM1("bM1","bM1",this,*_accepParams.bM1),
+cM1("cM1","cM1",this,*_accepParams.cM1),
+dM1("dM1","dM1",this,*_accepParams.dM1),
+aM2("aM2","aM2",this,*_accepParams.aM2),
+bM2("bM2","bM2",this,*_accepParams.bM2),
+cM2("cM2","cM2",this,*_accepParams.cM2),
+dM2("dM2","dM2",this,*_accepParams.dM2)
 {
 
   //std::cout << "RooSpinZero_7DComplex_withAccep::RooSpinZero_7DComplex_withAccep()" << std::endl;
@@ -148,7 +156,15 @@ aHs("aHs",this,other.aHs),
 bHs("bHs",this,other.bHs),
 cHs("cHs",this,other.cHs),
 dHs("dHs",this,other.dHs),
-eHs("eHs",this,other.eHs)
+eHs("eHs",this,other.eHs),
+aM1("aM1",this,other.aM1),
+bM1("bM1",this,other.bM1),
+cM1("cM1",this,other.cM1),
+dM1("dM1",this,other.dM1),
+aM2("aM2",this,other.aM2),
+bM2("bM2",this,other.bM2),
+cM2("cM2",this,other.cM2),
+dM2("dM2",this,other.dM2)
 {
 }
 
@@ -341,7 +357,9 @@ value+=0;
 value+=0;
 
 
-return  betaVal*term1Coeff*term2Coeff*value;
+ return  betaVal*term1Coeff*term2Coeff*value
+   *(1+aM1*m1+bM1*m1*m1+cM1*m1*m1*m1+dM1*m1*m1*m1*m1)
+   *(1+aM2*m1+bM2*m2*m2+cM2*m2*m2*m2+dM2*m2*m2*m2*m2);
 
 
 }
@@ -350,7 +368,7 @@ return  betaVal*term1Coeff*term2Coeff*value;
 Int_t RooSpinZero_7DComplex_withAccep::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const
 {
 
-  //if (matchArgs(allVars,analVars,RooArgSet(*hs.absArg(),*h1.absArg(),*h2.absArg(),*Phi.absArg(),*Phi1.absArg()))) return 6 ; // No m1,m2
+  if (matchArgs(allVars,analVars,RooArgSet(*hs.absArg(),*h1.absArg(),*h2.absArg(),*Phi.absArg(),*Phi1.absArg()))) return 6 ; // No m1,m2
   if (matchArgs(allVars,analVars,hs,h1,h2,Phi)) return 2 ; // No Phi1
   if (matchArgs(allVars,analVars,hs,h1,h2,Phi1)) return 5 ; // No Phi
   if (matchArgs(allVars,analVars,hs,h1,Phi,Phi1)) return 3 ; // No h2
@@ -537,7 +555,9 @@ value+=0;
 value+=0;
 
 
-return betaVal*term1Coeff*term2Coeff*value;
+return betaVal*term1Coeff*term2Coeff*value
+   *(1+aM1*m1+bM1*m1*m1+cM1*m1*m1*m1+dM1*m1*m1*m1*m1)
+   *(1+aM2*m1+bM2*m2*m2+cM2*m2*m2*m2+dM2*m2*m2*m2*m2);
 
 }
 // projections to Phi1
@@ -595,7 +615,9 @@ value+=0;
 value+=0;
 
 
-return betaVal*term1Coeff*term2Coeff*value;
+return betaVal*term1Coeff*term2Coeff*value
+   *(1+aM1*m1+bM1*m1*m1+cM1*m1*m1*m1+dM1*m1*m1*m1*m1)
+   *(1+aM2*m1+bM2*m2*m2+cM2*m2*m2*m2+dM2*m2*m2*m2*m2);
 
 }
 // projections to h2
@@ -653,7 +675,9 @@ value+=0;
 value+=0;
 
 
-return betaVal*term1Coeff*term2Coeff*value;
+return betaVal*term1Coeff*term2Coeff*value
+   *(1+aM1*m1+bM1*m1*m1+cM1*m1*m1*m1+dM1*m1*m1*m1*m1)
+   *(1+aM2*m1+bM2*m2*m2+cM2*m2*m2*m2+dM2*m2*m2*m2*m2);
 
 }
 // projections to h1
@@ -711,7 +735,9 @@ value+=0;
 value+=0;
 
 
-return betaVal*term1Coeff*term2Coeff*value;
+return betaVal*term1Coeff*term2Coeff*value
+   *(1+aM1*m1+bM1*m1*m1+cM1*m1*m1*m1+dM1*m1*m1*m1*m1)
+   *(1+aM2*m1+bM2*m2*m2+cM2*m2*m2*m2+dM2*m2*m2*m2*m2);
 
 }
 // projections to Phi
@@ -769,7 +795,9 @@ value+=0;
 value+=0;
 
 
-return betaVal*term1Coeff*term2Coeff*value;
+return betaVal*term1Coeff*term2Coeff*value
+   *(1+aM1*m1+bM1*m1*m1+cM1*m1*m1*m1+dM1*m1*m1*m1*m1)
+   *(1+aM2*m1+bM2*m2*m2+cM2*m2*m2*m2+dM2*m2*m2*m2*m2);
 
 }
 // projections to mz1/mz2
@@ -827,7 +855,9 @@ value+=0;
 value+=0;
 
 
-return betaVal*term1Coeff*term2Coeff*value;
+return betaVal*term1Coeff*term2Coeff*value
+   *(1+aM1*m1+bM1*m1*m1+cM1*m1*m1*m1+dM1*m1*m1*m1*m1)
+   *(1+aM2*m1+bM2*m2*m2+cM2*m2*m2*m2+dM2*m2*m2*m2*m2);
 
 }
 

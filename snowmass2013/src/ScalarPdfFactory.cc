@@ -2,7 +2,8 @@
 #define SCALAR_PDF_FACTORY
 
 #include "RooSpinZero_7DComplex_withAccep.h"
-//#include "AngularPdfFactory.cc"
+#include "RooPolynomial.h"
+#include "RooProdPdf.h"
 #include "TF1.h"
 #include "TMath.h"
 
@@ -13,8 +14,26 @@ public:
   RooSpinZero_7DComplex_withAccep::measurables _measurables;
   RooSpinZero_7DComplex_withAccep::modelParameters _modelParams;
   RooSpinZero_7DComplex_withAccep::accepParameters _accepParams;
-    
+
+  /*
+  RooRealVar* aM1;
+  RooRealVar* bM1;
+  RooRealVar* cM1;
+  RooRealVar* dM1;
+
+  RooRealVar* aM2;
+  RooRealVar* bM2;
+  RooRealVar* cM2;
+  RooRealVar* dM2;
+
+  RooPolynomial* m1Accep;
+  RooPolynomial* m2Accep;
+  */
+
+  //RooSpinZero_7DComplex_withAccep* PDFangleAccep;
   RooSpinZero_7DComplex_withAccep* PDF;
+
+  //RooProdPdf* PDF;
 
   ScalarPdfFactory(){};
     
@@ -59,15 +78,6 @@ public:
     _modelParams.R1Val = new RooRealVar("R1Val","R1Val",0.15);
     _modelParams.R2Val = new RooRealVar("R2Val","R2Val",0.15);
 
-   1  bH1          2.64540e-02   1.64519e-02   3.58402e-04   2.64540e-02
-   2  bH2         -3.73167e-01   1.20492e-02   2.62500e-04  -3.73167e-01
-   3  bHs         -1.55528e-01   1.31512e-02   2.88520e-04  -1.55528e-01
-   4  bPhi         4.88199e-03   6.26353e-03   1.37408e-04   4.88199e-03
-   5  bPhi1       -1.27958e-02   6.08110e-03   1.33408e-04  -1.27958e-02
-   6  cPhi         3.69579e-02   6.41775e-03   1.40728e-04   3.69579e-02
-   7  cPhi1       -1.64892e-01   6.35915e-03   1.36425e-04  -1.64892e-01
-
-
     // acceptance parameters
      _accepParams.aPhi = new RooRealVar("aPhi","aPhi",1.);
    _accepParams.bPhi = new RooRealVar("bPhi","bPhi",4.88199e-03);
@@ -99,10 +109,26 @@ public:
     _accepParams.dHs = new RooRealVar("dHs","dHs",0.);
     _accepParams.eHs = new RooRealVar("eHs","eHs",0.);
 
+    _accepParams.aM1 = new RooRealVar("aM1","aM1",1.);
+    _accepParams.bM1 = new RooRealVar("bM1","bM1",-1.26554e-02);
+    _accepParams.cM1 = new RooRealVar("cM1","cM1",3.13526e-05);
+    _accepParams.dM1 = new RooRealVar("dM1","dM1",0.);
+
+    _accepParams.aM2 = new RooRealVar("aM2","aM2",1.);
+    _accepParams.bM2 = new RooRealVar("bM2","bM2",,5.75519e-04);
+    _accepParams.cM2 = new RooRealVar("cM2","cM2",-7.74696e-05);
+    _accepParams.dM2 = new RooRealVar("dM2","dM2",0.);
+
+    //m1Accep = new RooPolynomial("m1Accep","m1Accep",*_measurables.m1,RooArgList(*aM1,*bM1,*cM1,*dM1),4);
+    //m2Accep = new RooPolynomial("m2Accep","m2Accep",*_measurables.m2,RooArgList(*aM2,*bM2,*cM2,*dM2),4);
+
     PDF = new RooSpinZero_7DComplex_withAccep("PDF","PDF",
 					      _measurables,
 					      _modelParams,
 					      _accepParams);
+
+    //PDF = new RooProdPdf("PDF","PDF",RooArgList(*m1Accep,*m2Accep,*PDFangleAccep));
+
 
     //std::cout << "ScalarPdfFactory::ScalarPdfFactory - done " << std::endl;
 
@@ -113,6 +139,19 @@ public:
     //std::cout << "~ScalarPdfFactory" << std::endl;
 
     delete PDF;
+    //delete PDFangleAccep;
+    //delete m1Accep;
+    //delete m2Accep;
+
+    delete _accepParams.aM1;
+    delete _accepParams.bM1;
+    delete _accepParams.cM1;
+    delete _accepParams.dM1;
+
+    delete _accepParams.aM2;
+    delete _accepParams.bM2;
+    delete _accepParams.cM2;
+    delete _accepParams.dM2;
 
     delete _modelParams.a1Val;
     delete _modelParams.phi1Val;
@@ -299,6 +338,16 @@ public:
       _accepParams.dHs->setConstant(kTRUE);
       _accepParams.eHs->setConstant(kTRUE);
 
+      _accepParams.aM1->setConstant(kTRUE);
+      _accepParams.bM1->setConstant(kTRUE);
+      _accepParams.cM1->setConstant(kTRUE);
+      _accepParams.dM1->setConstant(kTRUE);
+
+      _accepParams.aM2->setConstant(kTRUE);
+      _accepParams.bM2->setConstant(kTRUE);
+      _accepParams.cM2->setConstant(kTRUE);
+      _accepParams.dM2->setConstant(kTRUE);
+
     }else{
       _modelParams.a1Val->setConstant(kFALSE);
       _modelParams.phi1Val->setConstant(kFALSE);
@@ -353,10 +402,20 @@ public:
       _accepParams.dHs->setConstant(kFALSE);
       _accepParams.eHs->setConstant(kFALSE);
 
+      _accepParams.aM1->setConstant(kFALSE);
+      _accepParams.bM1->setConstant(kFALSE);
+      _accepParams.cM1->setConstant(kFALSE);
+      _accepParams.dM1->setConstant(kFALSE);
+
+      _accepParams.aM2->setConstant(kFALSE);
+      _accepParams.bM2->setConstant(kFALSE);
+      _accepParams.cM2->setConstant(kFALSE);
+      _accepParams.dM2->setConstant(kFALSE);
+
     }
   };
 
-};
+  };
 
 
 

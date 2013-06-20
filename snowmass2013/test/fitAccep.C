@@ -8,7 +8,7 @@ void fitAccep(){
   Playground myPG(125.);
 
   TChain* t = new TChain("SelectedTree");
-  t->Add("/scratch0/hep/cyou/Reso_test_0618/SMHiggsToZZTo4L_M-125_14TeV_0_true_wResolution_2e2mu.root");
+  t->Add("/scratch0/hep/cyou/Reso_test_0618/0+/SMHiggsToZZTo4L_M-125_14TeV_0_true_wResolution_2e2mu.root");
   
   RooRealVar* z1mass = new RooRealVar("Z1Mass","m_{Z1}",90.,12.,120.);
   RooRealVar* z2mass = new RooRealVar("Z2Mass","m_{Z2}",25.,12.,120.);
@@ -59,55 +59,67 @@ void fitAccep(){
   myPG.scalar->_modelParams.phia3->setVal(0.0);
   myPG.scalar->_modelParams.phia3->setConstant(true);  
 
-  //bool fitPhi = findVar(vars,kphi);
-  bool fitPhi = true;
+  bool fitPhi = false;
   //myPG.scalar->_accepParams.aPhi->setConstant(!fitPhi);
   myPG.scalar->_accepParams.bPhi->setConstant(!fitPhi);
   myPG.scalar->_accepParams.cPhi->setConstant(!fitPhi);
   //myPG.scalar->_accepParams.dPhi->setConstant(!fitPhi);
 
-  //bool fitPhi1 = findVar(vars,kphi1);
-  bool fitPhi1 = true;
+  bool fitPhi1 = false;
   //myPG.scalar->_accepParams.aPhi1->setConstant(!fitPhi1);
   myPG.scalar->_accepParams.bPhi1->setConstant(!fitPhi1);
   myPG.scalar->_accepParams.cPhi1->setConstant(!fitPhi1);
   //myPG.scalar->_accepParams.dPhi1->setConstant(!fitPhi1);
 
-  //bool fitH1 = findVar(vars,kcostheta1);
-  bool fitH1 = true;
+  bool fitH1 = false;
   //myPG.scalar->_accepParams.aH1->setConstant(!fitH1);
   myPG.scalar->_accepParams.bH1->setConstant(!fitH1);
   //myPG.scalar->_accepParams.cH1->setConstant(!fitH1);
   //myPG.scalar->_accepParams.dH1->setConstant(!fitH1);
 
-  //bool fitH2 = findVar(vars,kcostheta2);
-  bool fitH2 = true;
+  bool fitH2 = false;
   //myPG.scalar->_accepParams.aH2->setConstant(!fitH2);
   myPG.scalar->_accepParams.bH2->setConstant(!fitH2);
   //myPG.scalar->_accepParams.cH2->setConstant(!fitH2);
   //myPG.scalar->_accepParams.dH2->setConstant(!fitH2);
 
-  //bool fitHs = findVar(vars,kcosthetastar);
-  bool fitHs = true;
+  bool fitHs = false;
   //myPG.scalar->_accepParams.aHs->setConstant(!fitHs);
   myPG.scalar->_accepParams.bHs->setConstant(!fitHs);
   //myPG.scalar->_accepParams.cHs->setConstant(!fitHs);
   //myPG.scalar->_accepParams.dHs->setConstant(!fitHs);
 
-  myPG.generate(50000,false);
-  myPG.fitData(true);
+  bool fitM1 = false;
+  //myPG.scalar->_accepParams.aM1->setConstant(!fitM1);
+  myPG.scalar->_accepParams.bM1->setConstant(!fitM1);
+  myPG.scalar->_accepParams.cM1->setConstant(!fitM1);
+  //myPG.scalar->_accepParams.dM1->setConstant(!fitM1);
 
-  TCanvas* can =new TCanvas("can","can",900,600);
-  can->Divide(3,2);
+  bool fitM2 = false;
+  //myPG.scalar->_accepParams.aM2->setConstant(!fitM2);
+  myPG.scalar->_accepParams.bM2->setConstant(!fitM2);
+  myPG.scalar->_accepParams.cM2->setConstant(!fitM2);
+  //myPG.scalar->_accepParams.dM2->setConstant(!fitM2);
+
+  myPG.generate(50000,false);
+  //myPG.fitData(true);
+
+  TCanvas* can =new TCanvas("can","can",800,400);
+  can->Divide(4,2);
+
   can->cd(1);
-  myPG.projectPDF(PlaygroundHelpers::kcostheta1);//,20,true);
+  myPG.projectPDF(PlaygroundHelpers::kz1mass,80,true);
   can->cd(2);
-  myPG.projectPDF(PlaygroundHelpers::kcostheta2);//,20,true);
+  myPG.projectPDF(PlaygroundHelpers::kz2mass,80,true);
   can->cd(3);
-  myPG.projectPDF(PlaygroundHelpers::kcosthetastar);//,20,true);
+  myPG.projectPDF(PlaygroundHelpers::kcostheta1,20,true);
   can->cd(4);
-  myPG.projectPDF(PlaygroundHelpers::kphi);//,20,true);
+  myPG.projectPDF(PlaygroundHelpers::kcostheta2,20,true);
   can->cd(5);
-  myPG.projectPDF(PlaygroundHelpers::kphi1);//,20,true);
+  myPG.projectPDF(PlaygroundHelpers::kcosthetastar,20,true);
+  can->cd(6);
+  myPG.projectPDF(PlaygroundHelpers::kphi,20,true);
+  can->cd(7);
+  myPG.projectPDF(PlaygroundHelpers::kphi1,20,true);
 
 }

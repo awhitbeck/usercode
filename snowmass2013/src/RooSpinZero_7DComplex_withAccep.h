@@ -81,6 +81,14 @@ class RooSpinZero_7DComplex_withAccep : public RooAbsPdf {
     RooRealVar* cHs;
     RooRealVar* dHs;
     RooRealVar* eHs;
+    RooRealVar* aM1;
+    RooRealVar* bM1;
+    RooRealVar* cM1;
+    RooRealVar* dM1;
+    RooRealVar* aM2;
+    RooRealVar* bM2;
+    RooRealVar* cM2;
+    RooRealVar* dM2;
   };
 
   RooSpinZero_7DComplex_withAccep() {} ; 
@@ -156,6 +164,16 @@ protected:
     RooRealProxy cHs ;
     RooRealProxy dHs ;
     RooRealProxy eHs ;
+
+    RooRealProxy aM1 ;
+    RooRealProxy bM1 ;
+    RooRealProxy cM1 ;
+    RooRealProxy dM1 ;
+
+    RooRealProxy aM2 ;
+    RooRealProxy bM2 ;
+    RooRealProxy cM2 ;
+    RooRealProxy dM2 ;
 
     Double_t evaluate() const ;
     
