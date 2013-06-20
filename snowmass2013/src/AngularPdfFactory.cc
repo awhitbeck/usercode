@@ -23,9 +23,17 @@ public:
 
   ~AngularPdfFactory(){
 
-    //std::cout << "~AngularPdfFactory" << std::endl;
+    std::cout << "~AngularPdfFactory" << std::endl;
+
+    //delete mZ;
+    //delete gamZ;
+
+    //delete R1Val;
+    //delete R2Val;
     
-    delete PDF;
+    //delete PDF;
+
+    std::cout << "~AngularPdfFactory - end " << std::cout;
 
   };
 

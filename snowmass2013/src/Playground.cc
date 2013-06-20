@@ -89,10 +89,10 @@ public:
     
    ~Playground(){
 
-    //std::cout << "~Playground" << std::endl;
+     //std::cout << "~Playground" << std::endl;
 
     delete scalar;
-
+    
     delete z1mass;
     delete z2mass;
     delete costhetastar;
@@ -101,9 +101,9 @@ public:
     delete phi;
     delete phi1;
     delete mzz;
-    
+
     if(data) delete data;
-    if(toyData) delete toyData;
+    //if(toyData) delete toyData;
 
   };
 

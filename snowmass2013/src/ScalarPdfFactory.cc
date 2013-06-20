@@ -2,11 +2,11 @@
 #define SCALAR_PDF_FACTORY
 
 #include "RooSpinZero_7DComplex_withAccep.h"
-#include "AngularPdfFactory.cc"
+//#include "AngularPdfFactory.cc"
 #include "TF1.h"
 #include "TMath.h"
 
-class ScalarPdfFactory: public AngularPdfFactory{
+class ScalarPdfFactory{
 
 public:
 
@@ -59,33 +59,42 @@ public:
     _modelParams.R1Val = new RooRealVar("R1Val","R1Val",0.15);
     _modelParams.R2Val = new RooRealVar("R2Val","R2Val",0.15);
 
+   1  bH1          2.64540e-02   1.64519e-02   3.58402e-04   2.64540e-02
+   2  bH2         -3.73167e-01   1.20492e-02   2.62500e-04  -3.73167e-01
+   3  bHs         -1.55528e-01   1.31512e-02   2.88520e-04  -1.55528e-01
+   4  bPhi         4.88199e-03   6.26353e-03   1.37408e-04   4.88199e-03
+   5  bPhi1       -1.27958e-02   6.08110e-03   1.33408e-04  -1.27958e-02
+   6  cPhi         3.69579e-02   6.41775e-03   1.40728e-04   3.69579e-02
+   7  cPhi1       -1.64892e-01   6.35915e-03   1.36425e-04  -1.64892e-01
+
+
     // acceptance parameters
-    _accepParams.aPhi = new RooRealVar("aPhi","aPhi",1.);
-    _accepParams.bPhi = new RooRealVar("bPhi","bPhi",4.52722e-03);
-    _accepParams.cPhi = new RooRealVar("cPhi","cPhi",0.);
+     _accepParams.aPhi = new RooRealVar("aPhi","aPhi",1.);
+   _accepParams.bPhi = new RooRealVar("bPhi","bPhi",4.88199e-03);
+    _accepParams.cPhi = new RooRealVar("cPhi","cPhi",3.69579e-02);
     _accepParams.dPhi = new RooRealVar("dPhi","dPhi",0.);
     _accepParams.ePhi = new RooRealVar("ePhi","ePhi",0.);
 
     _accepParams.aPhi1 = new RooRealVar("aPhi1","aPhi1",1.); 
-    _accepParams.bPhi1 = new RooRealVar("bPhi1","bPhi1",-1.29138e-02);
-    _accepParams.cPhi1 = new RooRealVar("cPhi1","cPhi1",-1.64682e-01);
+    _accepParams.bPhi1 = new RooRealVar("bPhi1","bPhi1",-1.27958e-02);
+    _accepParams.cPhi1 = new RooRealVar("cPhi1","cPhi1",-1.64892e-01);
     _accepParams.dPhi1 = new RooRealVar("dPhi1","dPhi1",0.);
     _accepParams.ePhi1 = new RooRealVar("ePhi1","ePhi1",0.);
 
     _accepParams.aH1 = new RooRealVar("aH1","aH1",1.);
-    _accepParams.bH1 = new RooRealVar("bH1","bH1",2.42861e-02);
+    _accepParams.bH1 = new RooRealVar("bH1","bH1",2.64540e-02);
     _accepParams.cH1 = new RooRealVar("cH1","cH1",0.);
     _accepParams.dH1 = new RooRealVar("dH1","dH1",0.);
     _accepParams.eH1 = new RooRealVar("eH1","eH1",0.);
 
     _accepParams.aH2 = new RooRealVar("aH2","aH2",1.);
-    _accepParams.bH2 = new RooRealVar("bH2","bH2",-3.74663e-01);
+    _accepParams.bH2 = new RooRealVar("bH2","bH2",-3.73167e-01);
     _accepParams.cH2 = new RooRealVar("cH2","cH2",0.);
     _accepParams.dH2 = new RooRealVar("dH2","dH2",0.);
     _accepParams.eH2 = new RooRealVar("eH2","eH2",0.);
 
     _accepParams.aHs = new RooRealVar("aHs","aHs",1.);
-    _accepParams.bHs = new RooRealVar("bHs","bHs",-1.55533e-01);
+    _accepParams.bHs = new RooRealVar("bHs","bHs",-1.55528e-01);
     _accepParams.cHs = new RooRealVar("cHs","cHs",0.);
     _accepParams.dHs = new RooRealVar("dHs","dHs",0.);
     _accepParams.eHs = new RooRealVar("eHs","eHs",0.);
@@ -102,6 +111,8 @@ public:
   ~ScalarPdfFactory(){
 
     //std::cout << "~ScalarPdfFactory" << std::endl;
+
+    delete PDF;
 
     delete _modelParams.a1Val;
     delete _modelParams.phi1Val;
@@ -153,6 +164,8 @@ public:
     delete _accepParams.cHs;
     delete _accepParams.dHs;
     delete _accepParams.eHs;
+
+    //std::cout << "~ScalarPdfFactory - end " << std::endl;
 
   };
 

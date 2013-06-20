@@ -60,42 +60,42 @@ void fitAccep(){
   myPG.scalar->_modelParams.phia3->setConstant(true);  
 
   //bool fitPhi = findVar(vars,kphi);
-  bool fitPhi = false;
+  bool fitPhi = true;
   //myPG.scalar->_accepParams.aPhi->setConstant(!fitPhi);
   myPG.scalar->_accepParams.bPhi->setConstant(!fitPhi);
-  //myPG.scalar->_accepParams.cPhi->setConstant(!fitPhi);
+  myPG.scalar->_accepParams.cPhi->setConstant(!fitPhi);
   //myPG.scalar->_accepParams.dPhi->setConstant(!fitPhi);
 
   //bool fitPhi1 = findVar(vars,kphi1);
-  bool fitPhi1 = false;
+  bool fitPhi1 = true;
   //myPG.scalar->_accepParams.aPhi1->setConstant(!fitPhi1);
   myPG.scalar->_accepParams.bPhi1->setConstant(!fitPhi1);
   myPG.scalar->_accepParams.cPhi1->setConstant(!fitPhi1);
   //myPG.scalar->_accepParams.dPhi1->setConstant(!fitPhi1);
 
   //bool fitH1 = findVar(vars,kcostheta1);
-  bool fitH1 = false;
+  bool fitH1 = true;
   //myPG.scalar->_accepParams.aH1->setConstant(!fitH1);
   myPG.scalar->_accepParams.bH1->setConstant(!fitH1);
   //myPG.scalar->_accepParams.cH1->setConstant(!fitH1);
   //myPG.scalar->_accepParams.dH1->setConstant(!fitH1);
 
   //bool fitH2 = findVar(vars,kcostheta2);
-  bool fitH2 = false;
+  bool fitH2 = true;
   //myPG.scalar->_accepParams.aH2->setConstant(!fitH2);
   myPG.scalar->_accepParams.bH2->setConstant(!fitH2);
   //myPG.scalar->_accepParams.cH2->setConstant(!fitH2);
   //myPG.scalar->_accepParams.dH2->setConstant(!fitH2);
 
   //bool fitHs = findVar(vars,kcosthetastar);
-  bool fitHs = false;
+  bool fitHs = true;
   //myPG.scalar->_accepParams.aHs->setConstant(!fitHs);
   myPG.scalar->_accepParams.bHs->setConstant(!fitHs);
   //myPG.scalar->_accepParams.cHs->setConstant(!fitHs);
   //myPG.scalar->_accepParams.dHs->setConstant(!fitHs);
 
-  //myPG.generate(50000,false);
-  //myPG.fitData(true);
+  myPG.generate(50000,false);
+  myPG.fitData(true);
 
   TCanvas* can =new TCanvas("can","can",900,600);
   can->Divide(3,2);
@@ -106,23 +106,8 @@ void fitAccep(){
   can->cd(3);
   myPG.projectPDF(PlaygroundHelpers::kcosthetastar);//,20,true);
   can->cd(4);
-  //myPG.projectPDF(PlaygroundHelpers::kphi);//,20,true);
+  myPG.projectPDF(PlaygroundHelpers::kphi);//,20,true);
   can->cd(5);
-  //myPG.projectPDF(PlaygroundHelpers::kphi1);//,20,true);
-  
-}
-
-
-/*
-bool findVar(vector<varList> vars, varList var){
-
-  for(int i=0 ; i<var.size(); i++){
-    
-    if(var[i] == var) return true;
-
-  }
-
-  return false;
+  myPG.projectPDF(PlaygroundHelpers::kphi1);//,20,true);
 
 }
-*/
