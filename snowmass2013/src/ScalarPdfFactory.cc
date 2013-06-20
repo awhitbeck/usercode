@@ -115,7 +115,7 @@ public:
     _accepParams.dM1 = new RooRealVar("dM1","dM1",0.);
 
     _accepParams.aM2 = new RooRealVar("aM2","aM2",1.);
-    _accepParams.bM2 = new RooRealVar("bM2","bM2",,5.75519e-04);
+    _accepParams.bM2 = new RooRealVar("bM2","bM2",5.75519e-04);
     _accepParams.cM2 = new RooRealVar("cM2","cM2",-7.74696e-05);
     _accepParams.dM2 = new RooRealVar("dM2","dM2",0.);
 
