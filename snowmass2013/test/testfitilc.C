@@ -5,38 +5,39 @@
 
 using namespace PlaygroundZHhelpers;
 
-void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
+void testfitilc(bool pureToys=false, int ntoysperjob = 1000, int seed_index=2) {
 
   //   gROOT->ProcessLine(".x  loadLib.C");
   
   int random_seed = seed_index+487563; 
   RooRandom::randomGenerator()->SetSeed(random_seed);
-  bool debug = true;
+  bool debug = false;
 
   // 
   // specify inputs 
   // you need to go through these following settings and verify all the 
   // initial values
   // 
-  bool loadData = false;
+  bool loadData = true;
   bool fitData = false;
-  bool drawprojections = true;
-  bool testsingletoy = true;
-  bool dotoys = false;
+  bool drawprojections = false;
+  bool testsingletoy = false;
+  bool dotoys = true;
 
   float mH = 125.;
-  TString modeName = Form("g1_p_g4_100k");
-  TString fileName = Form("Events_20130618/unpol_%s_false.root", modeName.Data());
+  TString modeName = Form("g1_p_g2_p_g4_1M");
+  TString fileName = Form("Events_20130618/unweighted_unpol_%s_false.root", modeName.Data());
+  // TString fileName = Form("Events_20130618/unpol_%s_false.root", modeName.Data());
   TString treeName = "SelectedTree";
   
   double g1Re = 1;
   double g1Im = 0.;
-  double g2Re = 0.;
+  double g2Re = 0.54071;
   double g2Im = 0.;
   double g3Re = 0.;
   double g3Im = 0.;
-  double g4Re = 0.848391;
-  double g4Im = 0.;
+  double g4Re = 0.83265;
+  double g4Im = 0.; //
 
   // below will be recalculated once Playground is defined
   double fa2Val = 0.;
@@ -63,11 +64,11 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
   if ( parameterization == 2 ) {
     
     scalar->fa2->setVal(fa2Val);
-    scalar->fa2->setConstant(kTRUE);
+    // scalar->fa2->setConstant(kTRUE);
 
     scalar->phia2->setVal(phia2Val);
     scalar->phia2->setRange(-2*TMath::Pi(), 2*TMath::Pi());
-    scalar->phia2->setConstant(kTRUE);
+    // scalar->phia2->setConstant(kTRUE);
     
     scalar->fa3->setVal(fa3Val);
     scalar->fa3->setConstant(kFALSE);
@@ -90,7 +91,7 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
     scalar->g4Val->setConstant(kFALSE);
     scalar->g4Val->setVal(g4Re);
 
-    scalar->g4ValIm->setVal(g2Im);
+    scalar->g4ValIm->setVal(g4Im);
     // scalar->g4ValIm->setConstant(kTRUE);
     
   }
@@ -100,7 +101,7 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
   }
   
   if ( testsingletoy ) {
-    int nEvents = 50000;
+    int nEvents = 2000;
     if(test.generate(nEvents, true)!=kNoError) break;
   }
   // 
@@ -109,8 +110,8 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
 
   if ( dotoys ) {
     
-    float lumi = 3000; // in unit of fb
-    float nsignalperfb = 7.8; 
+    float lumi = 2000; // in unit of fb
+    float nsignalperfb = 8; 
     
     TFile *toyresults = new TFile(Form("toyresults_%i.root", random_seed), "RECREATE");
     gROOT->cd();
@@ -130,9 +131,9 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
     // do toys
     for (int i = 0; i < ntoysperjob; i++) {
       
-      if  ( i%100 == 0 )    
+      if  ( i%100 == 0 ) {
 	std::cout << "doing toy " << i << "\n";
-
+      }
       // set initial values
       scalar->fa2->setVal(fa2Val);
       scalar->fa3->setVal(fa3Val);
@@ -141,9 +142,8 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
       
       if(test.generate(lumi*nsignalperfb, pureToys)!=kNoError) break;
       
-      std::cout << "fitting data" << std::endl;
 
-      RooFitResult *toyfitresults = test.fitData(true);
+      RooFitResult *toyfitresults = test.fitData(true,-1);
       RooRealVar *r_fa2 = (RooRealVar *) toyfitresults->floatParsFinal().find("fa2");
       RooRealVar *r_fa3 = (RooRealVar *) toyfitresults->floatParsFinal().find("fa3");
       RooRealVar *r_phia2 = (RooRealVar *) toyfitresults->floatParsFinal().find("phia2");
