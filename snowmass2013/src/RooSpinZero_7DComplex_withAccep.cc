@@ -226,7 +226,7 @@ a3Im=phi3Val;
 //
 if(parameterization==kFracPhase_Gs){
 nanval = sqrt(1 - fa2 - fa3);
-if (nanval != nanval) return 1e-9;
+if (nanval != nanval) return 0.0;
 
 // convert fraction and phase to g1,g2...etc
 double sigma_1=2.0418442;   // numbers coming from JHUGen
@@ -421,7 +421,7 @@ a3Im=phi3Val;
 //
 if(parameterization==kFracPhase_Gs){
 nanval = sqrt(1 - fa2 - fa3);
-if (nanval != nanval) return 1e-9;
+ if (nanval != nanval) return 0.0;
 
 // convert fraction and phase to g1,g2...etc
 double sigma_1=2.0418442;   // numbers coming from JHUGen
