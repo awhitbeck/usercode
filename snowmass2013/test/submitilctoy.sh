@@ -4,8 +4,11 @@
 # make sure you edit 
 #    1. output directory
 #    2. the macro (.C) file with the correct argument
+#--------tips------------------
 # use showq -u username to check the status of the job
-
+# use qpeek jobid to check the output before it finishes
+#-------end of tips-------------
+ 
 export NJOBS=$1
 export NTOYSPERJOB=$2
 export ISPURETOY=$3
