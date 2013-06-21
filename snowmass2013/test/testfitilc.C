@@ -5,7 +5,7 @@
 
 using namespace PlaygroundZHhelpers;
 
-void testfitilc(bool pureToys=false, int ntoysperjob = 1000, int seed_index=2) {
+void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
 
   //   gROOT->ProcessLine(".x  loadLib.C");
   
@@ -25,14 +25,13 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1000, int seed_index=2) {
   bool dotoys = true;
 
   float mH = 125.;
-  TString modeName = Form("g1_p_g2_p_g4_1M");
-  TString fileName = Form("Events_20130618/unweighted_unpol_%s_false.root", modeName.Data());
-  // TString fileName = Form("Events_20130618/unpol_%s_false.root", modeName.Data());
+  TString modeName = Form("g1_p_g4_1M");
+  TString fileName = Form("data/Events_20130618/unweighted_unpol_%s_false.root", modeName.Data());
   TString treeName = "SelectedTree";
   
   double g1Re = 1;
   double g1Im = 0.;
-  double g2Re = 0.54071;
+  double g2Re = 0.; //0.54071;
   double g2Im = 0.;
   double g3Re = 0.;
   double g3Im = 0.;
@@ -64,11 +63,11 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1000, int seed_index=2) {
   if ( parameterization == 2 ) {
     
     scalar->fa2->setVal(fa2Val);
-    // scalar->fa2->setConstant(kTRUE);
+    scalar->fa2->setConstant(kTRUE);
 
     scalar->phia2->setVal(phia2Val);
     scalar->phia2->setRange(-2*TMath::Pi(), 2*TMath::Pi());
-    // scalar->phia2->setConstant(kTRUE);
+    scalar->phia2->setConstant(kTRUE);
     
     scalar->fa3->setVal(fa3Val);
     scalar->fa3->setConstant(kFALSE);
@@ -116,21 +115,52 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1000, int seed_index=2) {
     TFile *toyresults = new TFile(Form("toyresults_%i.root", random_seed), "RECREATE");
     gROOT->cd();
     
-    TH1F *h_fa2 = new TH1F("h_fa2", "h_fa2", 100, 0, 1);
-    TH1F *h_fa2_pull = new TH1F("h_fa2_pull", "h_fa2_pull", 100, -5, 5);
-
-    TH1F *h_fa3 = new TH1F("h_fa3", "h_fa3", 100, 0, 1);
-    TH1F *h_fa3_pull = new TH1F("h_fa3_pull", "h_fa3_pull", 100, -5, 5);
-
-    TH1F *h_phia2 = new TH1F("h_phia2", "h_phia2", 100, -TMath::Pi(), TMath::Pi());
-    TH1F *h_phia2_pull = new TH1F("h_phia2_pull", "h_phia2_pull", 100, -5, 5);
-
-    TH1F *h_phia3 = new TH1F("h_phia3", "h_phia3", 100, -TMath::Pi(), TMath::Pi());
-    TH1F *h_phia3_pull = new TH1F("h_phia3_pull", "h_phia3_pull", 100, -5, 5);
+    TTree *tree_fit = new TTree("fittree", "fittree");
     
+    Float_t m_fa2, m_fa2_err, m_fa2_pull;
+    Float_t m_fa3, m_fa3_err, m_fa3_pull;
+    Float_t m_phia2, m_phia2_err, m_phia2_pull;
+    Float_t m_phia3, m_phia3_err, m_phia3_pull;
+    
+    Float_t m_g2Re, m_g2Re_err, m_g2Re_pull;
+    Float_t m_g2Im, m_g2Im_err, m_g2Im_pull;
+    Float_t m_g4Re, m_g4Re_err, m_g4Re_pull;
+    Float_t m_g4Im, m_g4Im_err, m_g4Im_pull;
+	
+    tree_fit->Branch("fa2",        &m_fa2,        "fa2/F");
+    tree_fit->Branch("fa2_err",    &m_fa2_err,    "fa2_err/F");
+    tree_fit->Branch("fa2_pull",   &m_fa2_pull,   "fa2_pull/F");
+
+    tree_fit->Branch("fa3",        &m_fa3,        "fa3/F");
+    tree_fit->Branch("fa3_err",    &m_fa3_err,    "fa3_err/F");
+    tree_fit->Branch("fa3_pull",   &m_fa3_pull,   "fa3_pull/F");
+
+    tree_fit->Branch("phia2",      &m_phia2,      "phia2/F");
+    tree_fit->Branch("phia2_err",  &m_phia2_err,  "phia2_err/F");
+    tree_fit->Branch("phia2_pull", &m_phia2_pull, "phia2_pull/F");
+
+    tree_fit->Branch("phia3",      &m_phia3,      "phia3/F");
+    tree_fit->Branch("phia3_err",  &m_phia3_err,  "phia3_err/F");
+    tree_fit->Branch("phia3_pull", &m_phia3_pull, "phia3_pull/F");
+
+    tree_fit->Branch("g2Re",       &m_g2Re,       "g2Re/F");
+    tree_fit->Branch("g2Re_err",   &m_g2Re_err,   "g2Re_err/F");
+    tree_fit->Branch("g2Re_pull",  &m_g2Re_pull,  "g2Re_pull/F");
+
+    tree_fit->Branch("g2Im",       &m_g2Im,       "g2Im/F");
+    tree_fit->Branch("g2Im_err",   &m_g2Im_err,   "g2Im_err/F");
+    tree_fit->Branch("g2Im_pull",  &m_g2Im_pull,  "g2Im_pull/F");
+    
+    tree_fit->Branch("g4Re",       &m_g4Re,       "g4Re/F");
+    tree_fit->Branch("g4Re_err",   &m_g4Re_err,   "g4Re_err/F");
+    tree_fit->Branch("g4Re_pull",  &m_g4Re_pull,  "g4Re_pull/F");
+
+    tree_fit->Branch("g4Im",       &m_g4Im,       "g4Im/F");
+    tree_fit->Branch("g4Im_err",   &m_g4Im_err,   "g4Im_err/F");
+    tree_fit->Branch("g4Im_pull",  &m_g4Im_pull,  "g4Im_pull/F");
+
     // do toys
     for (int i = 0; i < ntoysperjob; i++) {
-      
       if  ( i%100 == 0 ) {
 	std::cout << "doing toy " << i << "\n";
       }
@@ -141,47 +171,66 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1000, int seed_index=2) {
       scalar->phia3->setVal(phia3Val);
       
       if(test.generate(lumi*nsignalperfb, pureToys)!=kNoError) break;
-      
 
       RooFitResult *toyfitresults = test.fitData(true,-1);
-      RooRealVar *r_fa2 = (RooRealVar *) toyfitresults->floatParsFinal().find("fa2");
-      RooRealVar *r_fa3 = (RooRealVar *) toyfitresults->floatParsFinal().find("fa3");
-      RooRealVar *r_phia2 = (RooRealVar *) toyfitresults->floatParsFinal().find("phia2");
-      RooRealVar *r_phia3 = (RooRealVar *) toyfitresults->floatParsFinal().find("phia3");
-
+      
       if ( debug ) {
 	std::cout << "toy trial " << i << "\n"; 
-	std::cout << r_fa2->getVal() << " +/- " << r_fa2->getError() << "\n";
-	std::cout << r_fa3->getVal() << " +/- " << r_fa3->getError() << "\n";
-	std::cout << r_phia2->getVal() << " +/- " << r_phia2->getError() << "\n";
-	std::cout << r_phia3->getVal() << " +/- " << r_phia3->getError() << "\n";
+	if ( parameterization == 2 ) {
+	  std::cout << "fa2 = " << scalar->fa2->getVal() << " +/- " << scalar->fa2->getError() << "\n";
+	  std::cout << "phia2 = " << scalar->phia2->getVal() << " +/- " << scalar->phia2->getError() << "\n";
+	  std::cout << "fa3 = " << scalar->fa3->getVal() << " +/- " << scalar->fa3->getError() << "\n";
+	  std::cout << "phia3 = " << scalar->phia3->getVal() << " +/- " << scalar->phia3->getError() << "\n";
+	}
+	if ( parameterization == 1 ) {
+	  std::cout << "Re(g2) = " << scalar->g2Val->getVal() << "+/-" << scalar->g2Val->getError() << "\n";
+	  std::cout << "Im(g2) = " << scalar->g2ValIm->getVal() << "+/-" << scalar->g2ValIm->getError() << "\n";
+	  std::cout << "Re(g4) = " << scalar->g4Val->getVal() << "+/-" << scalar->g4Val->getError() << "\n";
+	  std::cout << "Im(g4) = " << scalar->g4ValIm->getVal() << "+/-" << scalar->g4ValIm->getError() << "\n";
+	}
       }
-
-      h_fa2->Fill(r_fa2->getVal());
-      h_fa2_pull->Fill( (r_fa2->getVal() - fa2Val) / r_fa2->getError());
-      h_fa3->Fill(r_fa3->getVal());
-      h_fa3_pull->Fill( (r_fa3->getVal() - fa3Val) / r_fa3->getError());
-      h_phia2->Fill(r_phia2->getVal());
-      h_phia2_pull->Fill( (r_phia2->getVal() - phia2Val) / r_phia2->getError());
-      h_phia3->Fill(r_phia3->getVal());
-      h_phia3_pull->Fill( (r_phia3->getVal() - phia3Val) / r_phia3->getError());
       
-    }
+      m_fa2 = scalar->fa2->getVal();
+      m_fa2_err = scalar->fa2->getError();
+      m_fa2_pull = m_fa2_err > 0. ? (scalar->fa2->getVal() - fa2Val ) / scalar->fa2->getError() : 0.;
 
+      m_phia2 = scalar->phia2->getVal();
+      m_phia2_err = scalar->phia2->getError();
+      m_phia2_pull = m_phia2_err > 0. ? (scalar->phia2->getVal() - phia2Val ) / scalar->phia2->getError() : 0.;
+
+      m_fa3 = scalar->fa3->getVal();
+      m_fa3_err = scalar->fa3->getError();
+      m_fa3_pull = m_fa3_err > 0. ? (scalar->fa3->getVal() - fa3Val ) / scalar->fa3->getError() : 0.;
+
+      m_phia3 = scalar->phia3->getVal();
+      m_phia3_err = scalar->phia3->getError();
+      m_phia3_pull = m_phia3_err > 0. ? (scalar->phia3->getVal() - phia3Val ) / scalar->phia3->getError() : 0.;
+      
+      m_g2Re = scalar->g2Val->getVal();
+      m_g2Re_err = scalar->g2Val->getError();
+      m_g2Re_pull = m_g2Re_err >0. ? (scalar->g2Val->getVal() - g2Re ) / scalar->g2Val->getError() : 0.;
+
+      m_g2Im = scalar->g2ValIm->getVal();
+      m_g2Im_err = scalar->g2ValIm->getError();
+      m_g2Im_pull = (scalar->g2ValIm->getVal() - g2Im ) / scalar->g2ValIm->getError();
+
+      m_g4Re = scalar->g4Val->getVal();
+      m_g4Re_err = scalar->g4Val->getError();
+      m_g4Re_pull = (scalar->g4Val->getVal() - g4Re ) / scalar->g4Val->getError();
+
+      m_g4Im = scalar->g4ValIm->getVal();
+      m_g4Im_err = scalar->g4ValIm->getError();
+      m_g4Im_pull = (scalar->g4ValIm->getVal() - g4Im ) / scalar->g4ValIm->getError();
+      
+      tree_fit->Fill();
+    }
+    
     // Save toy results
     toyresults->cd();
-    h_fa2->Write();
-    h_fa2_pull->Write();
-    h_fa3->Write();
-    h_fa3_pull->Write();
-    h_phia2->Write();
-    h_phia2_pull->Write();
-    h_phia3->Write();
-    h_phia3_pull->Write();
-
+    tree_fit->Write();
     toyresults->Close();
   }
-
+  
   // 
   // Draw projetions of the loaded data
   // 
