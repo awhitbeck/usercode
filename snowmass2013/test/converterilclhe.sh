@@ -1,6 +1,6 @@
 #!/bin/bash
 
-f=$1
+inputLHEfile=$1
 
 if [ $# == 1 ] 
     then 
@@ -10,16 +10,13 @@ if [ $# == 1 ]
     applySmear=$2
     fi
 
-fr="${f%.*}"
-ff="${f%.*}_${applySmear}.txt"
-echo $f, $ff
+outputTXT="${inputLHEfile%.*}_${applySmear}"
+echo "Input LHE file: "$inputLHEfile
+echo "Processed text file: "$outputTXT".txt"
 
-awk '/<event>/,/LesHouchesEvents>/' $f | grep -iv "<event>" | grep -iv "</event>" | grep -iv "</LesHouchesEvents>" | grep -iv " -11   -1"  | grep -iv "11   -1" | grep -iv "23    2" | grep -iv "25    2" | grep -iv "23    0" | grep -iv "25    0" > $ff
+awk '/<event>/,/LesHouchesEvents>/' $inputLHEfile | grep -iv "<event>" | grep -iv "</event>" | grep -iv "</LesHouchesEvents>" | grep -iv " -11   -1"  | grep -iv "11   -1" | grep -iv "23    2" | grep -iv "25    2" | grep -iv "23    0" | grep -iv "25    0" > $outputTXT".txt"
 
-frt='"'"${ff%.txt}"'"'
-echo $frt
-
-root -l -q -b "readOutAngles_ILC.C(${frt},false)"
+root -l -n -q "readOutAngles_ILC.C+(\"${outputTXT}\",false)"
 
 
 echo "done"

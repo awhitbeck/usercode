@@ -35,6 +35,8 @@ void readOutAngles_ILC(std::string filename, bool debug = false) {
     Float_t m_zhmass, m_zmass, m_hmass;
     Float_t m_ptlplus, m_etalplus, m_philplus;
     Float_t m_ptlminus, m_etalminus, m_philminus;
+    Float_t m_ptb, m_etab, m_phib;
+    Float_t m_ptbbar, m_etabbar, m_phibbar;
     Float_t m_wt; 
 
     
@@ -55,6 +57,15 @@ void readOutAngles_ILC(std::string filename, bool debug = false) {
     tree->Branch("ptlminus"     , &m_ptlminus, "ptlminus/F");
     tree->Branch("etalminus"    , &m_etalminus,"etalminus/F");
     tree->Branch("philminus"    , &m_philminus,"philminus/F");
+
+    tree->Branch("ptb"     , &m_ptb, "ptb/F");
+    tree->Branch("etab"    , &m_etab,"etab/F");
+    tree->Branch("phib"    , &m_phib,"phib/F");
+
+    tree->Branch("ptbbar"     , &m_ptbbar, "ptbbar/F");
+    tree->Branch("etabbar"    , &m_etabbar,"etabbar/F");
+    tree->Branch("phibbar"    , &m_phibbar,"phibbar/F");
+
     tree->Branch("wt"           , &m_wt, "wt/F");
 
         
@@ -67,7 +78,8 @@ void readOutAngles_ILC(std::string filename, bool debug = false) {
     double weight, m_V, alpha_qed, alpha_s; 
     // has to use double as some weight is E-38, which exceeds the float
 
-    while (!fin.eof() && fin.good()){
+    //    while (!fin.eof() && fin.good()){
+    while (true) {
 
       fin  >> nparticle >> para >> weight >> m_V >> alpha_qed >> alpha_s; 
       if ( debug ) 
@@ -86,6 +98,7 @@ void readOutAngles_ILC(std::string filename, bool debug = false) {
 	if ( debug ) 
 	  std::cout << "\n";
       }
+      if(fin.eof()) break;
       
       // assign the p4 from the text file
       TLorentzVector p_lplus;
@@ -96,16 +109,16 @@ void readOutAngles_ILC(std::string filename, bool debug = false) {
       for ( int a = 0; a < 4; a++ ) {
 	
 	if ( idup[a] == -11 || idup[a] == -13  || idup[a] == -15 ) 		
-	  p_lplus = new TLorentzVector(pup[a][0], pup[a][1], pup[a][2], pup[a][3]);
+	  p_lplus.SetPxPyPzE(pup[a][0], pup[a][1], pup[a][2], pup[a][3]);
 
 	if ( idup[a] == 11 || idup[a] == 13  || idup[a] == 15 ) 		
-	  p_lminus = new TLorentzVector(pup[a][0], pup[a][1], pup[a][2], pup[a][3]);
+	  p_lminus.SetPxPyPzE(pup[a][0], pup[a][1], pup[a][2], pup[a][3]);
 	
 	if ( idup[a] == 5 ) 
-	  p_b = new TLorentzVector(pup[a][0], pup[a][1], pup[a][2], pup[a][3]);
+	  p_b.SetPxPyPzE(pup[a][0], pup[a][1], pup[a][2], pup[a][3]);
 	
 	if ( idup[a] == -5 ) 
-	  p_bbar = new TLorentzVector(pup[a][0], pup[a][1], pup[a][2], pup[a][3]);
+	  p_bbar.SetPxPyPzE(pup[a][0], pup[a][1], pup[a][2], pup[a][3]);
       }
 
       TLorentzVector pZ = p_lplus + p_lminus;
@@ -144,6 +157,14 @@ void readOutAngles_ILC(std::string filename, bool debug = false) {
       m_etalminus = p_lminus.Eta();
       m_philminus = p_lminus.Phi();
       
+      m_ptb = p_b.Pt();
+      m_etab = p_b.Eta();
+      m_phib = p_b.Phi();
+
+      m_ptbbar = p_bbar.Pt();
+      m_etabbar = p_bbar.Eta();
+      m_phibbar = p_bbar.Phi();
+
       m_wt = weight;
       
       tree->Fill();
