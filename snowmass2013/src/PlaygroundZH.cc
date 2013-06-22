@@ -120,7 +120,7 @@ public:
 
       for(int iEvent=0; iEvent<nEvents; iEvent++){
 
-	if(debug) cout << "generating event: " << iEvent << " embedTracker: " << embedTracker << endl;
+	// if(debug) cout << "generating event: " << iEvent << " embedTracker: " << embedTracker << endl;
 	tempEvent = (RooArgSet*) data->get(embedTracker);
 	toyData->add(*tempEvent);
 	embedTracker++;
@@ -188,13 +188,20 @@ public:
   }
 
 
-void calcfractionphase(double g1Re,  double g1Im,  double g2Re,   double g2Im,  double g4Re,  double g4Im, 
+void calcfractionphase(double sqrts, double g1Re,  double g1Im,  double g2Re,   double g2Im,  double g4Re,  double g4Im, 
 		       double & fa2, double & fa3, double & phia2, double & phia3) 
   {
     // ILC numbers at 250 GeV at mH= 125 GeV (narrow Z width approximation)
     Double_t sigma1_e = 0.981396; // was 0.94696 at 126 GeV
     Double_t sigma2_e = 33.4674;  // was 32.1981 at 126 GeV
     Double_t sigma4_e = 7.9229;   // was 7.45502 at 126 GeV
+    
+    // ILC numbers at 500 GeV with mH = 125 GeV ( narrow Z width approximation) 
+    if ( sqrts == 500. ) {
+      sigma1_e = 2.57246; 
+      sigma2_e = 516.556;  
+      sigma4_e = 414.378;
+    }
     
     Double_t g1 = sqrt(g1Re*g1Re + g1Im*g1Im);
     Double_t g2 = sqrt(g2Re*g2Re + g2Im*g2Im);

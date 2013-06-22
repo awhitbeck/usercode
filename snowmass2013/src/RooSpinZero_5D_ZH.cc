@@ -159,6 +159,14 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
       Double_t sigma1_e = 0.981396; // was 0.94696 at 126 GeV
       Double_t sigma2_e = 33.4674;  // was 32.1981 at 126 GeV
       Double_t sigma4_e = 7.9229;   // was 7.45502 at 126 GeV
+
+      // ILC numbers at 500 GeV with mH = 125 GeV ( narrow Z width approximation) 
+      if ( sqrts == 500. ) {
+	sigma1_e = 2.57246; 
+	sigma2_e = 516.556;  
+	sigma4_e = 414.378;
+      }
+      
       
       double g1Mag = 1.;
       double g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma1_e/sigma2_e); 
@@ -173,7 +181,6 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
       g4   = - g4Mag*cos(phia3);
       g4Im = - g4Mag*sin(phia3);
 
-      
     }else if(parameterization==kRealImag_Gs){
 
       g1   =  g1Val;
@@ -243,14 +250,14 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
 
 Int_t RooSpinZero_5D_ZH::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const
 {
-  
+
   if (matchArgs(allVars,analVars,RooArgSet(*h1.absArg(),*h2.absArg(),*hs.absArg(),*Phi1.absArg(),*Phi.absArg()))) return 6 ;
   if (matchArgs(allVars,analVars,h1,h2,Phi1,Phi)) return 1 ;
   if (matchArgs(allVars,analVars,h1,h2,hs,Phi1)) return 5 ;
   if (matchArgs(allVars,analVars,h1,hs,Phi1,Phi)) return 3 ;
   if (matchArgs(allVars,analVars,h2,hs,Phi1,Phi)) return 4 ;
   if (matchArgs(allVars,analVars,h1,h2,hs,Phi)) return 2 ;
-  
+
   return 0 ;
 }
 
@@ -295,6 +302,13 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
        Double_t sigma2_e = 33.4674;  // was 32.1981 at 126 GeV
        Double_t sigma4_e = 7.9229;   // was 7.45502 at 126 GeV
        
+       // ILC numbers at 500 GeV with mH = 125 GeV ( narrow Z width approximation) 
+       if ( sqrts == 500. ) {
+	 sigma1_e = 2.57246; 
+	 sigma2_e = 516.556;  
+	 sigma4_e = 414.378;
+       }
+
        double g1Mag = 1.;
        double g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma1_e/sigma2_e); 
        double g4Mag = sqrt(fa3/(1.-fa2-fa3))*sqrt(sigma1_e/sigma4_e); 
