@@ -1,7 +1,7 @@
 #ifndef SCALAR_PDF_FACTORY
 #define SCALAR_PDF_FACTORY
 
-#include "RooSpinZero_5D_ZH.h"
+#include "RooSpinZero_3D_ZH.h"
 #include "RooRealVar.h"
 #include "TF1.h"
 #include "TMath.h"
@@ -37,11 +37,11 @@ public:
   RooRealVar* R1Val;
   RooRealVar* R2Val;
 
-  RooSpinZero_5D_ZH* PDF;
+  RooSpinZero_3D_ZH* PDF;
 
   ScalarPdfFactoryZH(){};
     
-  ScalarPdfFactoryZH(RooRealVar* h1,RooRealVar* h2,RooRealVar* hs,RooRealVar* Phi,RooRealVar* Phi1, RooRealVar* mX, int para) {
+  ScalarPdfFactoryZH(RooRealVar* h1,RooRealVar* h2,RooRealVar* Phi, RooRealVar* mX, int para) {
 
 
     // Parameters
@@ -75,7 +75,7 @@ public:
     R1Val  = new RooRealVar("R1Val","R1Val",0.15);
     R2Val  = new RooRealVar("R2Val","R2Val",0.15);
 
-    PDF = new RooSpinZero_5D_ZH("PDF","PDF",*h1,*h2,*hs,*Phi,*Phi1,*sqrts,*mX,*mZ,*R1Val,*R2Val,parameterization,*a1Val,*phi1Val,*a2Val,*phi2Val,*a3Val,*phi3Val,*g1Val,*g2Val,*g3Val,*g4Val,*g1ValIm,*g2ValIm,*g3ValIm,*g4ValIm,*fa2,*fa3,*phia2,*phia3);
+    PDF = new RooSpinZero_3D_ZH("PDF","PDF",*h1,*h2,*Phi,*sqrts,*mX,*mZ,*R1Val,*R2Val,parameterization,*a1Val,*phi1Val,*a2Val,*phi2Val,*a3Val,*phi3Val,*g1Val,*g2Val,*g3Val,*g4Val,*g1ValIm,*g2ValIm,*g3ValIm,*g4ValIm,*fa2,*fa3,*phia2,*phia3);
 
   };
 
