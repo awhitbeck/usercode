@@ -5,7 +5,7 @@
 
 using namespace PlaygroundZHhelpers;
 
-void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
+void testfitilc(bool pureToys=false, int ntoysperjob = 500, int seed_index=2) {
 
   //   gROOT->ProcessLine(".x  loadLib.C");
   
@@ -25,8 +25,9 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
   bool dotoys = true;
 
   float mH = 125.;
-  TString modeName = Form("g1_p_g4_1M");
-  TString fileName = Form("data/Events_20130618/unweighted_unpol_%s_false.root", modeName.Data());
+  float sqrtsVal = 500.;
+  TString modeName = Form("model7_500GeV_1M");
+  TString fileName = Form("Events_20130620/unweighted_unpol_%s_false.root", modeName.Data());
   TString treeName = "SelectedTree";
   
   double g1Re = 1;
@@ -35,7 +36,7 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
   double g2Im = 0.;
   double g3Re = 0.;
   double g3Im = 0.;
-  double g4Re = 0.83265;
+  double g4Re = 2.62636E-02;// 0.117316;
   double g4Im = 0.; //
 
   // below will be recalculated once Playground is defined
@@ -52,10 +53,11 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
   if ( loadData ) 
     test.loadTree(fileName, treeName);
   if(debug) cout << test.data << endl;
-  test.calcfractionphase(g1Re, g1Im, g2Re, g2Im, g4Re, g4Im, fa2Val, fa3Val, phia2Val, phia3Val);
+  test.calcfractionphase(sqrtsVal, g1Re, g1Im, g2Re, g2Im, g4Re, g4Im, fa2Val, fa3Val, phia2Val, phia3Val);
   
   ScalarPdfFactoryZH *scalar = test.scalar;
-
+  scalar->sqrts->setVal(sqrtsVal);
+  scalar->sqrts->setConstant(kTRUE);
   // 
   //cout << "define the parameters to be fitted and the initial values" << endl;
   // 
@@ -109,8 +111,8 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
 
   if ( dotoys ) {
     
-    float lumi = 2000; // in unit of fb
-    float nsignalperfb = 8; 
+    float lumi = 500; // in unit of fb
+    float nsignalperfb = 8./3.; 
     
     TFile *toyresults = new TFile(Form("toyresults_%i.root", random_seed), "RECREATE");
     gROOT->cd();
@@ -237,22 +239,16 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
 
   if ( drawprojections ) {
 
-    TCanvas *c1 = new TCanvas("c1","c1",1000, 800);
-    c1->Divide(3,2);
-
+    TCanvas *c1 = new TCanvas("c1","c1",1500, 500);
+    c1->Divide(3,1);
+    
     c1->cd(1);
-    test.projectPDF(kcosthetastar, 20, testsingletoy);
-    
-    c1->cd(2);
-    test.projectPDF(kphi1, 20, testsingletoy);
-    
-    c1->cd(4);
     test.projectPDF(kcostheta1, 20, testsingletoy);
     
-    c1->cd(5);
+    c1->cd(2);
     test.projectPDF(kcostheta2, 20, testsingletoy);
     
-    c1->cd(6);
+    c1->cd(3);
     test.projectPDF(kphi, 20, testsingletoy);
 
     TString fitName = "nofit";
