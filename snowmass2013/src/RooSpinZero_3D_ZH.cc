@@ -52,7 +52,8 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
 				      RooAbsReal& _fa2,
 				      RooAbsReal& _fa3,
 				      RooAbsReal& _phia2,
-				      RooAbsReal& _phia3 ):
+				      RooAbsReal& _phia3,
+				      bool      _withAcc):
    RooAbsPdf(name,title), 
    h1("h1","h1",this,_h1),
    h2("h2","h2",this,_h2),
@@ -80,7 +81,8 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
    fa2("fa2","fa2",this,_fa2),
    fa3("fa3","fa3",this,_fa3),
    phia2("phia2","phia2",this,_phia2),
-   phia3("phia3","phia3",this,_phia3)
+   phia3("phia3","phia3",this,_phia3),
+   withAcc(_withAcc)
  { 
  } 
 
@@ -113,7 +115,8 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
    fa2("fa2",this,other.fa2),
    fa3("fa3",this,other.fa3),
    phia2("phia2",this,other.phia2),
-   phia3("phia3",this,other.phia3)
+   phia3("phia3",this,other.phia3),
+   withAcc(other.withAcc)
  { 
  } 
 
@@ -170,11 +173,12 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
    eta_minus = lepM4vec.Eta();
    pt_plus = lepP4vec.Pt();
    eta_plus = lepP4vec.Eta();
-   /*
-   if(pt_minus<5.0 || pt_plus<5.0 || 
-      eta_minus>2.4 || eta_plus>2.4 || 
-      eta_minus<-2.4 || eta_plus<-2.4 ) return 0.0;
-   */
+
+   if ( withAcc ) {
+     if( pt_minus<5.0 || pt_plus<5.0 
+	 || eta_minus>2.4 || eta_plus>2.4
+	 || eta_minus<-2.4 || eta_plus<-2.4 ) return 0.0;
+   }
    //-------------------------------------------------
 
    // below calcualtions are based on the H->ZZ amplitudes 
@@ -295,11 +299,12 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
 Int_t RooSpinZero_3D_ZH::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const
 {
 
-  if (matchArgs(allVars,analVars,RooArgSet(*h1.absArg(),*h2.absArg(),*Phi.absArg()))) return 4 ;
-  if (matchArgs(allVars,analVars,h1,h2)) return 1 ;
-  if (matchArgs(allVars,analVars,h1,Phi)) return 2 ;
-  if (matchArgs(allVars,analVars,h2,Phi)) return 3 ;
-
+  if ( !withAcc ) {
+    if (matchArgs(allVars,analVars,RooArgSet(*h1.absArg(),*h2.absArg(),*Phi.absArg()))) return 4 ;
+    if (matchArgs(allVars,analVars,h1,h2)) return 1 ;
+    if (matchArgs(allVars,analVars,h1,Phi)) return 2 ;
+    if (matchArgs(allVars,analVars,h2,Phi)) return 3 ;
+  }
   return 0 ;
 }
 

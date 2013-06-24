@@ -43,7 +43,8 @@ public:
 		    RooAbsReal& _fa2,
 		    RooAbsReal& _fa3,
 		    RooAbsReal& _phia2,
-		    RooAbsReal& _phia3);
+		    RooAbsReal& _phia3,
+		    bool  _withAcc);
 		    
   RooSpinZero_3D_ZH(const RooSpinZero_3D_ZH& other, const char* name=0) ;
   virtual TObject* clone(const char* newname) const { return new RooSpinZero_3D_ZH(*this,newname); }
@@ -82,7 +83,8 @@ protected:
   RooRealProxy fa3;
   RooRealProxy phia2;
   RooRealProxy phia3;
-
+  bool withAcc;
+  
     
   Double_t evaluate() const ;
 

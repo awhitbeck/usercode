@@ -36,7 +36,7 @@ public:
   RooDataSet* toyData;
   int embedTracker;
 
-  PlaygroundZH(double mH, bool debug_=false, int parameterization_=2){
+  PlaygroundZH(double mH, bool debug_=false, int parameterization_=2, bool withAcc_=false){
     
     debug=debug_;
 
@@ -52,7 +52,7 @@ public:
     varContainer.push_back(costheta2);
     varContainer.push_back(phi);
 
-    scalar = new ScalarPdfFactoryZH(costheta1,costheta2,phi,mX,parameterization_);
+    scalar = new ScalarPdfFactoryZH(costheta1,costheta2,phi,mX,parameterization_,withAcc_);
 
     scalar->makeParamsConst(true);
 
