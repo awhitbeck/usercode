@@ -6,11 +6,14 @@
 
  // Your description goes here... 
 
- #include "Riostream.h" 
+#include "Riostream.h" 
 
- #include "RooSpinZero_3D_ZH.h" 
- #include "RooAbsReal.h" 
- #include "RooAbsCategory.h" 
+#include "RooSpinZero_3D_ZH.h" 
+#include "RooAbsReal.h" 
+#include "RooAbsCategory.h" 
+
+#include "TLorentzRotation.h"
+#include "TLorentzVector.h"
 
 #include <math.h>
 #include "TMath.h"
@@ -126,6 +129,50 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
       // http://prd.aps.org/pdf/PRD/v49/i1/p79_1
    // Double_t f00 = gamma*gamma/(2+gamma*gamma);
 
+
+   // check whether event is in acceptance or not
+
+   double pt_plus, pt_minus;
+   double eta_plus, eta_minus;
+    
+   float pZsquare = (sqrts*sqrts+mZ*mZ-mH*mH)*(sqrts*sqrts+mZ*mZ-mH*mH)/(2*sqrts)/(2*sqrts) - mZ*mZ;
+   float pZ = sqrt(pZsquare);
+   
+   float plep = mZ/2.;
+   
+   float gammaZ = sqrt(mZ*mZ+pZ*pZ)/mZ;
+   float betaZ  = sqrt(1-1/(gammaZ*gammaZ));
+   
+   TLorentzVector Z4vec(gammaZ*mZ*betaZ*sqrt(1-h1*h1),
+			0.0,
+			gammaZ*mZ*betaZ*h1,
+			gammaZ*mZ);
+   
+   TLorentzVector lepM4vec(.5*mZ*cos(Phi)*sqrt(1-h2*h2),
+			   .5*mZ*sin(Phi)*sqrt(1-h2*h2),
+			   .5*mZ*h2,
+			   .5*mZ);
+   
+   TLorentzVector lepP4vec(-.5*mZ*cos(Phi)*sqrt(1-h2*h2),
+			   -.5*mZ*sin(Phi)*sqrt(1-h2*h2),
+			   -.5*mZ*h2,
+			   .5*mZ);
+    
+   TLorentzRotation ZToZ;
+   
+   ZToZ.Boost(0,0,betaZ);
+   ZToZ.RotateY(-TMath::Pi()/2.+h1);
+   
+   lepP4vec = ZToZ*lepP4vec;
+   lepM4vec = ZToZ*lepM4vec;
+
+   pt_minus = lepM4vec.Pt();
+   eta_minus = lepM4vec.Eta();
+   pt_plus = lepP4vec.Pt();
+   eta_plus = lepP4vec.Eta();
+   
+   if(pt_minus<5.0 || pt_plus<5.0 || abs(eta_minus)>2.4 || abs(eta_plus)>2.4) return 0.0;
+   //-------------------------------------------------
 
    // below calcualtions are based on the H->ZZ amplitudes 
    double s=-(mX*mX-sqrts*sqrts-mZ*mZ)/2.;
