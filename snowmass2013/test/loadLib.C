@@ -11,6 +11,7 @@
 
   // tools for ILC studies 
   gROOT->LoadMacro("../src/RooSpinZero_5D_ZH.cc+");
+  gROOT->LoadMacro("../src/RooSpinZero_3D_ZH.cc+");
   gROOT->LoadMacro("../src/ScalarPdfFactoryZH.cc+");
   gROOT->LoadMacro("../src/PlaygroundZH.cc+");
 
