@@ -11,10 +11,13 @@
 #include "TTree.h"
 #include "TRandom.h"
 #include "TLorentzVector.h"
+#include "TLorentzRotation.h"
 
 using namespace std;
 
 void calculateAngles(TLorentzVector p4H, TLorentzVector p4Z1, TLorentzVector p4M11, TLorentzVector p4M12, TLorentzVector p4Z2, TLorentzVector p4M21, TLorentzVector p4M22, double& costheta1, double& costheta2, double& phi, double& costhetastar, double& phistar1, double& phistar2, double& phistar12, double& phi1, double& phi2);
+
+vector<TLorentzVector> Calculate4Momentum(float Mx,float M1,float M2,float theta,float theta1,float theta2,float _Phi1_,float _Phi_); 
 
 void readOutAngles_ILC(std::string filename, bool debug = false) {
   
@@ -39,6 +42,8 @@ void readOutAngles_ILC(std::string filename, bool debug = false) {
     Float_t m_ptbbar, m_etabbar, m_phibbar;
     Float_t m_wt; 
 
+    Float_t ptlminus_ALT,ptlplus_ALT;
+    Float_t etalminus_ALT,etalplus_ALT;
     
     tree->Branch("ZHMass", &m_zhmass, "ZHMass/F");
     tree->Branch("ZMass",  &m_zmass,  "ZMass/F");
@@ -58,6 +63,11 @@ void readOutAngles_ILC(std::string filename, bool debug = false) {
     tree->Branch("etalminus"    , &m_etalminus,"etalminus/F");
     tree->Branch("philminus"    , &m_philminus,"philminus/F");
 
+    tree->Branch("ptlplus_ALT"     , &ptlplus_ALT, "ptlplus_ALT/F");
+    tree->Branch("ptlminus_ALT"     , &ptlminus_ALT, "ptlminus_ALT/F");
+    tree->Branch("etalplus_ALT"     , &etalplus_ALT, "etalplus_ALT/F");
+    tree->Branch("etalminus_ALT"     , &etalminus_ALT, "etalminus_ALT/F");
+    
     tree->Branch("ptb"     , &m_ptb, "ptb/F");
     tree->Branch("etab"    , &m_etab,"etab/F");
     tree->Branch("phib"    , &m_phib,"phib/F");
@@ -166,7 +176,14 @@ void readOutAngles_ILC(std::string filename, bool debug = false) {
       m_phibbar = p_bbar.Phi();
 
       m_wt = weight;
+
+      vector<TLorentzVector> lep_4vec = Calculate4Momentum(m_zhmass,91.188,125.,acos(m_costheta1),acos(m_costheta2),acos(0),m_phi,0);
       
+      ptlminus_ALT = lep_4vec[0].Pt();
+      ptlplus_ALT = lep_4vec[1].Pt();
+      etalminus_ALT = lep_4vec[0].Eta();
+      etalplus_ALT = lep_4vec[1].Eta();
+
       tree->Fill();
 			  
       // counter
@@ -326,6 +343,68 @@ void calculateAngles(TLorentzVector thep4H, TLorentzVector thep4Z1, TLorentzVect
   else if (phistar12_0 < (-1.)*TMath::Pi()) phistar12 = phistar12_0 + 2*TMath::Pi();
   else phistar12 = phistar12_0;
 	
+}
+
+vector<TLorentzVector> Calculate4Momentum(float Mx,float M1,float M2,float theta,float theta1,float theta2,float _Phi1_,float _Phi_)
+{
+
+  float phi1,phi2;
+  phi1=TMath::Pi()-_Phi1_;
+  phi2=_Phi1_+_Phi_;
+    
+    
+  float gamma1,gamma2,beta1,beta2;
+    
+  gamma1=(Mx*Mx+M1*M1-M2*M2)/(2*Mx*M1);
+  gamma2=(Mx*Mx-M1*M1+M2*M2)/(2*Mx*M2);
+  beta1=sqrt(1-1/(gamma1*gamma1));
+  beta2=sqrt(1-1/(gamma2*gamma2));
+    
+  //gluon 4 vectors
+  TLorentzVector p1CM(0,0,Mx/2,Mx/2);
+  TLorentzVector p2CM(0,0,-Mx/2,Mx/2);
+    
+  //vector boson 4 vectors
+  TLorentzVector kZ1(gamma1*M1*sin(theta)*beta1,0, gamma1*M1*cos(theta)*beta1,gamma1*M1*1);   
+  TLorentzVector kZ2(-gamma2*M2*sin(theta)*beta2,0, -gamma2*M2*cos(theta)*beta2,gamma2*M2*1);
+    
+  //Rotation and Boost matrices. Note gamma1*beta1*M1=gamma2*beta2*M2.
+    
+  TLorentzRotation Z1ToZ,Z2ToZ;
+    
+  Z1ToZ.Boost(0,0,beta1);
+  Z2ToZ.Boost(0,0,beta2);
+  Z1ToZ.RotateY(theta);
+  Z2ToZ.RotateY(TMath::Pi()+theta);
+
+  //fermons 4 vectors in vector boson rest frame
+    
+  TLorentzVector p3Z1((M1/2)*sin(theta1)*cos(phi1),(M1/2)*sin(theta1)*sin(phi1),(M1/2)*cos(theta1),(M1/2)*1);
+       
+  TLorentzVector p4Z1(-(M1/2)*sin(theta1)*cos(phi1),-(M1/2)*sin(theta1)*sin(phi1),-(M1/2)*cos(theta1),(M1/2)*1);
+      
+  TLorentzVector p5Z2((M2/2)*sin(theta2)*cos(phi2),(M2/2)*sin(theta2)*sin(phi2),(M2/2)*cos(theta2),(M2/2)*1);
+    
+  TLorentzVector p6Z2(-(M2/2)*sin(theta2)*cos(phi2),-(M2/2)*sin(theta2)*sin(phi2),-(M2/2)*cos(theta2),(M2/2)*1);
+      
+
+  // fermions 4 vectors in CM frame
+    
+  TLorentzVector p3CM,p4CM,p5CM,p6CM;
+    
+  p3CM=Z1ToZ*p3Z1;
+  p4CM=Z1ToZ*p4Z1;
+  p5CM=Z2ToZ*p5Z2;
+  p6CM=Z2ToZ*p6Z2;
+
+  vector<TLorentzVector> p;
+    
+  p.push_back(p3CM);
+  p.push_back(p4CM);
+  p.push_back(p5CM);
+  p.push_back(p6CM);
+
+  return p;
 }
 
 
