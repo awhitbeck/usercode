@@ -135,7 +135,7 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
    double pt_plus, pt_minus;
    double eta_plus, eta_minus;
     
-   float pZsquare = (sqrts*sqrts+mZ*mZ-mH*mH)*(sqrts*sqrts+mZ*mZ-mH*mH)/(2*sqrts)/(2*sqrts) - mZ*mZ;
+   float pZsquare = (sqrts*sqrts+mZ*mZ-mX*mX)*(sqrts*sqrts+mZ*mZ-mX*mX)/(2*sqrts)/(2*sqrts) - mZ*mZ;
    float pZ = sqrt(pZsquare);
    
    float plep = mZ/2.;
@@ -171,7 +171,9 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
    pt_plus = lepP4vec.Pt();
    eta_plus = lepP4vec.Eta();
    
-   if(pt_minus<5.0 || pt_plus<5.0 || abs(eta_minus)>2.4 || abs(eta_plus)>2.4) return 0.0;
+   if(pt_minus<5.0 || pt_plus<5.0 || 
+      eta_minus>2.4 || eta_plus>2.4 || 
+      eta_minus<-2.4 || eta_plus<-2.4 ) return 0.0;
    //-------------------------------------------------
 
    // below calcualtions are based on the H->ZZ amplitudes 
