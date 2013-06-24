@@ -20,13 +20,13 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 500, int seed_index=2) {
   // 
   bool loadData = true;
   bool fitData = false;
-  bool drawprojections = false;
+  bool drawprojections = true;
   bool testsingletoy = false;
-  bool dotoys = true;
+  bool dotoys = false;
 
   float mH = 125.;
-  float sqrtsVal = 500.;
-  TString modeName = Form("model7_500GeV_1M");
+  float sqrtsVal = 250.;
+  TString modeName = Form("model6_250GeV_1M");
   TString fileName = Form("Events_20130620/unweighted_unpol_%s_false.root", modeName.Data());
   TString treeName = "SelectedTree";
   
@@ -36,7 +36,7 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 500, int seed_index=2) {
   double g2Im = 0.;
   double g3Re = 0.;
   double g3Im = 0.;
-  double g4Re = 2.62636E-02;// 0.117316;
+  double g4Re = 0.117316;// 2.62636E-02;// 0.117316;
   double g4Im = 0.; //
 
   // below will be recalculated once Playground is defined
@@ -49,7 +49,8 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 500, int seed_index=2) {
   //cout << "Get Playground class started" << endl;
   // 
   int parameterization = 2; 
-  PlaygroundZH test(mH, debug, parameterization);
+  bool withAcceptance = false;
+  PlaygroundZH test(mH, debug, parameterization, withAcceptance);
   if ( loadData ) 
     test.loadTree(fileName, treeName);
   if(debug) cout << test.data << endl;
@@ -239,8 +240,8 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 500, int seed_index=2) {
 
   if ( drawprojections ) {
 
-    TCanvas *c1 = new TCanvas("c1","c1",1500, 500);
-    c1->Divide(3,1);
+    TCanvas *c1 = new TCanvas("c1","c1",1200, 500);
+    c1->Divide(3);
     
     c1->cd(1);
     test.projectPDF(kcostheta1, 20, testsingletoy);
@@ -258,7 +259,7 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 500, int seed_index=2) {
       fitName = "toy";
 
     c1->SaveAs(Form("ilcplots/projection_%s_%s.eps", fitName.Data(), modeName.Data()));
-    c1->SaveAs(Form("ilcplots/projection_%s_%s.png", fitName.Data(), modeName.Data()));
+    c1->Print(Form("ilcplots/projection_%s_%s.png", fitName.Data(), modeName.Data()));
 
     delete c1; 
   }
