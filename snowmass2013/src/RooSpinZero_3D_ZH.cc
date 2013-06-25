@@ -135,50 +135,17 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
 
    // check whether event is in acceptance or not
 
-   double pt_plus, pt_minus;
-   double eta_plus, eta_minus;
-    
-   float pZsquare = (sqrts*sqrts+mZ*mZ-mX*mX)*(sqrts*sqrts+mZ*mZ-mX*mX)/(2*sqrts)/(2*sqrts) - mZ*mZ;
-   float pZ = sqrt(pZsquare);
+   vector<TLorentzVector> lep_4vecs = Calculate4Momentum(sqrts,mZ,mX,acos(h1),acos(h2),acos(0),Phi,0);
    
-   float plep = mZ/2.;
+   double pt_plus = lep_4vecs[1].Pt();
+   double pt_minus = lep_4vecs[0].Pt();
+   double eta_plus = lep_4vecs[1].Eta();
+   double eta_minus = lep_4vecs[0].Eta();
    
-   float gammaZ = sqrt(mZ*mZ+pZ*pZ)/mZ;
-   float betaZ  = sqrt(1-1/(gammaZ*gammaZ));
-   
-   TLorentzVector Z4vec(gammaZ*mZ*betaZ*sqrt(1-h1*h1),
-			0.0,
-			gammaZ*mZ*betaZ*h1,
-			gammaZ*mZ);
-   
-   TLorentzVector lepM4vec(.5*mZ*cos(Phi)*sqrt(1-h2*h2),
-			   .5*mZ*sin(Phi)*sqrt(1-h2*h2),
-			   .5*mZ*h2,
-			   .5*mZ);
-   
-   TLorentzVector lepP4vec(-.5*mZ*cos(Phi)*sqrt(1-h2*h2),
-			   -.5*mZ*sin(Phi)*sqrt(1-h2*h2),
-			   -.5*mZ*h2,
-			   .5*mZ);
-    
-   TLorentzRotation ZToZ;
-   
-   ZToZ.Boost(0,0,betaZ);
-   ZToZ.RotateY(-TMath::Pi()/2.+h1);
-   
-   lepP4vec = ZToZ*lepP4vec;
-   lepM4vec = ZToZ*lepM4vec;
-
-   pt_minus = lepM4vec.Pt();
-   eta_minus = lepM4vec.Eta();
-   pt_plus = lepP4vec.Pt();
-   eta_plus = lepP4vec.Eta();
-
-   if ( withAcc ) {
-     if( pt_minus<5.0 || pt_plus<5.0 
-	 || eta_minus>2.4 || eta_plus>2.4
-	 || eta_minus<-2.4 || eta_plus<-2.4 ) return 0.0;
-   }
+   if( pt_minus<5.0 || pt_plus<5.0 
+       || eta_minus>2.4 || eta_plus>2.4
+       || eta_minus<-2.4 || eta_plus<-2.4 ) return 0.0;
+ 
    //-------------------------------------------------
 
    // below calcualtions are based on the H->ZZ amplitudes 
@@ -487,6 +454,68 @@ Double_t RooSpinZero_3D_ZH::analyticalIntegral(Int_t code, const char* rangeName
      }
    assert(0) ;
    return 0 ;
+}
+
+vector<TLorentzVector> RooSpinZero_3D_ZH::Calculate4Momentum(float Mx,float M1,float M2,float theta,float theta1,float theta2,float _Phi1_,float _Phi_) const 
+{
+
+  float phi1,phi2;
+  phi1=TMath::Pi()-_Phi1_;
+  phi2=_Phi1_+_Phi_;
+    
+    
+  float gamma1,gamma2,beta1,beta2;
+    
+  gamma1=(Mx*Mx+M1*M1-M2*M2)/(2*Mx*M1);
+  gamma2=(Mx*Mx-M1*M1+M2*M2)/(2*Mx*M2);
+  beta1=sqrt(1-1/(gamma1*gamma1));
+  beta2=sqrt(1-1/(gamma2*gamma2));
+    
+  //gluon 4 vectors
+  TLorentzVector p1CM(0,0,Mx/2,Mx/2);
+  TLorentzVector p2CM(0,0,-Mx/2,Mx/2);
+    
+  //vector boson 4 vectors
+  TLorentzVector kZ1(gamma1*M1*sin(theta)*beta1,0, gamma1*M1*cos(theta)*beta1,gamma1*M1*1);   
+  TLorentzVector kZ2(-gamma2*M2*sin(theta)*beta2,0, -gamma2*M2*cos(theta)*beta2,gamma2*M2*1);
+    
+  //Rotation and Boost matrices. Note gamma1*beta1*M1=gamma2*beta2*M2.
+    
+  TLorentzRotation Z1ToZ,Z2ToZ;
+    
+  Z1ToZ.Boost(0,0,beta1);
+  Z2ToZ.Boost(0,0,beta2);
+  Z1ToZ.RotateY(theta);
+  Z2ToZ.RotateY(TMath::Pi()+theta);
+
+  //fermons 4 vectors in vector boson rest frame
+    
+  TLorentzVector p3Z1((M1/2)*sin(theta1)*cos(phi1),(M1/2)*sin(theta1)*sin(phi1),(M1/2)*cos(theta1),(M1/2)*1);
+       
+  TLorentzVector p4Z1(-(M1/2)*sin(theta1)*cos(phi1),-(M1/2)*sin(theta1)*sin(phi1),-(M1/2)*cos(theta1),(M1/2)*1);
+      
+  TLorentzVector p5Z2((M2/2)*sin(theta2)*cos(phi2),(M2/2)*sin(theta2)*sin(phi2),(M2/2)*cos(theta2),(M2/2)*1);
+    
+  TLorentzVector p6Z2(-(M2/2)*sin(theta2)*cos(phi2),-(M2/2)*sin(theta2)*sin(phi2),-(M2/2)*cos(theta2),(M2/2)*1);
+      
+
+  // fermions 4 vectors in CM frame
+    
+  TLorentzVector p3CM,p4CM,p5CM,p6CM;
+    
+  p3CM=Z1ToZ*p3Z1;
+  p4CM=Z1ToZ*p4Z1;
+  p5CM=Z2ToZ*p5Z2;
+  p6CM=Z2ToZ*p6Z2;
+
+  vector<TLorentzVector> p;
+    
+  p.push_back(p3CM);
+  p.push_back(p4CM);
+  p.push_back(p5CM);
+  p.push_back(p6CM);
+
+  return p;
 }
 
 

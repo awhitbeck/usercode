@@ -12,6 +12,8 @@
 #include "RooCategoryProxy.h"
 #include "RooAbsReal.h"
 #include "RooAbsCategory.h"
+#include "TLorentzVector.h"
+#include "TLorentzRotation.h"
  
 class RooSpinZero_3D_ZH : public RooAbsPdf {
 public:
@@ -89,6 +91,8 @@ protected:
   Double_t evaluate() const ;
 
 private:
+
+  vector<TLorentzVector> Calculate4Momentum(float Mx,float M1,float M2,float theta,float theta1,float theta2,float _Phi1_,float _Phi_) const ;
 
   ClassDef(RooSpinZero_3D_ZH,1) // Your description goes here...
 };
