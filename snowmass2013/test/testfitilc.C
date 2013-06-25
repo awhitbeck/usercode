@@ -5,25 +5,37 @@
 
 using namespace PlaygroundZHhelpers;
 
-void testfitilc(bool pureToys=false, int ntoysperjob = 500, int seed_index=2) {
+void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
 
   //   gROOT->ProcessLine(".x  loadLib.C");
   
   int random_seed = seed_index+487563; 
   RooRandom::randomGenerator()->SetSeed(random_seed);
-  bool debug = false;
+  bool debug = true;
 
   // 
   // specify inputs 
   // you need to go through these following settings and verify all the 
   // initial values
   // 
-  bool loadData = true;
+  bool loadSigData = true;
+  bool loadBkgData = true;
   bool fitData = false;
-  bool drawprojections = true;
-  bool testsingletoy = false;
-  bool dotoys = false;
+  bool drawprojections = false;
+  bool dotoys = true;
 
+  float lumi = 250.; // in unit of fb
+  float nsigperfb = 8.;
+  float nbkgperfb = 13.;
+  
+  float nsigEvents = lumi*nsigperfb; 
+  float nbkgEvents = lumi*nbkgperfb; 
+
+  if ( debug ) {
+    std::cout << "nsigEvents = " << nsigEvents << ",\t nbkgEvents = " << nbkgEvents << "\n";
+  }
+
+  
   float mH = 125.;
   float sqrtsVal = 250.;
   TString modeName = Form("model6_250GeV_1M");
@@ -44,24 +56,68 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 500, int seed_index=2) {
   double phia2Val = 0;
   double fa3Val = 0.;
   double phia3Val = 0;
-  
-  // 
-  //cout << "Get Playground class started" << endl;
-  // 
   int parameterization = 2; 
   bool withAcceptance = false;
-  PlaygroundZH test(mH, debug, parameterization, withAcceptance);
-  if ( loadData ) 
-    test.loadTree(fileName, treeName);
+  
+  // 
+  // Set up background PDF
+  // 
+  
+  RooRealVar* costheta1 = new RooRealVar("costheta1","cos#theta_{1}",0.,-1.,1.);
+  RooRealVar* costheta2 = new RooRealVar("costheta2","cos#theta_{2}",0.,-1.,1.);
+  RooRealVar* phi = new RooRealVar("phi","#Phi",0.,-TMath::Pi(),TMath::Pi());
+  
+  TChain *bkgTree = new TChain("SelectedTree");
+  bkgTree->Add("Events_20130620/llbb_bkg_250GeV_1M_false.root");
+  RooDataSet *bkgData = new RooDataSet("bkgData","bkgData",bkgTree,RooArgSet(*costheta1, *costheta2, *phi));
+  RooDataHist *bkgHist = bkgData->binnedClone(0);
+  RooHistPdf* bkgPdf = new RooHistPdf("bkgPdf", "bkgPdf", RooArgSet(*costheta1, *costheta2, *phi), *bkgHist);
+  
+
+  /*
+    h1pol2  = new RooRealVar("h1pol2","h1pol2", 1.62636, -10, 10);
+    h1pol4  = new RooRealVar("h1pol4","h1pol4", -1.985, -10, 10);
+    h1pol6  = new RooRealVar("h1pol6","h1pol6", 4.69253, -10, 10);
+    h2pol2  = new RooRealVar("h2pol2","h2pol2", 0.417, -1, 1);
+    phiconst  = new RooRealVar("phicons","phiconst", -0.0165, -1, 1);
+    twophiconst  = new RooRealVar("twophicons","twophiconst", -0.09, -1, 1);
+    
+    h1pol2->setConstant(kTRUE);
+    h1pol4->setConstant(kTRUE);
+    h1pol6->setConstant(kTRUE);
+    h2pol2->setConstant(kTRUE);
+    phiconst->setConstant(kTRUE);
+    twophiconst->setConstant(kTRUE);
+    
+    RooZZ_3D*  bkgPdf = new RooZZ_3D("bkgPdf","bkgPdf", *costheta1,*costheta2,
+    *phi,*h1pol2,*h1pol4,*h1pol6,*h2pol2,*phiconst,*twophiconst,withAcceptance);
+    */
+  
+  // 
+  // start PlaygroundZH
+  // 1) load signal and backgrounds
+  // 2) Set the correct signal parameters
+  // 
+  // 
+  
+  if ( debug ) 
+    std::cout << "Get Playground class started\n";
+  
+  PlaygroundZH test(mH, nsigEvents, nbkgEvents, debug, parameterization, withAcceptance);
+  if ( loadSigData ) 
+    test.loadSigTree(fileName, treeName);
   if(debug) cout << test.data << endl;
-  test.calcfractionphase(sqrtsVal, g1Re, g1Im, g2Re, g2Im, g4Re, g4Im, fa2Val, fa3Val, phia2Val, phia3Val);
+  if ( loadBkgData ) 
+    test.loadBkgTree("Events_20130620/llbb_bkg_250GeV_1M_false.root", treeName);
+
+  // 
+  // setting the siganl pdf
+  // 
   
   ScalarPdfFactoryZH *scalar = test.scalar;
   scalar->sqrts->setVal(sqrtsVal);
   scalar->sqrts->setConstant(kTRUE);
-  // 
-  //cout << "define the parameters to be fitted and the initial values" << endl;
-  // 
+  test.calcfractionphase(sqrtsVal, g1Re, g1Im, g2Re, g2Im, g4Re, g4Im, fa2Val, fa3Val, phia2Val, phia3Val);
 
   if ( parameterization == 2 ) {
     
@@ -98,22 +154,16 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 500, int seed_index=2) {
     
   }
   
+
   if ( fitData ) { 
-    RooFitResult *fitresults = test.fitData();
+    RooFitResult *fitresults = test.fitData(scalar->PDF, bkgPdf);
   }
   
-  if ( testsingletoy ) {
-    int nEvents = 2000;
-    if(test.generate(nEvents, true)!=kNoError) break;
-  }
   // 
   // Do puretoy experiments 
   // 
 
   if ( dotoys ) {
-    
-    float lumi = 500; // in unit of fb
-    float nsignalperfb = 8./3.; 
     
     TFile *toyresults = new TFile(Form("toyresults_%i.root", random_seed), "RECREATE");
     gROOT->cd();
@@ -129,6 +179,10 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 500, int seed_index=2) {
     Float_t m_g2Im, m_g2Im_err, m_g2Im_pull;
     Float_t m_g4Re, m_g4Re_err, m_g4Re_pull;
     Float_t m_g4Im, m_g4Im_err, m_g4Im_pull;
+
+    Float_t m_nsig, m_nsig_err, m_nsig_pull;
+    Float_t m_nbkg, m_nbkg_err, m_nbkg_pull;
+
 	
     tree_fit->Branch("fa2",        &m_fa2,        "fa2/F");
     tree_fit->Branch("fa2_err",    &m_fa2_err,    "fa2_err/F");
@@ -162,6 +216,14 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 500, int seed_index=2) {
     tree_fit->Branch("g4Im_err",   &m_g4Im_err,   "g4Im_err/F");
     tree_fit->Branch("g4Im_pull",  &m_g4Im_pull,  "g4Im_pull/F");
 
+    tree_fit->Branch("nsig",       &m_nsig,       "nsig/F");
+    tree_fit->Branch("nsig_err",   &m_nsig_err,   "nsig_err/F");
+    tree_fit->Branch("nsig_pull",  &m_nsig_pull,  "nsig_pull/F");
+
+    tree_fit->Branch("nbkg",       &m_nbkg,       "nbkg/F");
+    tree_fit->Branch("nbkg_err",   &m_nbkg_err,   "nbkg_err/F");
+    tree_fit->Branch("nbkg_pull",  &m_nbkg_pull,  "nbkg_pull/F");
+    
     // do toys
     for (int i = 0; i < ntoysperjob; i++) {
       if  ( i%100 == 0 ) {
@@ -172,11 +234,13 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 500, int seed_index=2) {
       scalar->fa3->setVal(fa3Val);
       scalar->phia2->setVal(phia2Val);
       scalar->phia3->setVal(phia3Val);
+      test.nsig->setVal(lumi*nsigperfb);
+      test.nbkg->setVal(lumi*nbkgperfb);
       
-      if(test.generate(lumi*nsignalperfb, pureToys)!=kNoError) break;
+      if(test.generate(scalar->PDF, bkgPdf, pureToys)!=kNoError) break;
 
-      RooFitResult *toyfitresults = test.fitData(true,-1);
-      
+      RooFitResult *toyfitresults = test.fitData(scalar->PDF, bkgPdf, true, -1);
+
       if ( debug ) {
 	std::cout << "toy trial " << i << "\n"; 
 	if ( parameterization == 2 ) {
@@ -191,6 +255,9 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 500, int seed_index=2) {
 	  std::cout << "Re(g4) = " << scalar->g4Val->getVal() << "+/-" << scalar->g4Val->getError() << "\n";
 	  std::cout << "Im(g4) = " << scalar->g4ValIm->getVal() << "+/-" << scalar->g4ValIm->getError() << "\n";
 	}
+	std::cout << "nsig = " << test.nsig->getVal() << " +/- " << test.nsig->getError() << "\n";
+	std::cout << "nbkg = " << test.nbkg->getVal() << " +/- " << test.nbkg->getError() << "\n";
+
       }
       
       m_fa2 = scalar->fa2->getVal();
@@ -224,6 +291,15 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 500, int seed_index=2) {
       m_g4Im = scalar->g4ValIm->getVal();
       m_g4Im_err = scalar->g4ValIm->getError();
       m_g4Im_pull = (scalar->g4ValIm->getVal() - g4Im ) / scalar->g4ValIm->getError();
+
+      m_nsig = test.nsig->getVal();
+      m_nsig_err = test.nsig->getError();
+      m_nsig_pull = (test.nsig->getVal() - nsigEvents ) / test.nsig->getError();
+
+      m_nbkg = test.nbkg->getVal();
+      m_nbkg_err = test.nbkg->getError();
+      m_nbkg_pull = (test.nbkg->getVal() - nbkgEvents ) / test.nbkg->getError();
+
       
       tree_fit->Fill();
     }
@@ -244,13 +320,13 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 500, int seed_index=2) {
     c1->Divide(3);
     
     c1->cd(1);
-    test.projectPDF(kcostheta1, 20, testsingletoy);
+    test.projectPDF(kcostheta1, scalar->PDF, bkgPdf, 20, dotoys);
     
     c1->cd(2);
-    test.projectPDF(kcostheta2, 20, testsingletoy);
+    test.projectPDF(kcostheta2, scalar->PDF, bkgPdf, 20, dotoys);
     
     c1->cd(3);
-    test.projectPDF(kphi, 20, testsingletoy);
+    test.projectPDF(kphi, scalar->PDF, bkgPdf, 20, dotoys);
 
     TString fitName = "nofit";
     if ( fitData ) 
