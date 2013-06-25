@@ -7,10 +7,14 @@
 #include "TMath.h"
 #include "TChain.h"
 #include "vector"
+#include "RooAddPdf.h"
+// PDFs
+#include "RooZZ_3D.h"
+
 
 namespace PlaygroundZHhelpers{
 
-  enum ERRORcode {kNoError,kFileLoadFailure,kNotEnoughEvents,kDataEmpty};
+  enum ERRORcode {kNoError,kFileLoadFailure,kNotEnoughEvents,kDataEmpty,kNoPdf};
   enum varList {kcostheta1,kcostheta2,kphi};
 }
 
@@ -25,7 +29,6 @@ public:
   RooRealVar* costheta1;
   RooRealVar* costheta2;  
   RooRealVar* phi;
-
   RooRealVar* mX;
 
   vector<RooRealVar*> varContainer;
@@ -33,21 +36,38 @@ public:
   ScalarPdfFactoryZH* scalar;
 
   RooDataSet* data;
+  RooDataSet* sigData;
+  RooDataSet* bkgData; 
   RooDataSet* toyData;
-  int embedTracker;
+  int embedTrackerSig;
+  int embedTrackerBkg;
+  
+  RooRealVar* nsig;
+  RooRealVar* nbkg;
+  RooAbsPdf* bkgPdf; 
 
-  PlaygroundZH(double mH, bool debug_=false, int parameterization_=2, bool withAcc_=false){
+  RooRealVar* h1pol2;
+  RooRealVar* h1pol4;
+  RooRealVar* h1pol6;
+  RooRealVar* h2pol2;
+  RooRealVar* phiconst;
+  RooRealVar* twophiconst;
+
+
+  PlaygroundZH(double mH, float nsignal, float nbackground, bool debug_=false, int parameterization_=2, bool withAcc_=false){
     
     debug=debug_;
-
-    embedTracker=0;
+    embedTrackerSig=0;
+    embedTrackerBkg=0;
 
     costheta1 = new RooRealVar("costheta1","cos#theta_{1}",0.,-1.,1.);
     costheta2 = new RooRealVar("costheta2","cos#theta_{2}",0.,-1.,1.);
     phi = new RooRealVar("phi","#Phi",0.,-TMath::Pi(),TMath::Pi());
-
     mX = new RooRealVar("mX","mX",mH);
-      
+    // signal and background
+    nsig = new RooRealVar("nsig","number of signal events",  0, 10000000.);
+    nbkg = new RooRealVar("nbkg","number of background events", 0, 10000000.);
+    
     varContainer.push_back(costheta1);
     varContainer.push_back(costheta2);
     varContainer.push_back(phi);
@@ -58,7 +78,6 @@ public:
 
     // float these parameters by default
     if ( parameterization_ == 2 ) {
-        
       scalar->fa2->setConstant(kFALSE);
       scalar->phia2->setConstant(kFALSE);
       scalar->fa3->setConstant(kFALSE);
@@ -72,53 +91,71 @@ public:
       scalar->g4ValIm->setConstant(kFALSE);
     }
 
+    nsig->setVal(nsignal);
+    nbkg->setVal(nbackground);
+    
   }
     
    ~PlaygroundZH(){
 
     delete scalar;
-
     delete costheta1;
     delete costheta2;
     delete phi;
-    
+    delete nsig;
+    delete nbkg;
     delete mX;
-
-    if(data) delete data;
+    
+    if(sigData) delete sigData;
     if(toyData) delete toyData;
+    if(bkgData) delete bkgData;
 
   };
 
-  int generate(int nEvents, bool pure=true){
-
-    if(debug)
+  int generate(RooAbsPdf* sigPdf, RooAbsPdf* bkgPdf, bool pure=true){
+  
+    if(debug) 
       cout << "PlaygroundZH::generate()" << endl;
+    int nsigEvents = nsig->getVal();
+    int nbkgEvents = nbkg->getVal();
+
+    int nEvents = nsigEvents + nbkgEvents; 
+    RooAddPdf* totalPdf = new RooAddPdf("totalPdf","totalPdf",RooArgList(*sigPdf,*bkgPdf),RooArgList(*nsig,*nbkg));
+
+    if ( debug ) {
+      std::cout << "nsignal = " << nsigEvents << ",\t nbackground = " << nbkgEvents << ", total is " << nEvents << "\n";
+    }
+    
 
     if(pure) {
       if ( debug ) 
 	std::cout << "Generating pure toy\n";  
-      toyData = scalar->PDF->generate(RooArgSet(*costheta1,*costheta2,*phi),nEvents);
+      toyData = totalPdf->generate(RooArgSet(*costheta1,*costheta2,*phi), (int) nEvents);
     }  else{
 
       RooArgSet *tempEvent;
-      //if(toyData) delete toyData;
       toyData = new RooDataSet("toyData","toyData",RooArgSet(*costheta1,*costheta2,*phi));
 
-      if(nEvents+embedTracker > data->sumEntries()){
+      if(  (nsigEvents+embedTrackerSig > sigData->sumEntries()) 
+	  || (nbkgEvents+embedTrackerBkg > bkgData->sumEntries()) ) {
 	cout << "PlaygroundZH::generate() - ERROR!!! PlaygroundZH::data does not have enough events to fill toy!!!!  bye :) " << endl;
 	toyData = NULL;
 	return kNotEnoughEvents;
       }
 
-      for(int iEvent=0; iEvent<nEvents; iEvent++){
-
-	// if(debug) cout << "generating event: " << iEvent << " embedTracker: " << embedTracker << endl;
-	tempEvent = (RooArgSet*) data->get(embedTracker);
+      for(int iEvent=0; iEvent<nsigEvents; iEvent++){
+	//if(debug) cout << "generating signal event: " << iEvent << " embedTrackerSig: " << embedTrackerSig << endl;
+	tempEvent = (RooArgSet*) sigData->get(embedTrackerSig);
 	toyData->add(*tempEvent);
-	embedTracker++;
-
+	embedTrackerSig++;
       }
-	
+
+      for(int iEvent=0; iEvent<nbkgEvents; iEvent++){
+	// if(debug) cout << "generating background event: " << iEvent << " embedTrackerBkg: " << embedTrackerBkg << endl;
+	tempEvent = (RooArgSet*) bkgData->get(embedTrackerBkg);
+	toyData->add(*tempEvent);
+	embedTrackerBkg++;
+      }
     }
 
     return kNoError;
@@ -132,37 +169,60 @@ public:
 
   }
 
-  int loadTree(TString fileName, TString treeName){
+  int loadSigTree(TString fileName, TString treeName){
 
     TChain* myChain = new TChain(treeName);
     myChain->Add(fileName);
     
     if(!myChain || myChain->GetEntries()<=0) return kFileLoadFailure;
 
-    if(data)
-      data=0;
+    if(sigData)
+      sigData=0;
 
-    data = new RooDataSet("data","data",myChain,RooArgSet(*costheta1,*costheta2,*phi),"");
+    sigData = new RooDataSet("sigData","sigData",myChain,RooArgSet(*costheta1,*costheta2,*phi),"");
 
     if(debug)
-      cout << "Number of events in data: " << data->numEntries() << endl;
+      cout << "Number of signal events: " << sigData->numEntries() << endl;
 
     return kNoError;
   
   };
 
-  RooFitResult* fitData(bool istoy = false, int PrintLevel = 1){
 
+  int loadBkgTree(TString fileName, TString treeName){
+
+    TChain* myChain = new TChain(treeName);
+    myChain->Add(fileName);
+    
+    if(!myChain || myChain->GetEntries()<=0) return kFileLoadFailure;
+
+    if(bkgData)
+      bkgData=0;
+
+    bkgData = new RooDataSet("bkgData","bkgData",myChain,RooArgSet(*costheta1,*costheta2,*phi),"");
+    
+    if(debug)
+      cout << "Number of background events in data: " << bkgData->numEntries() << endl;
+    
+    return kNoError;
+  
+  };
+
+
+  RooFitResult* fitData(RooAbsPdf* sigPdf, RooAbsPdf* bkgPdf, bool istoy = false, int PrintLevel = 1){
+
+    RooAddPdf* totalPdf = new RooAddPdf("totalPdf","totalPdf",RooArgList(*sigPdf,*bkgPdf),RooArgList(*nsig,*nbkg));
+    
     if ( istoy )  {
-      return ((scalar->PDF)->fitTo(*toyData, RooFit::PrintLevel(PrintLevel), RooFit::Save(true)));
+      return ( totalPdf->fitTo(*toyData, RooFit::PrintLevel(PrintLevel), RooFit::Save(true), RooFit::Extended(kTRUE)) );
     }
     else  {
-      return ((scalar->PDF)->fitTo(*data, RooFit::PrintLevel(PrintLevel), RooFit::Save(true))); 
+      return ( totalPdf->fitTo(*sigData, RooFit::PrintLevel(PrintLevel), RooFit::Save(true), RooFit::Extended(kTRUE)) ); 
     }
     
   };
 
-  int projectPDF(varList myVar, int bins=20, bool istoy=false){
+  int projectPDF(varList myVar, RooAbsPdf* sigPdf, RooAbsPdf* bkgPdf, int bins=20, bool istoy=false){
 
     if(debug) cout << "PlaygroundZH::projectionPDF()" << endl;
     RooPlot* plot = varContainer[myVar]->frame(bins);
@@ -171,14 +231,23 @@ public:
 
     if ( istoy ) {
       if( !toyData ) return kDataEmpty; 
-      toyData->plotOn(plot);
       if ( debug ) std::cout << "Drawing toy dataset\n";  
+      toyData->plotOn(plot);
+      RooAddPdf* totalPdf = new RooAddPdf("totalPdf","totalPdf",RooArgList(*sigPdf,*bkgPdf),RooArgList(*nsig,*nbkg));
+      totalPdf->plotOn(plot);
     }else{
-      if( !data ) return kDataEmpty;
-      data->plotOn(plot);
-    }
+      /*
+      if( ! sigData ) return kDataEmpty;
+      sigData->plotOn(plot);
+      scalar->PDF->plotOn(plot);
+      */
 
-    scalar->PDF->plotOn(plot);
+      if( ! bkgData ) return kDataEmpty;
+      bkgData->plotOn(plot);
+      bkgPdf->plotOn(plot);
+
+
+    }
     
     plot->Draw();
 
@@ -214,7 +283,7 @@ void calcfractionphase(double sqrts, double g1Re,  double g1Im,  double g2Re,   
     std::cout << "fa2 = " << fa2 << "\t with phase " << phia2 << "\n"; 
     std::cout << "fa3 = " << fa3 << "\t with phase " << phia3 << "\n"; 
   }
-  
+ 
 };
 
 #endif
