@@ -30,6 +30,7 @@ public:
   RooRealVar* fa3;
   RooRealVar* phia2;
   RooRealVar* phia3;
+  bool withAcc; 
 
   RooRealVar* mZ;
 
@@ -41,7 +42,7 @@ public:
 
   ScalarPdfFactoryZH(){};
     
-  ScalarPdfFactoryZH(RooRealVar* h1,RooRealVar* h2,RooRealVar* Phi, RooRealVar* mX, int para) {
+  ScalarPdfFactoryZH(RooRealVar* h1,RooRealVar* h2,RooRealVar* Phi, RooRealVar* mX, int para, bool withAcceptance) {
 
 
     // Parameters
@@ -75,7 +76,9 @@ public:
     R1Val  = new RooRealVar("R1Val","R1Val",0.15);
     R2Val  = new RooRealVar("R2Val","R2Val",0.15);
 
-    PDF = new RooSpinZero_3D_ZH("PDF","PDF",*h1,*h2,*Phi,*sqrts,*mX,*mZ,*R1Val,*R2Val,parameterization,*a1Val,*phi1Val,*a2Val,*phi2Val,*a3Val,*phi3Val,*g1Val,*g2Val,*g3Val,*g4Val,*g1ValIm,*g2ValIm,*g3ValIm,*g4ValIm,*fa2,*fa3,*phia2,*phia3);
+    withAcc = withAcceptance;  
+
+    PDF = new RooSpinZero_3D_ZH("PDF","PDF",*h1,*h2,*Phi,*sqrts,*mX,*mZ,*R1Val,*R2Val,parameterization,*a1Val,*phi1Val,*a2Val,*phi2Val,*a3Val,*phi3Val,*g1Val,*g2Val,*g3Val,*g4Val,*g1ValIm,*g2ValIm,*g3ValIm,*g4ValIm,*fa2,*fa3,*phia2,*phia3,withAcc);
 
   };
 
