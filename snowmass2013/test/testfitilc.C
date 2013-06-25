@@ -5,13 +5,16 @@
 
 using namespace PlaygroundZHhelpers;
 
-void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
+void testfitilc(bool pureToys=true, int ntoysperjob = 1, int seed_index=2) {
 
   //   gROOT->ProcessLine(".x  loadLib.C");
   
   int random_seed = seed_index+487563; 
   RooRandom::randomGenerator()->SetSeed(random_seed);
-  bool debug = true;
+  bool debug = false;
+  float mH = 125.;
+  float sqrtsVal = 250.;
+  bool withAcceptance = false;
 
   // 
   // specify inputs 
@@ -26,7 +29,7 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
 
   float lumi = 250.; // in unit of fb
   float nsigperfb = 8.;
-  float nbkgperfb = 13.;
+  float nbkgperfb = 0.8;
   
   float nsigEvents = lumi*nsigperfb; 
   float nbkgEvents = lumi*nbkgperfb; 
@@ -36,8 +39,6 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
   }
 
   
-  float mH = 125.;
-  float sqrtsVal = 250.;
   TString modeName = Form("model6_250GeV_1M");
   TString fileName = Form("Events_20130620/unweighted_unpol_%s_false.root", modeName.Data());
   TString treeName = "SelectedTree";
@@ -57,7 +58,6 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
   double fa3Val = 0.;
   double phia3Val = 0;
   int parameterization = 2; 
-  bool withAcceptance = false;
   
   // 
   // Set up background PDF
@@ -66,32 +66,61 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=2) {
   RooRealVar* costheta1 = new RooRealVar("costheta1","cos#theta_{1}",0.,-1.,1.);
   RooRealVar* costheta2 = new RooRealVar("costheta2","cos#theta_{2}",0.,-1.,1.);
   RooRealVar* phi = new RooRealVar("phi","#Phi",0.,-TMath::Pi(),TMath::Pi());
-  
+
+  /*
+  // From RooDataHist
   TChain *bkgTree = new TChain("SelectedTree");
-  bkgTree->Add("Events_20130620/llbb_bkg_250GeV_1M_false.root");
+  bkgTree->Add("bkgData/llbb_bkg_250GeV_1M_true.root");
   RooDataSet *bkgData = new RooDataSet("bkgData","bkgData",bkgTree,RooArgSet(*costheta1, *costheta2, *phi));
   RooDataHist *bkgHist = bkgData->binnedClone(0);
   RooHistPdf* bkgPdf = new RooHistPdf("bkgPdf", "bkgPdf", RooArgSet(*costheta1, *costheta2, *phi), *bkgHist);
-  
+  costheta1->setBins(5);
+  costheta2->setBins(5);
+  phi->setBins(5);
+  */
 
-  /*
-    h1pol2  = new RooRealVar("h1pol2","h1pol2", 1.62636, -10, 10);
-    h1pol4  = new RooRealVar("h1pol4","h1pol4", -1.985, -10, 10);
-    h1pol6  = new RooRealVar("h1pol6","h1pol6", 4.69253, -10, 10);
-    h2pol2  = new RooRealVar("h2pol2","h2pol2", 0.417, -1, 1);
-    phiconst  = new RooRealVar("phicons","phiconst", -0.0165, -1, 1);
-    twophiconst  = new RooRealVar("twophicons","twophiconst", -0.09, -1, 1);
-    
-    h1pol2->setConstant(kTRUE);
-    h1pol4->setConstant(kTRUE);
-    h1pol6->setConstant(kTRUE);
-    h2pol2->setConstant(kTRUE);
-    phiconst->setConstant(kTRUE);
-    twophiconst->setConstant(kTRUE);
-    
-    RooZZ_3D*  bkgPdf = new RooZZ_3D("bkgPdf","bkgPdf", *costheta1,*costheta2,
-    *phi,*h1pol2,*h1pol4,*h1pol6,*h2pol2,*phiconst,*twophiconst,withAcceptance);
-    */
+
+  bool bkgAcc = true;
+  // From emphirical fit
+  float h1pol2Val = 1.62636;
+  float h1pol4Val = -1.985;
+  float h1pol6Val = 4.69253;
+  float h2pol2Val = 0.417;
+  float phiconstVal = -0.0165;
+  float twophiconstVal = -0.09;
+  
+  if ( bkgAcc ) {
+    h1pol2Val = -0.18576;
+    h1pol4Val = 2.8289;
+    h1pol6Val = -1.20225;
+    h2pol2Val = 0.2531;
+    phiconstVal = -0.0206;
+    twophiconstVal = -0.1956;
+  }
+  
+  RooRealVar* h1pol2  = new RooRealVar("h1pol2","h1pol2", h1pol2Val, -10, 10);
+  RooRealVar* h1pol4  = new RooRealVar("h1pol4","h1pol4", h1pol4Val, -10, 10);
+  RooRealVar* h1pol6  = new RooRealVar("h1pol6","h1pol6", h1pol6Val, -10, 10);
+  RooRealVar* h2pol2  = new RooRealVar("h2pol2","h2pol2", h2pol2Val, -1, 1);
+  RooRealVar* phiconst  = new RooRealVar("phicons","phiconst", phiconstVal, -1, 1);
+  RooRealVar* twophiconst  = new RooRealVar("twophicons","twophiconst", twophiconstVal, -1, 1);
+  
+  h1pol2  = new RooRealVar("h1pol2","h1pol2", 1.62636, -10, 10);
+  h1pol4  = new RooRealVar("h1pol4","h1pol4", -1.985, -10, 10);
+  h1pol6  = new RooRealVar("h1pol6","h1pol6", 4.69253, -10, 10);
+  h2pol2  = new RooRealVar("h2pol2","h2pol2", 0.417, -1, 1);
+  phiconst  = new RooRealVar("phicons","phiconst", -0.0165, -1, 1);
+  twophiconst  = new RooRealVar("twophicons","twophiconst", -0.09, -1, 1);
+  
+  h1pol2->setConstant(kTRUE);
+  h1pol4->setConstant(kTRUE);
+  h1pol6->setConstant(kTRUE);
+  h2pol2->setConstant(kTRUE);
+  phiconst->setConstant(kTRUE);
+  twophiconst->setConstant(kTRUE);
+  
+  RooZZ_3D*  bkgPdf = new RooZZ_3D("bkgPdf","bkgPdf", *costheta1,*costheta2,
+				   *phi,*h1pol2,*h1pol4,*h1pol6,*h2pol2,*phiconst,*twophiconst,withAcceptance);
   
   // 
   // start PlaygroundZH
