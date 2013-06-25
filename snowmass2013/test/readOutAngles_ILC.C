@@ -19,7 +19,7 @@ void calculateAngles(TLorentzVector p4H, TLorentzVector p4Z1, TLorentzVector p4M
 
 vector<TLorentzVector> Calculate4Momentum(float Mx,float M1,float M2,float theta,float theta1,float theta2,float _Phi1_,float _Phi_); 
 
-void readOutAngles_ILC(std::string filename, bool debug = false) {
+void readOutAngles_ILC(std::string filename, bool applyAcc=false, bool debug = false) {
   
     ifstream fin;
     std::string filenameT = filename + ".txt";
@@ -184,6 +184,17 @@ void readOutAngles_ILC(std::string filename, bool debug = false) {
       etalminus_ALT = lep_4vec[0].Eta();
       etalplus_ALT = lep_4vec[1].Eta();
 
+      if ( applyAcc ) {
+	if ( ptlplus_ALT < 5. ) continue;
+	if ( TMath::Abs(etalplus_ALT) > 2.4 ) continue;
+	if ( ptlminus_ALT < 5. ) continue;
+	if ( TMath::Abs(etalminus_ALT) > 2.4 ) continue;
+	if ( m_zmass  < 91.1876 - 10. ) continue;
+	if ( m_zmass  > 91.1876 + 10. ) continue;
+	if ( m_hmass  < 115. ) continue;
+	if ( m_hmass  > 140. ) continue;
+      }
+      
       tree->Fill();
 			  
       // counter
