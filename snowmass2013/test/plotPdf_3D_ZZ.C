@@ -23,12 +23,13 @@ void plotPdf_3D_ZZ(float sqrtsVal = 250.) {
     gSystem->Load("../src/RooZZ_3D.cc");
 
     // these values define the generator couplings
-    bool withAcc = true;
+    bool withAcc = false;
     TString accName = "false";
     if ( withAcc ) 
       accName = "true";
-    TString modeName = "llbb_bkg_250GeV_1M";
+    TString modeName = "ee_ZZ_llbb_250GeV_25M";
     TString fileName = Form("bkgData/%s_%s.root", modeName.Data(), accName.Data());
+
     
     // 
     // Read input file
@@ -41,12 +42,12 @@ void plotPdf_3D_ZZ(float sqrtsVal = 250.) {
     RooRealVar* h2 = new RooRealVar("costheta2","h2",-1,1);
     RooRealVar* Phi = new RooRealVar("phi","Phi",-TMath::Pi(),TMath::Pi());
 
-    float h1pol2Val = 1.62636;
-    float h1pol4Val = -1.985;
-    float h1pol6Val = 4.69253;
-    float h2pol2Val = 0.417;
-    float phiconstVal = -0.0165;
-    float twophiconstVal = -0.09;
+    float h1pol2Val = 5.43096e-01;
+    float h1pol4Val = 1.05202e+00;
+    float h1pol6Val = 1.61973e-02;
+    float h2pol2Val = 0.246235;
+    float phiconstVal = -1.96298e-02;
+    float twophiconstVal =-1.37763e-01;
 
     if ( withAcc ) {
       h1pol2Val = -0.18576;
@@ -96,7 +97,7 @@ void plotPdf_3D_ZZ(float sqrtsVal = 250.) {
     data.plotOn(phiframe, LineColor(kBlack), MarkerStyle(24));
     myPDF->plotOn(phiframe, LineColor(kBlack));
         
-    TCanvas* czz = new TCanvas( "czz", "czz", 1200, 500 );
+    TCanvas* czz = new TCanvas( "czz", "czz", 1200, 400 );
     czz->Divide(3,1);
     
     czz->cd(1);
@@ -108,7 +109,7 @@ void plotPdf_3D_ZZ(float sqrtsVal = 250.) {
     czz->cd(3);
     phiframe->Draw();
 
-    TString plotName = Form("plots/ZZ_%s_%.0fGeV", modeName.Data(), sqrtsVal);
+    TString plotName = Form("plots/%s_acc%s", modeName.Data(), accName.Data());
     
     czz->SaveAs(Form("%s.eps", plotName.Data()));
     czz->SaveAs(Form("%s.png", plotName.Data()));
