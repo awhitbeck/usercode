@@ -183,16 +183,14 @@ void readOutAngles_ILC(std::string filename, bool applyAcc=false, bool debug = f
       ptlplus_ALT = lep_4vec[1].Pt();
       etalminus_ALT = lep_4vec[0].Eta();
       etalplus_ALT = lep_4vec[1].Eta();
+      if ( m_hmass  < 115. ) continue;
+      if ( m_hmass  > 140. ) continue;
 
       if ( applyAcc ) {
 	if ( ptlplus_ALT < 5. ) continue;
 	if ( TMath::Abs(etalplus_ALT) > 2.4 ) continue;
 	if ( ptlminus_ALT < 5. ) continue;
 	if ( TMath::Abs(etalminus_ALT) > 2.4 ) continue;
-	if ( m_zmass  < 91.1876 - 10. ) continue;
-	if ( m_zmass  > 91.1876 + 10. ) continue;
-	if ( m_hmass  < 115. ) continue;
-	if ( m_hmass  > 140. ) continue;
       }
       
       tree->Fill();
