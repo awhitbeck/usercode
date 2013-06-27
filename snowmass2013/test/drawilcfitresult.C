@@ -18,21 +18,29 @@
 #include "TCut.h"
 #include "THStack.h"
 #include "TNtuple.h"
-
+#include "TMath.h"
 
 bool debug = false;
 void drawilcfitresult()
 {
   float sqrts = 500;
   
-  TString toyName = "embd_g1_g4_fa3_p1_2000signal_250GeV";
+  TString toyName = "embd_model6_fa3_p1_2000signal_200bkg_accfalse";
   double fa3val = 0.1;
   double fa3err = 0.03; 
-  drawsingle(toyName, "fa3", Form("f_{3}"), 40, fa3val-5.*fa3err, fa3val+5*fa3err, 0., 2*fa3err);
+  drawsingle(toyName, "fa3", Form("f_{3}"), 40, fa3val-5.*fa3err, fa3val+5.*fa3err, 0., 2*fa3err);
 
   double phia3val = 0.;
   double phia3err = 0.2; 
   drawsingle(toyName, "phia3", Form("#phi_{3}"), 40, phia3val-5.*phia3err, phia3val+5.*phia3err, 0., 2*0.1);
+
+  double nsigval = 2000.;
+  double nsigerr = 100;
+  drawsingle(toyName, "nsig", Form("nSignal"), 40, nsigval-5.*nsigerr, nsigval+5.*nsigerr, 0., 200.);
+
+  double nbkgval = 200.;
+  double nbkgerr = 100;
+  drawsingle(toyName, "nbkg", Form("nBackground"), 40, TMath::Max(nbkgval-5.*nbkgerr, 0.), nbkgval+5.*nbkgerr, 0., 200.);
 }
 
 void drawsingle(TString toyName, TString var, TString varName, int nBins, float xMin, float xMax, float errMin, float errMax)
@@ -78,7 +86,7 @@ void drawsingle(TString toyName, TString var, TString varName, int nBins, float 
   // h_var_err->Draw("hist");
   // c1->cd(3);
   h_var_pull->Draw("hist");
-  h_var_pull->Fit("gaus");
+  //h_var_pull->Fit("gaus");
   
   c1->SaveAs(Form("fitplots/%s_fitresults_%s.eps", var.Data(), toyName.Data()));
   c1->SaveAs(Form("fitplots/%s_fitresults_%s.png", var.Data(), toyName.Data()));
@@ -86,6 +94,7 @@ void drawsingle(TString toyName, TString var, TString varName, int nBins, float 
   delete h_var;
   delete h_var_err;
   delete h_var_pull;
+  delete c1;
   file->Close();
   
 }

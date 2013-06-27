@@ -18,8 +18,8 @@ using namespace RooFit ;
 bool drawbkg = false;
 // set this to true if you are using the JHUGen one with weights
 bool weightedevents = false;
-void calcfractionphase(double g1Re,  double g1Im,  double g2Re,   double g2Im,  double g4Re,  double g4Im, 
-		  double & fa2, double & fa3, double & phia2, double & phia3);
+void calcfractionphase(double sqrts, double g1Re,  double g1Im,  double g2Re,   double g2Im,  double g4Re,  double g4Im, 
+		       double & fa2, double & fa3, double & phia2, double & phia3);
 
 void plotPdf_5D_ZH(float mH = 125, float sqrtsVal = 250.) {
     
@@ -43,30 +43,32 @@ void plotPdf_5D_ZH(float mH = 125, float sqrtsVal = 250.) {
     if ( P_ele == -1. ) beamPolarName = Form("LL");
     if ( P_ele  == 1. ) beamPolarName = Form("RR");
     
-    double r1 = -0.15; // this is related to the Z->ll decay
+    double r1 = 0.15; // this is related to the Z->ll decay
     double r1val = (r1 + P_ele ) / (1 + r1*P_ele); 
-
-    
     
     // these values define the generator couplings
-    TString modeName = "g1_p_ig4";
-    TString fileName = Form("Events_20130618/unweighted_%s_%s_1M_false.root", beamPolarName.Data(), modeName.Data());
-    //TString fileName = "lhefiles/ee_ZsmH_llbb_false.root";
+    TString modeName = Form("fa3_%.0fGeV_5M", sqrtsVal);
+    TString fileName = Form("Events_20130626/unweighted_%s_%s_false.root", beamPolarName.Data(), modeName.Data());
     double g1Gen =   1;
     double g1ImGen = 0.;
-    double g2Gen =   0 ; // 0.54071;
-    double g2ImGen = 0; // 0.54071; 
+    double g2Gen =   0.; 
+    double g2ImGen = 0.; 
     double g3Gen =   0.;
     double g3ImGen = 0.;
-    double g4Gen =   0; // 0.83265; 
-    double g4ImGen = 0.83265;
-    
+    double g4Gen =  0.117316; 
+    if ( modeName.Contains("fa3")  ) {
+      g4Gen =  0.83265;
+    } 
+    if ( sqrtsVal == 500. ) 
+      g4Gen =  2.62636E-2;
+
+    double g4ImGen = 0.; // 0.83265;
     double fa2Gen = 0.;
     double phia2Gen = 0.;
     double fa3Gen = 0.;
     double phia3Gen = 0.;
 
-    calcfractionphase(g1Gen, g1ImGen, g2Gen, g2ImGen, g4Gen, g4ImGen, fa2Gen, fa3Gen, phia2Gen, phia3Gen);
+    calcfractionphase(sqrtsVal, g1Gen, g1ImGen, g2Gen, g2ImGen, g4Gen, g4ImGen, fa2Gen, fa3Gen, phia2Gen, phia3Gen);
     
     if ( drawbkg ) {
       fileName = ("lhefiles/ee_ZZ_llbb_false.root");
@@ -96,8 +98,8 @@ void plotPdf_5D_ZH(float mH = 125, float sqrtsVal = 250.) {
     RooRealVar* R2Val = new RooRealVar("R2Val","R2Val", 0.15);
 
     // amplitude parameters
-    // int para = kFracPhase_Gs;  // chose from kMagPhase_As, kRealImag_Gs, kFracPhase_Gs;
-    int para = kRealImag_Gs;  // chose from kFracPhase_Gs, kMagPhase_As;
+    int para = kFracPhase_Gs;  // chose from kMagPhase_As, kRealImag_Gs, kFracPhase_Gs;
+    // int para = kRealImag_Gs;  // chose from kFracPhase_Gs, kMagPhase_As;
      
     RooRealVar* a1Val  = new RooRealVar("a1Val","a1Val",0.);
     RooRealVar* phi1Val= new RooRealVar("phi1Val","phi1Val",0.);
@@ -139,31 +141,44 @@ void plotPdf_5D_ZH(float mH = 125, float sqrtsVal = 250.) {
 
     
     // 
+    // Generate toy Data
+    // 
+    
+    int nsig = 1e+6;
+    RooDataSet* sigToyData = myPDF->generate(RooArgSet(*h1,*h2,*hs,*Phi,*Phi1), nsig);
+
+    // 
     // Plotting frames
     // 
     
     RooPlot* h1frame =  h1->frame(20);
-    data.plotOn(h1frame, LineColor(kBlack), MarkerStyle(24));
+    // data.plotOn(h1frame, LineColor(kBlack), MarkerStyle(24));
+    sigToyData.plotOn(h1frame, LineColor(kBlack), MarkerStyle(24));
+
     if ( !drawbkg )
       myPDF->plotOn(h1frame, LineColor(kBlack));
 
     RooPlot* h2frame =  h2->frame(20);
-    data.plotOn(h2frame, LineColor(kBlack), MarkerStyle(24));
+    // data.plotOn(h2frame, LineColor(kBlack), MarkerStyle(24));
+    sigToyData.plotOn(h2frame, LineColor(kBlack), MarkerStyle(24));
     if ( !drawbkg ) 
       myPDF->plotOn(h2frame, LineColor(kBlack));
 
     RooPlot* hsframe =  hs->frame(20);
-    data.plotOn(hsframe, LineColor(kBlack), MarkerStyle(24));
+    // data.plotOn(hsframe, LineColor(kBlack), MarkerStyle(24));
+    sigToyData.plotOn(hsframe, LineColor(kBlack), MarkerStyle(24));
     if ( !drawbkg )
       myPDF->plotOn(hsframe, LineColor(kBlack));
 
     RooPlot* phiframe =  Phi->frame(20);
-    data.plotOn(phiframe, LineColor(kBlack), MarkerStyle(24));
+    // data.plotOn(phiframe, LineColor(kBlack), MarkerStyle(24));
+    sigToyData.plotOn(phiframe, LineColor(kBlack), MarkerStyle(24));
     if ( !drawbkg ) 
       myPDF->plotOn(phiframe, LineColor(kBlack));
     
     RooPlot* phi1frame =  Phi1->frame(20);
-    data.plotOn(phi1frame, LineColor(kBlack), MarkerStyle(24));
+    // data.plotOn(phi1frame, LineColor(kBlack), MarkerStyle(24));
+    sigToyData.plotOn(phi1frame, LineColor(kBlack), MarkerStyle(24));
     if ( !drawbkg ) 
       myPDF->plotOn(phi1frame, LineColor(kBlack));
     
@@ -201,7 +216,7 @@ void plotPdf_5D_ZH(float mH = 125, float sqrtsVal = 250.) {
 }
 
 
-void calcfractionphase(double g1Re,  double g1Im,  double g2Re,   double g2Im,  double g4Re,  double g4Im, 
+void calcfractionphase(double sqrts, double g1Re,  double g1Im,  double g2Re,   double g2Im,  double g4Re,  double g4Im, 
 		       double & fa2, double & fa3, double & phia2, double & phia3) 
 {
 
@@ -209,6 +224,14 @@ void calcfractionphase(double g1Re,  double g1Im,  double g2Re,   double g2Im,  
   Double_t sigma1_e = 0.981396; // was 0.94696 at 126 GeV
   Double_t sigma2_e = 33.4674;  // was 32.1981 at 126 GeV
   Double_t sigma4_e = 7.9229;   // was 7.45502 at 126 GeV
+  
+  // ILC nubmers at 500 GeV at mH = 125 GeV
+  if ( sqrts == 500. ) {
+    sigma1_e = 2.57246; 
+    sigma2_e = 516.556;  
+    sigma4_e = 414.378;
+  }
+
   
   Double_t g1 = sqrt(g1Re*g1Re + g1Im*g1Im);
   Double_t g2 = sqrt(g2Re*g2Re + g2Im*g2Im);
