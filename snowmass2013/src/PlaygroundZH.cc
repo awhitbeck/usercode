@@ -8,6 +8,8 @@
 #include "TChain.h"
 #include "vector"
 #include "RooAddPdf.h"
+#include "TRandom3.h"
+
 // PDFs
 #include "RooZZ_3D.h"
 
@@ -46,28 +48,23 @@ public:
   RooRealVar* nbkg;
   RooAbsPdf* bkgPdf; 
 
-  RooRealVar* h1pol2;
-  RooRealVar* h1pol4;
-  RooRealVar* h1pol6;
-  RooRealVar* h2pol2;
-  RooRealVar* phiconst;
-  RooRealVar* twophiconst;
+  int seed_;
 
-
-  PlaygroundZH(double mH, float nsignal, float nbackground, bool debug_=false, int parameterization_=2, bool withAcc_=false){
+  PlaygroundZH(double mH, float nsignal, float nbackground, const unsigned int seed, bool debug_=false, int parameterization_=2, bool withAcc_=false){
     
     debug=debug_;
     embedTrackerSig=0;
     embedTrackerBkg=0;
+    seed_= seed;
 
-    costheta1 = new RooRealVar("costheta1","cos#theta_{1}",0.,-1.,1.);
-    costheta2 = new RooRealVar("costheta2","cos#theta_{2}",0.,-1.,1.);
-    phi = new RooRealVar("phi","#Phi",0.,-TMath::Pi(),TMath::Pi());
+    costheta1 = new RooRealVar("costheta1","cos#theta_{1}",-1.,1.);
+    costheta2 = new RooRealVar("costheta2","cos#theta_{2}",-1.,1.);
+    phi = new RooRealVar("phi","#Phi",-TMath::Pi(),TMath::Pi());
     mX = new RooRealVar("mX","mX",mH);
     // signal and background
     nsig = new RooRealVar("nsig","number of signal events",  0, 10000000.);
     nbkg = new RooRealVar("nbkg","number of background events", 0, 10000000.);
-    
+
     varContainer.push_back(costheta1);
     varContainer.push_back(costheta2);
     varContainer.push_back(phi);
@@ -112,12 +109,15 @@ public:
 
   };
 
-  int generate(RooAbsPdf* sigPdf, RooAbsPdf* bkgPdf, bool pure=true){
+  int generate(RooAbsPdf* sigPdf, RooAbsPdf* bkgPdf, int toy_index, bool pure=true){
   
     if(debug) 
-      cout << "PlaygroundZH::generate()" << endl;
-    int nsigEvents = nsig->getVal();
-    int nbkgEvents = nbkg->getVal();
+      cout << "PlaygroundZH::generate() with seed " << seed_ + toy_index  << endl;
+    TRandom3 rng_;
+    rng_.SetSeed(seed_+toy_index); 
+
+    int nsigEvents = rng_.Poisson( nsig->getVal());
+    int nbkgEvents = rng_.Poisson( nbkg->getVal());
 
     int nEvents = nsigEvents + nbkgEvents; 
     RooAddPdf* totalPdf = new RooAddPdf("totalPdf","totalPdf",RooArgList(*sigPdf,*bkgPdf),RooArgList(*nsig,*nbkg));
@@ -222,11 +222,11 @@ public:
     
   };
 
-  int projectPDF(varList myVar, RooAbsPdf* sigPdf, RooAbsPdf* bkgPdf, int bins=20, bool istoy=false){
+  int projectPDF(varList myVar, RooAbsPdf* sigPdf, RooAbsPdf* bkgPdf, int bins=20, bool istoy=false, bool isbkg=false){
 
     if(debug) cout << "PlaygroundZH::projectionPDF()" << endl;
     RooPlot* plot = varContainer[myVar]->frame(bins);
-
+    
     if(debug) cout << "RooPlot: " << plot << endl;
 
     if ( istoy ) {
@@ -235,18 +235,14 @@ public:
       toyData->plotOn(plot);
       RooAddPdf* totalPdf = new RooAddPdf("totalPdf","totalPdf",RooArgList(*sigPdf,*bkgPdf),RooArgList(*nsig,*nbkg));
       totalPdf->plotOn(plot);
-    }else{
-      /*
-      if( ! sigData ) return kDataEmpty;
-      sigData->plotOn(plot);
-      scalar->PDF->plotOn(plot);
-      */
-
+    } else if ( isbkg ) {
       if( ! bkgData ) return kDataEmpty;
       bkgData->plotOn(plot);
       bkgPdf->plotOn(plot);
-
-
+    } else {
+      if( ! sigData ) return kDataEmpty;
+      sigData->plotOn(plot);
+      scalar->PDF->plotOn(plot);
     }
     
     plot->Draw();
