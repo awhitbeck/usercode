@@ -5,13 +5,13 @@
 
 using namespace PlaygroundZHhelpers;
 
-void testfitilc(bool pureToys=true, int ntoysperjob = 1, int seed_index=1) {
+void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=1) {
 
   //   gROOT->ProcessLine(".x  loadLib.C");
   
   int random_seed = seed_index+487563; 
   RooRandom::randomGenerator()->SetSeed(random_seed);
-  bool debug = false;
+  bool debug = true;
   float mH = 125.;
   float sqrtsVal = 250.;
   bool withAcceptance = false;
@@ -42,8 +42,8 @@ void testfitilc(bool pureToys=true, int ntoysperjob = 1, int seed_index=1) {
   }
 
   
-  TString modeName = Form("model6_250GeV_1M");
-  TString fileName = Form("Events_20130620/unweighted_unpol_%s_%s.root", modeName.Data(), accName.Data());
+  TString modeName = Form("f_3_250GeV_5M");
+  TString fileName = Form("Events_20130626/unweighted_unpol_%s_%s.root", modeName.Data(), accName.Data());
   TString treeName = "SelectedTree";
   
   double g1Re = 1;
@@ -161,12 +161,12 @@ void testfitilc(bool pureToys=true, int ntoysperjob = 1, int seed_index=1) {
   float twophiconstVal =-1.37763e-01;
   
   if ( withAcceptance ) {
-    h1pol2Val = -0.18576;
-    h1pol4Val = 2.8289;
-    h1pol6Val = -1.20225;
-    h2pol2Val = 0.2531;
-    phiconstVal = -0.0206;
-    twophiconstVal = -0.1956;
+      h1pol2Val = 7.31558e-01;
+      h1pol4Val = 3.65903e-01;
+      h1pol6Val = 5.59806e-01;
+      h2pol2Val = 2.15611e-01;
+      phiconstVal = -1.98335e-02;
+      twophiconstVal =-2.00570e-01;
   }
   
   RooRealVar* h1pol2  = new RooRealVar("h1pol2","h1pol2", -10, 10);
