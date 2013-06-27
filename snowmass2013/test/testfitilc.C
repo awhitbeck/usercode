@@ -5,7 +5,7 @@
 
 using namespace PlaygroundZHhelpers;
 
-void testfitilc(bool pureToys=true, int ntoysperjob = 1, int seed_index=2) {
+void testfitilc(bool pureToys=true, int ntoysperjob = 1, int seed_index=1) {
 
   //   gROOT->ProcessLine(".x  loadLib.C");
   
@@ -16,6 +16,9 @@ void testfitilc(bool pureToys=true, int ntoysperjob = 1, int seed_index=2) {
   float sqrtsVal = 250.;
   bool withAcceptance = false;
 
+  TString accName = "false";
+  if (withAcceptance )  accName = "true";
+    
   // 
   // specify inputs 
   // you need to go through these following settings and verify all the 
@@ -27,7 +30,7 @@ void testfitilc(bool pureToys=true, int ntoysperjob = 1, int seed_index=2) {
   bool drawprojections = false;
   bool dotoys = true;
 
-  float lumi = 250.; // in unit of fb
+  float lumi = 250; // in unit of fb
   float nsigperfb = 8.;
   float nbkgperfb = 0.8;
   
@@ -40,7 +43,7 @@ void testfitilc(bool pureToys=true, int ntoysperjob = 1, int seed_index=2) {
 
   
   TString modeName = Form("model6_250GeV_1M");
-  TString fileName = Form("Events_20130620/unweighted_unpol_%s_false.root", modeName.Data());
+  TString fileName = Form("Events_20130620/unweighted_unpol_%s_%s.root", modeName.Data(), accName.Data());
   TString treeName = "SelectedTree";
   
   double g1Re = 1;
@@ -60,69 +63,6 @@ void testfitilc(bool pureToys=true, int ntoysperjob = 1, int seed_index=2) {
   int parameterization = 2; 
   
   // 
-  // Set up background PDF
-  // 
-  
-  RooRealVar* costheta1 = new RooRealVar("costheta1","cos#theta_{1}",0.,-1.,1.);
-  RooRealVar* costheta2 = new RooRealVar("costheta2","cos#theta_{2}",0.,-1.,1.);
-  RooRealVar* phi = new RooRealVar("phi","#Phi",0.,-TMath::Pi(),TMath::Pi());
-
-  /*
-  // From RooDataHist
-  TChain *bkgTree = new TChain("SelectedTree");
-  bkgTree->Add("bkgData/llbb_bkg_250GeV_1M_true.root");
-  RooDataSet *bkgData = new RooDataSet("bkgData","bkgData",bkgTree,RooArgSet(*costheta1, *costheta2, *phi));
-  RooDataHist *bkgHist = bkgData->binnedClone(0);
-  RooHistPdf* bkgPdf = new RooHistPdf("bkgPdf", "bkgPdf", RooArgSet(*costheta1, *costheta2, *phi), *bkgHist);
-  costheta1->setBins(5);
-  costheta2->setBins(5);
-  phi->setBins(5);
-  */
-
-
-  bool bkgAcc = true;
-  // From emphirical fit
-  float h1pol2Val = 1.62636;
-  float h1pol4Val = -1.985;
-  float h1pol6Val = 4.69253;
-  float h2pol2Val = 0.417;
-  float phiconstVal = -0.0165;
-  float twophiconstVal = -0.09;
-  
-  if ( bkgAcc ) {
-    h1pol2Val = -0.18576;
-    h1pol4Val = 2.8289;
-    h1pol6Val = -1.20225;
-    h2pol2Val = 0.2531;
-    phiconstVal = -0.0206;
-    twophiconstVal = -0.1956;
-  }
-  
-  RooRealVar* h1pol2  = new RooRealVar("h1pol2","h1pol2", h1pol2Val, -10, 10);
-  RooRealVar* h1pol4  = new RooRealVar("h1pol4","h1pol4", h1pol4Val, -10, 10);
-  RooRealVar* h1pol6  = new RooRealVar("h1pol6","h1pol6", h1pol6Val, -10, 10);
-  RooRealVar* h2pol2  = new RooRealVar("h2pol2","h2pol2", h2pol2Val, -1, 1);
-  RooRealVar* phiconst  = new RooRealVar("phicons","phiconst", phiconstVal, -1, 1);
-  RooRealVar* twophiconst  = new RooRealVar("twophicons","twophiconst", twophiconstVal, -1, 1);
-  
-  h1pol2  = new RooRealVar("h1pol2","h1pol2", 1.62636, -10, 10);
-  h1pol4  = new RooRealVar("h1pol4","h1pol4", -1.985, -10, 10);
-  h1pol6  = new RooRealVar("h1pol6","h1pol6", 4.69253, -10, 10);
-  h2pol2  = new RooRealVar("h2pol2","h2pol2", 0.417, -1, 1);
-  phiconst  = new RooRealVar("phicons","phiconst", -0.0165, -1, 1);
-  twophiconst  = new RooRealVar("twophicons","twophiconst", -0.09, -1, 1);
-  
-  h1pol2->setConstant(kTRUE);
-  h1pol4->setConstant(kTRUE);
-  h1pol6->setConstant(kTRUE);
-  h2pol2->setConstant(kTRUE);
-  phiconst->setConstant(kTRUE);
-  twophiconst->setConstant(kTRUE);
-  
-  RooZZ_3D*  bkgPdf = new RooZZ_3D("bkgPdf","bkgPdf", *costheta1,*costheta2,
-				   *phi,*h1pol2,*h1pol4,*h1pol6,*h2pol2,*phiconst,*twophiconst,withAcceptance);
-  
-  // 
   // start PlaygroundZH
   // 1) load signal and backgrounds
   // 2) Set the correct signal parameters
@@ -132,60 +72,130 @@ void testfitilc(bool pureToys=true, int ntoysperjob = 1, int seed_index=2) {
   if ( debug ) 
     std::cout << "Get Playground class started\n";
   
-  PlaygroundZH test(mH, nsigEvents, nbkgEvents, debug, parameterization, withAcceptance);
+  srand (time(NULL));
+  unsigned int random_seed_events = rand() %100000;
+  
+  PlaygroundZH test(mH, nsigEvents, nbkgEvents, random_seed_events, debug, parameterization, withAcceptance);
   if ( loadSigData ) 
     test.loadSigTree(fileName, treeName);
   if(debug) cout << test.data << endl;
   if ( loadBkgData ) 
-    test.loadBkgTree("Events_20130620/llbb_bkg_250GeV_1M_false.root", treeName);
-
-  // 
-  // setting the siganl pdf
-  // 
+    test.loadBkgTree(Form("bkgData/ee_ZZ_llbb_250GeV_25M_%s.root", accName.Data()), treeName);
   
-  ScalarPdfFactoryZH *scalar = test.scalar;
-  scalar->sqrts->setVal(sqrtsVal);
-  scalar->sqrts->setConstant(kTRUE);
+  // 
+   // setting the siganl pdf
+   // 
+  
+   // ScalarPdfFactoryZH *scalar = test.scalar;
+   test.scalar->sqrts->setVal(sqrtsVal);
+   test.scalar->sqrts->setConstant(kTRUE);
   test.calcfractionphase(sqrtsVal, g1Re, g1Im, g2Re, g2Im, g4Re, g4Im, fa2Val, fa3Val, phia2Val, phia3Val);
 
   if ( parameterization == 2 ) {
     
-    scalar->fa2->setVal(fa2Val);
-    scalar->fa2->setConstant(kTRUE);
+    test.scalar->fa2->setVal(fa2Val);
+    test.scalar->fa2->setConstant(kTRUE);
 
-    scalar->phia2->setVal(phia2Val);
-    scalar->phia2->setRange(-2*TMath::Pi(), 2*TMath::Pi());
-    scalar->phia2->setConstant(kTRUE);
+    test.scalar->phia2->setVal(phia2Val);
+    test.scalar->phia2->setRange(-2*TMath::Pi(), 2*TMath::Pi());
+    test.scalar->phia2->setConstant(kTRUE);
     
-    scalar->fa3->setVal(fa3Val);
-    scalar->fa3->setConstant(kFALSE);
- 
-    scalar->phia3->setVal(phia3Val);    
-    scalar->phia3->setRange(-2*TMath::Pi(), 2*TMath::Pi());
-    scalar->phia3->setConstant(kFALSE);
+    test.scalar->fa3->setVal(fa3Val);
+    // test.scalar->fa3->setConstant(kTRUE);
+    
+    test.scalar->phia3->setVal(phia3Val);    
+    test.scalar->phia3->setRange(-2*TMath::Pi(), 2*TMath::Pi());
+    // test.scalar->phia3->setConstant(kTRUE);
 
 
   }
 
   if ( parameterization == 1 ) {
     
-    scalar->g2Val->setVal(g2Re);
-    // scalar->g2Val->setConstant(kTRUE);
+    test.scalar->g2Val->setVal(g2Re);
+    // test.scalar->g2Val->setConstant(kTRUE);
  
-    scalar->g2ValIm->setVal(g2Im);
-    // scalar->g2ValIm->setConstant(kTRUE);
+    test.scalar->g2ValIm->setVal(g2Im);
+    // test.scalar->g2ValIm->setConstant(kTRUE);
 
-    scalar->g4Val->setConstant(kFALSE);
-    scalar->g4Val->setVal(g4Re);
+    test.scalar->g4Val->setConstant(kFALSE);
+    test.scalar->g4Val->setVal(g4Re);
 
-    scalar->g4ValIm->setVal(g4Im);
-    // scalar->g4ValIm->setConstant(kTRUE);
+    test.scalar->g4ValIm->setVal(g4Im);
+    // test.scalar->g4ValIm->setConstant(kTRUE);
     
   }
   
 
+  // 
+  // set up background PDF
+  // 
+
+  // 
+  // Set up background PDF
+  // 
+  /*
+
+  RooRealVar* costheta1 = new RooRealVar("costheta1","cos#theta_{1}",-1.,1.);
+  RooRealVar* costheta2 = new RooRealVar("costheta2","cos#theta_{2}",-1.,1.);
+  RooRealVar* phi = new RooRealVar("phi","#Phi", -TMath::Pi(),TMath::Pi());
+
+  costheta1->setBins(10);
+  costheta2->setBins(10);
+  phi->setBins(10);
+
+  // From RooDataHist
+  TChain *bkgTree = new TChain("SelectedTree");
+  bkgTree->Add(Form("bkgData/ee_ZZ_llbb_250GeV_25M_%s.root", accName.Data()));
+  RooDataSet *bkgData = new RooDataSet("bkgData","bkgData",bkgTree,RooArgSet(*costheta1, *costheta2, *phi));
+  RooDataHist *bkgHist = bkgData->binnedClone(0);
+  RooHistPdf* bkgPdf = new RooHistPdf("bkgPdf", "bkgPdf", RooArgSet(*costheta1, *costheta2, *phi), *bkgHist);
+  */
+
+  // From emphirical fit
+  float h1pol2Val = 5.43096e-01;
+  float h1pol4Val = 1.05202e+00;
+  float h1pol6Val = 1.61973e-02;
+  float h2pol2Val = 0.246235;
+  float phiconstVal = -1.96298e-02;
+  float twophiconstVal =-1.37763e-01;
+  
+  if ( withAcceptance ) {
+    h1pol2Val = -0.18576;
+    h1pol4Val = 2.8289;
+    h1pol6Val = -1.20225;
+    h2pol2Val = 0.2531;
+    phiconstVal = -0.0206;
+    twophiconstVal = -0.1956;
+  }
+  
+  RooRealVar* h1pol2  = new RooRealVar("h1pol2","h1pol2", -10, 10);
+  RooRealVar* h1pol4  = new RooRealVar("h1pol4","h1pol4", -10, 10);
+  RooRealVar* h1pol6  = new RooRealVar("h1pol6","h1pol6", -10, 10);
+  RooRealVar* h2pol2  = new RooRealVar("h2pol2","h2pol2",  -10, 10);
+  RooRealVar* phiconst  = new RooRealVar("phicons","phiconst",  -10, 10);
+  RooRealVar* twophiconst  = new RooRealVar("twophicons","twophiconst", -10, 10);
+
+  h1pol2->setVal(h1pol2Val);
+  h1pol4->setVal(h1pol4Val);
+  h1pol6->setVal(h1pol6Val);
+  h2pol2->setVal(h2pol2Val);
+  phiconst->setVal(phiconstVal);
+  twophiconst->setVal(twophiconstVal);
+
+  h1pol2->setConstant(kTRUE);
+  h1pol4->setConstant(kTRUE);
+  h1pol6->setConstant(kTRUE);
+  h2pol2->setConstant(kTRUE);
+  phiconst->setConstant(kTRUE);
+  twophiconst->setConstant(kTRUE);
+  
+  RooZZ_3D*  bkgPdf = new RooZZ_3D("bkgPdf","bkgPdf", *(test.costheta1), *(test.costheta2), *(test.phi),
+				   *h1pol2,*h1pol4,*h1pol6,*h2pol2,*phiconst,*twophiconst,withAcceptance);
+
+
   if ( fitData ) { 
-    RooFitResult *fitresults = test.fitData(scalar->PDF, bkgPdf);
+    RooFitResult *fitresults = test.fitData(test.scalar->PDF, bkgPdf);
   }
   
   // 
@@ -194,7 +204,7 @@ void testfitilc(bool pureToys=true, int ntoysperjob = 1, int seed_index=2) {
 
   if ( dotoys ) {
     
-    TFile *toyresults = new TFile(Form("toyresults_%i.root", random_seed), "RECREATE");
+    TFile *toyresults = new TFile(Form("toyresults_%s_%i.root", accName.Data(), random_seed), "RECREATE");
     gROOT->cd();
     
     TTree *tree_fit = new TTree("fittree", "fittree");
@@ -259,67 +269,70 @@ void testfitilc(bool pureToys=true, int ntoysperjob = 1, int seed_index=2) {
 	std::cout << "doing toy " << i << "\n";
       }
       // set initial values
-      scalar->fa2->setVal(fa2Val);
-      scalar->fa3->setVal(fa3Val);
-      scalar->phia2->setVal(phia2Val);
-      scalar->phia3->setVal(phia3Val);
-      test.nsig->setVal(lumi*nsigperfb);
-      test.nbkg->setVal(lumi*nbkgperfb);
-      
-      if(test.generate(scalar->PDF, bkgPdf, pureToys)!=kNoError) break;
+      test.scalar->fa2->setVal(fa2Val);
+      test.scalar->fa3->setVal(fa3Val);
+      test.scalar->phia2->setVal(phia2Val);
+      test.scalar->phia3->setVal(phia3Val);
+      test.nsig->setVal(nsigEvents);
+      test.nbkg->setVal(nbkgEvents);
 
-      RooFitResult *toyfitresults = test.fitData(scalar->PDF, bkgPdf, true, -1);
+      // test.nsig->setConstant(kTRUE);
+      // test.nbkg->setConstant(kTRUE);
+      
+      if(test.generate(test.scalar->PDF, bkgPdf, i, pureToys)!=kNoError) break;
+
+      RooFitResult *toyfitresults = test.fitData(test.scalar->PDF, bkgPdf, true, -1);
 
       if ( debug ) {
 	std::cout << "toy trial " << i << "\n"; 
 	if ( parameterization == 2 ) {
-	  std::cout << "fa2 = " << scalar->fa2->getVal() << " +/- " << scalar->fa2->getError() << "\n";
-	  std::cout << "phia2 = " << scalar->phia2->getVal() << " +/- " << scalar->phia2->getError() << "\n";
-	  std::cout << "fa3 = " << scalar->fa3->getVal() << " +/- " << scalar->fa3->getError() << "\n";
-	  std::cout << "phia3 = " << scalar->phia3->getVal() << " +/- " << scalar->phia3->getError() << "\n";
+	  std::cout << "fa2 = " << test.scalar->fa2->getVal() << " +/- " << test.scalar->fa2->getError() << "\n";
+	  std::cout << "phia2 = " << test.scalar->phia2->getVal() << " +/- " << test.scalar->phia2->getError() << "\n";
+	  std::cout << "fa3 = " << test.scalar->fa3->getVal() << " +/- " << test.scalar->fa3->getError() << "\n";
+	  std::cout << "phia3 = " << test.scalar->phia3->getVal() << " +/- " << test.scalar->phia3->getError() << "\n";
 	}
 	if ( parameterization == 1 ) {
-	  std::cout << "Re(g2) = " << scalar->g2Val->getVal() << "+/-" << scalar->g2Val->getError() << "\n";
-	  std::cout << "Im(g2) = " << scalar->g2ValIm->getVal() << "+/-" << scalar->g2ValIm->getError() << "\n";
-	  std::cout << "Re(g4) = " << scalar->g4Val->getVal() << "+/-" << scalar->g4Val->getError() << "\n";
-	  std::cout << "Im(g4) = " << scalar->g4ValIm->getVal() << "+/-" << scalar->g4ValIm->getError() << "\n";
+	  std::cout << "Re(g2) = " << test.scalar->g2Val->getVal() << "+/-" << test.scalar->g2Val->getError() << "\n";
+	  std::cout << "Im(g2) = " << test.scalar->g2ValIm->getVal() << "+/-" << test.scalar->g2ValIm->getError() << "\n";
+	  std::cout << "Re(g4) = " << test.scalar->g4Val->getVal() << "+/-" << test.scalar->g4Val->getError() << "\n";
+	  std::cout << "Im(g4) = " << test.scalar->g4ValIm->getVal() << "+/-" << test.scalar->g4ValIm->getError() << "\n";
 	}
 	std::cout << "nsig = " << test.nsig->getVal() << " +/- " << test.nsig->getError() << "\n";
 	std::cout << "nbkg = " << test.nbkg->getVal() << " +/- " << test.nbkg->getError() << "\n";
 
       }
       
-      m_fa2 = scalar->fa2->getVal();
-      m_fa2_err = scalar->fa2->getError();
-      m_fa2_pull = m_fa2_err > 0. ? (scalar->fa2->getVal() - fa2Val ) / scalar->fa2->getError() : 0.;
+      m_fa2 = test.scalar->fa2->getVal();
+      m_fa2_err = test.scalar->fa2->getError();
+      m_fa2_pull = m_fa2_err > 0. ? (test.scalar->fa2->getVal() - fa2Val ) / test.scalar->fa2->getError() : 0.;
 
-      m_phia2 = scalar->phia2->getVal();
-      m_phia2_err = scalar->phia2->getError();
-      m_phia2_pull = m_phia2_err > 0. ? (scalar->phia2->getVal() - phia2Val ) / scalar->phia2->getError() : 0.;
+      m_phia2 = test.scalar->phia2->getVal();
+      m_phia2_err = test.scalar->phia2->getError();
+      m_phia2_pull = m_phia2_err > 0. ? (test.scalar->phia2->getVal() - phia2Val ) / test.scalar->phia2->getError() : 0.;
 
-      m_fa3 = scalar->fa3->getVal();
-      m_fa3_err = scalar->fa3->getError();
-      m_fa3_pull = m_fa3_err > 0. ? (scalar->fa3->getVal() - fa3Val ) / scalar->fa3->getError() : 0.;
+      m_fa3 = test.scalar->fa3->getVal();
+      m_fa3_err = test.scalar->fa3->getError();
+      m_fa3_pull = m_fa3_err > 0. ? (test.scalar->fa3->getVal() - fa3Val ) / test.scalar->fa3->getError() : 0.;
 
-      m_phia3 = scalar->phia3->getVal();
-      m_phia3_err = scalar->phia3->getError();
-      m_phia3_pull = m_phia3_err > 0. ? (scalar->phia3->getVal() - phia3Val ) / scalar->phia3->getError() : 0.;
+      m_phia3 = test.scalar->phia3->getVal();
+      m_phia3_err = test.scalar->phia3->getError();
+      m_phia3_pull = m_phia3_err > 0. ? (test.scalar->phia3->getVal() - phia3Val ) / test.scalar->phia3->getError() : 0.;
       
-      m_g2Re = scalar->g2Val->getVal();
-      m_g2Re_err = scalar->g2Val->getError();
-      m_g2Re_pull = m_g2Re_err >0. ? (scalar->g2Val->getVal() - g2Re ) / scalar->g2Val->getError() : 0.;
+      m_g2Re = test.scalar->g2Val->getVal();
+      m_g2Re_err = test.scalar->g2Val->getError();
+      m_g2Re_pull = m_g2Re_err >0. ? (test.scalar->g2Val->getVal() - g2Re ) / test.scalar->g2Val->getError() : 0.;
 
-      m_g2Im = scalar->g2ValIm->getVal();
-      m_g2Im_err = scalar->g2ValIm->getError();
-      m_g2Im_pull = (scalar->g2ValIm->getVal() - g2Im ) / scalar->g2ValIm->getError();
+      m_g2Im = test.scalar->g2ValIm->getVal();
+      m_g2Im_err = test.scalar->g2ValIm->getError();
+      m_g2Im_pull = (test.scalar->g2ValIm->getVal() - g2Im ) / test.scalar->g2ValIm->getError();
 
-      m_g4Re = scalar->g4Val->getVal();
-      m_g4Re_err = scalar->g4Val->getError();
-      m_g4Re_pull = (scalar->g4Val->getVal() - g4Re ) / scalar->g4Val->getError();
+      m_g4Re = test.scalar->g4Val->getVal();
+      m_g4Re_err = test.scalar->g4Val->getError();
+      m_g4Re_pull = (test.scalar->g4Val->getVal() - g4Re ) / test.scalar->g4Val->getError();
 
-      m_g4Im = scalar->g4ValIm->getVal();
-      m_g4Im_err = scalar->g4ValIm->getError();
-      m_g4Im_pull = (scalar->g4ValIm->getVal() - g4Im ) / scalar->g4ValIm->getError();
+      m_g4Im = test.scalar->g4ValIm->getVal();
+      m_g4Im_err = test.scalar->g4ValIm->getError();
+      m_g4Im_pull = (test.scalar->g4ValIm->getVal() - g4Im ) / test.scalar->g4ValIm->getError();
 
       m_nsig = test.nsig->getVal();
       m_nsig_err = test.nsig->getError();
@@ -345,17 +358,22 @@ void testfitilc(bool pureToys=true, int ntoysperjob = 1, int seed_index=2) {
 
   if ( drawprojections ) {
 
+    bool drawbkg = false;
+
+    int nbins = 20;
+    if ( drawbkg ) nbins = 10; 
+
     TCanvas *c1 = new TCanvas("c1","c1",1200, 500);
     c1->Divide(3);
     
     c1->cd(1);
-    test.projectPDF(kcostheta1, scalar->PDF, bkgPdf, 20, dotoys);
+    test.projectPDF(kcostheta1, test.scalar->PDF, bkgPdf, nbins, dotoys, drawbkg);
     
     c1->cd(2);
-    test.projectPDF(kcostheta2, scalar->PDF, bkgPdf, 20, dotoys);
+    test.projectPDF(kcostheta2, test.scalar->PDF, bkgPdf, nbins, dotoys, drawbkg);
     
     c1->cd(3);
-    test.projectPDF(kphi, scalar->PDF, bkgPdf, 20, dotoys);
+    test.projectPDF(kphi, test.scalar->PDF, bkgPdf, nbins, dotoys, drawbkg);
 
     TString fitName = "nofit";
     if ( fitData ) 
