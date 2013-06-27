@@ -142,10 +142,9 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
    double eta_plus = lep_4vecs[1].Eta();
    double eta_minus = lep_4vecs[0].Eta();
    
-   if( pt_minus<5.0 || pt_plus<5.0 
-       || eta_minus>2.4 || eta_plus>2.4
-       || eta_minus<-2.4 || eta_plus<-2.4 ) return 0.0;
- 
+   if ( withAcc ) {
+     if( pt_minus<5.0 || pt_plus<5.0 || eta_minus>2.4 || eta_plus>2.4 || eta_minus<-2.4 || eta_plus<-2.4 ) return 0.0;
+   }
    //-------------------------------------------------
 
    // below calcualtions are based on the H->ZZ amplitudes 
