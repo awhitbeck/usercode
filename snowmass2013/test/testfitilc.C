@@ -11,7 +11,7 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=1) {
   
   int random_seed = seed_index+487563; 
   RooRandom::randomGenerator()->SetSeed(random_seed);
-  bool debug = true;
+  bool debug = false;
   float mH = 125.;
   float sqrtsVal = 250.;
   bool withAcceptance = false;
