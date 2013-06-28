@@ -17,7 +17,7 @@
   gROOT->LoadMacro("../src/RooZZ_3D.cc+");
 
   // stat tools from summer 2012 paper 
-  gROOT->LoadMacro("../src/StatFactory.cc");
+  gROOT->LoadMacro("../src/statsFactory.cc+");
 
   // loading tdr style for plots
   gROOT->ProcessLine(".L  tdrstyle.C");
