@@ -18,6 +18,9 @@
 
   // stat tools from summer 2012 paper 
   gROOT->LoadMacro("../src/statsFactory.cc+");
+  
+  // code to convert fa3
+  gROOT->LoadMacro("../src/fa3Converter.cc+");
 
   // loading tdr style for plots
   gROOT->ProcessLine(".L  tdrstyle.C");
