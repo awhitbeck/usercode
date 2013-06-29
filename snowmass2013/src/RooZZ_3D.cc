@@ -26,6 +26,7 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
 	                              RooAbsReal& _h1pol2,
  	                              RooAbsReal& _h1pol4,
  	                              RooAbsReal& _h1pol6,
+ 	                              RooAbsReal& _h1pol8,
  	                              RooAbsReal& _h2pol2,
   		                      RooAbsReal& _phiconst,
   		                      RooAbsReal& _twophiconst,
@@ -38,6 +39,7 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
    h1pol2("h1pol2","h1pol2",this,_h1pol2),
    h1pol4("h1pol4","h1pol4",this,_h1pol4),
    h1pol6("h1pol6","h1pol6",this,_h1pol6),
+   h1pol8("h1pol8","h1pol8",this,_h1pol8),
    h2pol2("h2pol2","h2pol2",this,_h2pol2),
    phiconst("phiconst","phiconst",this,_phiconst),
    twophiconst("twophiconst","twophiconst",this,_twophiconst),
@@ -54,6 +56,7 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
    h1pol2("h1pol2",this,other.h1pol2),
    h1pol4("h1pol4",this,other.h1pol4),
    h1pol6("h1pol6",this,other.h1pol6),
+   h1pol8("h1pol8",this,other.h1pol8),
    h2pol2("h2pol2",this,other.h2pol2),
    phiconst("phiconst",this,other.phiconst),
    twophiconst("twophiconst",this,other.twophiconst),
@@ -67,7 +70,7 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
  { 
 
    double value;
-   value += ( 1. + Power(h1,2) * h1pol2 + Power(h1,4)*h1pol4 + Power(h1,6)*h1pol6) * (1 + Power(h2,2) * h2pol2) 
+   value += ( 1. + Power(h1,2) * h1pol2 + Power(h1,4)*h1pol4 + Power(h1,6)*h1pol6 + Power(h1,8)*h1pol8) * (1 + Power(h2,2) * h2pol2) 
      *(1+cos(Phi)*phiconst+cos(2*Phi)*twophiconst);
    return value ; 
  } 
@@ -94,7 +97,7 @@ Double_t RooZZ_3D::analyticalIntegral(Int_t code, const char* rangeName) const
        {
 	 double value = 0.;
 	 
-	 value += (2. + 2./3.*h1pol2 + 2./5.*h1pol4 + 2./7.*h1pol6) * (2. + 2./3.*h2pol2) *(1+cos(Phi)*phiconst+cos(2*Phi)*twophiconst);
+	 value += (2. + 2./3.*h1pol2 + 2./5.*h1pol4 + 2./7.*h1pol6 + 2./9.*h1pol8) * (2. + 2./3.*h2pol2) *(1+cos(Phi)*phiconst+cos(2*Phi)*twophiconst);
 	 
 	 return value;
        }
@@ -105,7 +108,7 @@ Double_t RooZZ_3D::analyticalIntegral(Int_t code, const char* rangeName) const
 
 	 double value = 0.;
 
-	 value += (2. + 2./3.*h1pol2 + 2./5.*h1pol4 + 2./7.*h1pol6) * (1 + Power(h2,2)*h2pol2) * 2*Pi();
+	 value += (2. + 2./3.*h1pol2 + 2./5.*h1pol4 + 2./7.*h1pol6 + 2./9.*h1pol8) * (1 + Power(h2,2)*h2pol2) * 2*Pi();
 
 	 return value;
 
@@ -117,7 +120,7 @@ Double_t RooZZ_3D::analyticalIntegral(Int_t code, const char* rangeName) const
 
 	 double value = 0.;
 
-	 value += (1 + Power(h1,2)*h1pol2 + Power(h1,4)*h1pol4 + Power(h1,6)*h1pol6) * (2. + 2./3.*h2pol2) * 2*Pi();
+	 value += (1 + Power(h1,2)*h1pol2 + Power(h1,4)*h1pol4 + Power(h1,6)*h1pol6 + Power(h1,8)*h1pol8) * (2. + 2./3.*h2pol2) * 2*Pi();
 
 	 return value; 
 
@@ -128,7 +131,7 @@ Double_t RooZZ_3D::analyticalIntegral(Int_t code, const char* rangeName) const
        {
 	 double value = 0.;
 	 
-	 value += (2. + 2./3.*h1pol2 + 2./5.*h1pol4 + 2./7.*h1pol6) * (2. + 2./3.*h2pol2) * 2.*Pi();
+	 value += (2. + 2./3.*h1pol2 + 2./5.*h1pol4 + 2./7.*h1pol6 + 2./9.*h1pol8) * (2. + 2./3.*h2pol2) * 2.*Pi();
 	 
 	 return value;
        }

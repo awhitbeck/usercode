@@ -23,6 +23,7 @@ public:
 		    RooAbsReal& _h1pol2,
 		    RooAbsReal& _h1pol4,
 		    RooAbsReal& _h1pol6,
+		    RooAbsReal& _h1pol8,
 		    RooAbsReal& _h2pol2,
            	    RooAbsReal& _phiconst,
            	    RooAbsReal& _twophiconst,
@@ -44,6 +45,7 @@ protected:
   RooRealProxy h1pol2;
   RooRealProxy h1pol4;
   RooRealProxy h1pol6;
+  RooRealProxy h1pol8;
   RooRealProxy h2pol2;
   RooRealProxy phiconst;
   RooRealProxy twophiconst;
