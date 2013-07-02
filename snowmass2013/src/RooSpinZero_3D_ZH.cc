@@ -135,15 +135,23 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
 
    // check whether event is in acceptance or not
 
-   vector<TLorentzVector> lep_4vecs = Calculate4Momentum(sqrts,mZ,mX,acos(h1),acos(h2),acos(0),Phi,0);
-   
-   double pt_plus = lep_4vecs[1].Pt();
-   double pt_minus = lep_4vecs[0].Pt();
-   double eta_plus = lep_4vecs[1].Eta();
-   double eta_minus = lep_4vecs[0].Eta();
    
    if ( withAcc ) {
-     if( pt_minus<5.0 || pt_plus<5.0 || eta_minus>2.4 || eta_plus>2.4 || eta_minus<-2.4 || eta_plus<-2.4 ) return 0.0;
+
+     vector<TLorentzVector> lep_4vecs = Calculate4Momentum(sqrts,mZ,mX,acos(h1),acos(h2),acos(0),Phi,0);
+     
+     
+     double pt_plus_sq = pow(lep_4vecs[1].Px(),2) + pow(lep_4vecs[1].Py(),2);
+     double pt_minus_sq = pow(lep_4vecs[0].Px(),2) + pow(lep_4vecs[0].Py(),2);
+     
+     double sinh2_eta_plus = pow(lep_4vecs[1].Pz(),2)/pt_plus_sq;
+     double sinh2_eta_minus = pow(lep_4vecs[0].Pz(),2)/pt_minus_sq;
+     
+     if( pt_minus_sq<25.0 
+	 || pt_plus_sq<25.0 
+	 || sinh2_eta_minus>pow(sinh(2.4),2) 
+	 || sinh2_eta_plus>pow(sinh(2.4),2) 
+	 ) return 1e-30;
    }
    //-------------------------------------------------
 
@@ -279,15 +287,21 @@ Double_t RooSpinZero_3D_ZH::analyticalIntegral(Int_t code, const char* rangeName
    
    // check whether event is in acceptance or not
 
-   vector<TLorentzVector> lep_4vecs = Calculate4Momentum(sqrts,mZ,mX,acos(h1),acos(h2),acos(0),Phi,0);
-   
-   double pt_plus = lep_4vecs[1].Pt();
-   double pt_minus = lep_4vecs[0].Pt();
-   double eta_plus = lep_4vecs[1].Eta();
-   double eta_minus = lep_4vecs[0].Eta();
-   
    if ( withAcc ) {
-     if( pt_minus<5.0 || pt_plus<5.0 || eta_minus>2.4 || eta_plus>2.4 || eta_minus<-2.4 || eta_plus<-2.4 ) return 0.0;
+
+     vector<TLorentzVector> lep_4vecs = Calculate4Momentum(sqrts,mZ,mX,acos(h1),acos(h2),acos(0),Phi,0);
+   
+     double pt_plus_sq = pow(lep_4vecs[1].Px(),2) + pow(lep_4vecs[1].Py(),2);
+     double pt_minus_sq = pow(lep_4vecs[0].Px(),2) + pow(lep_4vecs[0].Py(),2);
+     
+     double sinh2_eta_plus = pow(lep_4vecs[1].Pz(),2)/pt_plus_sq;
+     double sinh2_eta_minus = pow(lep_4vecs[0].Pz(),2)/pt_minus_sq;
+     
+     if( pt_minus_sq<25.0 
+	 || pt_plus_sq<25.0 
+	 || sinh2_eta_minus>pow(sinh(2.4),2) 
+	 || sinh2_eta_plus>pow(sinh(2.4),2) 
+	 ) return 1e-30;
    }
 
     // the beta and gamma are velocities of the Z in the C.O.M
