@@ -40,7 +40,7 @@ public:
   RooDataSet* toyData;
   int embedTracker;
 
-  Playground(double mH, bool debug_=false, int parameterization_=2){
+  Playground(double mH, bool debug_=false, int parameterization_=2, bool acceptance=false){
     
     debug=debug_;
 
@@ -65,7 +65,7 @@ public:
     varContainer.push_back(phi1);
     varContainer.push_back(mzz);
 
-    scalar = new ScalarPdfFactory(z1mass,z2mass,costhetastar,costheta1,costheta2,phi,phi1,mzz,parameterization_);
+    scalar = new ScalarPdfFactory(z1mass,z2mass,costhetastar,costheta1,costheta2,phi,phi1,mzz,parameterization_,acceptance);
     mzz->setConstant(kTRUE);
     scalar->makeParamsConst(true);
 
@@ -84,8 +84,7 @@ public:
       scalar->_modelParams.g4Val->setConstant(kFALSE);
       scalar->_modelParams.g4ValIm->setConstant(kFALSE);
     }
-
-  }
+   }
     
    ~Playground(){
 

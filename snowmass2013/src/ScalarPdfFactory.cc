@@ -33,11 +33,13 @@ public:
   //RooSpinZero_7DComplex_withAccep* PDFangleAccep;
   RooSpinZero_7DComplex_withAccep* PDF;
 
+  bool acceptance_;
+
   //RooProdPdf* PDF;
 
   ScalarPdfFactory(){};
     
-  ScalarPdfFactory(RooRealVar* m1,RooRealVar* m2,RooRealVar* hs,RooRealVar* h1,RooRealVar* h2,RooRealVar* Phi,RooRealVar* Phi1,RooRealVar* mZZ, int para) {
+  ScalarPdfFactory(RooRealVar* m1,RooRealVar* m2,RooRealVar* hs,RooRealVar* h1,RooRealVar* h2,RooRealVar* Phi,RooRealVar* Phi1,RooRealVar* mZZ, int para, bool acceptance) {
 
     _measurables.m1   = m1;
     _measurables.m2   = m2;
@@ -79,8 +81,11 @@ public:
     _modelParams.R2Val = new RooRealVar("R2Val","R2Val",0.15);
 
     // acceptance parameters
-     _accepParams.aPhi = new RooRealVar("aPhi","aPhi",1.);
-   _accepParams.bPhi = new RooRealVar("bPhi","bPhi",4.88199e-03);
+    acceptance_ = acceptance;
+
+    if(acceptance_){
+    _accepParams.aPhi = new RooRealVar("aPhi","aPhi",1.);
+    _accepParams.bPhi = new RooRealVar("bPhi","bPhi",4.88199e-03);
     _accepParams.cPhi = new RooRealVar("cPhi","cPhi",3.69579e-02);
     _accepParams.dPhi = new RooRealVar("dPhi","dPhi",0.);
     _accepParams.ePhi = new RooRealVar("ePhi","ePhi",0.);
@@ -119,6 +124,90 @@ public:
     _accepParams.cM2 = new RooRealVar("cM2","cM2",-7.74696e-05);
     _accepParams.dM2 = new RooRealVar("dM2","dM2",0.);
 
+    }
+
+    else {
+
+    _accepParams.aPhi = new RooRealVar("aPhi","aPhi",1.);
+    _accepParams.bPhi = new RooRealVar("bPhi","bPhi",0.);
+    _accepParams.cPhi = new RooRealVar("cPhi","cPhi",0.);
+    _accepParams.dPhi = new RooRealVar("dPhi","dPhi",0.);
+    _accepParams.ePhi = new RooRealVar("ePhi","ePhi",0.);
+
+    _accepParams.aPhi1 = new RooRealVar("aPhi1","aPhi1",1.); 
+    _accepParams.bPhi1 = new RooRealVar("bPhi1","bPhi1",0.);
+    _accepParams.cPhi1 = new RooRealVar("cPhi1","cPhi1",0.);
+    _accepParams.dPhi1 = new RooRealVar("dPhi1","dPhi1",0.);
+    _accepParams.ePhi1 = new RooRealVar("ePhi1","ePhi1",0.);
+
+    _accepParams.aH1 = new RooRealVar("aH1","aH1",1.);
+    _accepParams.bH1 = new RooRealVar("bH1","bH1",0.);
+    _accepParams.cH1 = new RooRealVar("cH1","cH1",0.);
+    _accepParams.dH1 = new RooRealVar("dH1","dH1",0.);
+    _accepParams.eH1 = new RooRealVar("eH1","eH1",0.);
+
+    _accepParams.aH2 = new RooRealVar("aH2","aH2",1.);
+    _accepParams.bH2 = new RooRealVar("bH2","bH2",0.);
+    _accepParams.cH2 = new RooRealVar("cH2","cH2",0.);
+    _accepParams.dH2 = new RooRealVar("dH2","dH2",0.);
+    _accepParams.eH2 = new RooRealVar("eH2","eH2",0.);
+
+    _accepParams.aHs = new RooRealVar("aHs","aHs",1.);
+    _accepParams.bHs = new RooRealVar("bHs","bHs",0.);
+    _accepParams.cHs = new RooRealVar("cHs","cHs",0.);
+    _accepParams.dHs = new RooRealVar("dHs","dHs",0.);
+    _accepParams.eHs = new RooRealVar("eHs","eHs",0.);
+
+    _accepParams.aM1 = new RooRealVar("aM1","aM1",1.);
+    _accepParams.bM1 = new RooRealVar("bM1","bM1",0.);
+    _accepParams.cM1 = new RooRealVar("cM1","cM1",0.);
+    _accepParams.dM1 = new RooRealVar("dM1","dM1",0.);
+
+    _accepParams.aM2 = new RooRealVar("aM2","aM2",1.);
+    _accepParams.bM2 = new RooRealVar("bM2","bM2",0.);
+    _accepParams.cM2 = new RooRealVar("cM2","cM2",0.);
+    _accepParams.dM2 = new RooRealVar("dM2","dM2",0.);
+
+    _accepParams.aPhi->setConstant(kTRUE);
+    _accepParams.bPhi->setConstant(kTRUE);
+    _accepParams.cPhi->setConstant(kTRUE);
+    _accepParams.dPhi->setConstant(kTRUE);
+    _accepParams.ePhi->setConstant(kTRUE);
+    
+    _accepParams.aPhi1->setConstant(kTRUE);
+    _accepParams.bPhi1->setConstant(kTRUE);
+    _accepParams.cPhi1->setConstant(kTRUE);
+    _accepParams.dPhi1->setConstant(kTRUE);
+    _accepParams.ePhi1->setConstant(kTRUE);
+    
+    _accepParams.aH1->setConstant(kTRUE);
+    _accepParams.bH1->setConstant(kTRUE);
+    _accepParams.cH1->setConstant(kTRUE);
+    _accepParams.dH1->setConstant(kTRUE);
+    _accepParams.eH1->setConstant(kTRUE);
+    
+    _accepParams.aH2->setConstant(kTRUE);
+    _accepParams.bH2->setConstant(kTRUE);
+    _accepParams.cH2->setConstant(kTRUE);
+    _accepParams.dH2->setConstant(kTRUE);
+    _accepParams.eH2->setConstant(kTRUE);
+    
+    _accepParams.aHs->setConstant(kTRUE);
+    _accepParams.bHs->setConstant(kTRUE);
+    _accepParams.cHs->setConstant(kTRUE);
+    _accepParams.dHs->setConstant(kTRUE);
+    _accepParams.eHs->setConstant(kTRUE);
+    
+    _accepParams.aM1->setConstant(kTRUE);
+    _accepParams.bM1->setConstant(kTRUE);
+    _accepParams.cM1->setConstant(kTRUE);
+    _accepParams.dM1->setConstant(kTRUE);
+    
+    _accepParams.aM2->setConstant(kTRUE);
+    _accepParams.bM2->setConstant(kTRUE);
+    _accepParams.cM2->setConstant(kTRUE);
+    _accepParams.dM2->setConstant(kTRUE);
+    }
     //m1Accep = new RooPolynomial("m1Accep","m1Accep",*_measurables.m1,RooArgList(*aM1,*bM1,*cM1,*dM1),4);
     //m2Accep = new RooPolynomial("m2Accep","m2Accep",*_measurables.m2,RooArgList(*aM2,*bM2,*cM2,*dM2),4);
 
@@ -412,6 +501,47 @@ public:
       _accepParams.cM2->setConstant(kFALSE);
       _accepParams.dM2->setConstant(kFALSE);
 
+    }
+    if(!acceptance_){
+      _accepParams.aPhi->setConstant(kTRUE);
+      _accepParams.bPhi->setConstant(kTRUE);
+      _accepParams.cPhi->setConstant(kTRUE);
+      _accepParams.dPhi->setConstant(kTRUE);
+      _accepParams.ePhi->setConstant(kTRUE);
+
+      _accepParams.aPhi1->setConstant(kTRUE);
+      _accepParams.bPhi1->setConstant(kTRUE);
+      _accepParams.cPhi1->setConstant(kTRUE);
+      _accepParams.dPhi1->setConstant(kTRUE);
+      _accepParams.ePhi1->setConstant(kTRUE);
+
+      _accepParams.aH1->setConstant(kTRUE);
+      _accepParams.bH1->setConstant(kTRUE);
+      _accepParams.cH1->setConstant(kTRUE);
+      _accepParams.dH1->setConstant(kTRUE);
+      _accepParams.eH1->setConstant(kTRUE);
+
+      _accepParams.aH2->setConstant(kTRUE);
+      _accepParams.bH2->setConstant(kTRUE);
+      _accepParams.cH2->setConstant(kTRUE);
+      _accepParams.dH2->setConstant(kTRUE);
+      _accepParams.eH2->setConstant(kTRUE);
+
+      _accepParams.aHs->setConstant(kTRUE);
+      _accepParams.bHs->setConstant(kTRUE);
+      _accepParams.cHs->setConstant(kTRUE);
+      _accepParams.dHs->setConstant(kTRUE);
+      _accepParams.eHs->setConstant(kTRUE);
+
+      _accepParams.aM1->setConstant(kTRUE);
+      _accepParams.bM1->setConstant(kTRUE);
+      _accepParams.cM1->setConstant(kTRUE);
+      _accepParams.dM1->setConstant(kTRUE);
+
+      _accepParams.aM2->setConstant(kTRUE);
+      _accepParams.bM2->setConstant(kTRUE);
+      _accepParams.cM2->setConstant(kTRUE);
+      _accepParams.dM2->setConstant(kTRUE);
     }
   };
 
