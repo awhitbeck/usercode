@@ -158,12 +158,12 @@ public:
     _accepParams.dHs = new RooRealVar("dHs","dHs",0.);
     _accepParams.eHs = new RooRealVar("eHs","eHs",0.);
 
-    _accepParams.aM1 = new RooRealVar("aM1","aM1",1.);
+    _accepParams.aM1 = new RooRealVar("aM1","aM1",0.);
     _accepParams.bM1 = new RooRealVar("bM1","bM1",0.);
     _accepParams.cM1 = new RooRealVar("cM1","cM1",0.);
     _accepParams.dM1 = new RooRealVar("dM1","dM1",0.);
 
-    _accepParams.aM2 = new RooRealVar("aM2","aM2",1.);
+    _accepParams.aM2 = new RooRealVar("aM2","aM2",0.);
     _accepParams.bM2 = new RooRealVar("bM2","bM2",0.);
     _accepParams.cM2 = new RooRealVar("cM2","cM2",0.);
     _accepParams.dM2 = new RooRealVar("dM2","dM2",0.);

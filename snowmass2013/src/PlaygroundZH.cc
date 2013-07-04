@@ -162,9 +162,39 @@ public:
 
   };
 
+  int generate(int nEvents, bool pure=true){
+  
+    if(pure) {
+      if ( debug ) 
+	std::cout << "Generating pure toy\n";  
+      toyData = scalar->PDF->generate(RooArgSet(*costheta1,*costheta2,*phi), (int) nEvents);
+    }  else{
+
+      RooArgSet *tempEvent;
+      toyData = new RooDataSet("toyData","toyData",RooArgSet(*costheta1,*costheta2,*phi));
+
+      if( nEvents + embedTrackerSig > sigData->sumEntries() ){
+	cout << "PlaygroundZH::generate() - ERROR!!! PlaygroundZH::data does not have enough events to fill toy!!!!  bye :) " << endl;
+	toyData = NULL;
+	return kNotEnoughEvents;
+      }
+
+      for(int iEvent=0; iEvent<nEvents; iEvent++){
+	//if(debug) cout << "generating signal event: " << iEvent << " embedTrackerSig: " << embedTrackerSig << endl;
+	tempEvent = (RooArgSet*) sigData->get(embedTrackerSig);
+	toyData->add(*tempEvent);
+	embedTrackerSig++;
+      }
+
+    }
+
+    return kNoError;
+
+  };
+
   int loadTree(RooDataSet* _data){
 
-    data = _data;
+    sigData = _data;
     return kNoError;
 
   }
@@ -222,6 +252,17 @@ public:
     
   };
 
+  RooFitResult* fitSigData(bool istoy = false, int PrintLevel = 1){
+
+    if ( istoy )  {
+      return ( scalar->PDF->fitTo(*toyData, RooFit::PrintLevel(PrintLevel), RooFit::Save(true), RooFit::Minimizer("Minuit","scan")) );
+    }
+    else  {
+      return ( scalar->PDF->fitTo(*sigData, RooFit::PrintLevel(PrintLevel), RooFit::Save(true), RooFit::Minimizer("Minuit","scan")) ); 
+    }
+    
+  };
+
   int projectPDF(varList myVar, RooAbsPdf* sigPdf, RooAbsPdf* bkgPdf, int bins=20, bool istoy=false, bool isbkg=false){
 
     if(debug) cout << "PlaygroundZH::projectionPDF()" << endl;
@@ -250,6 +291,31 @@ public:
     return kNoError;
 
   }
+
+
+  int projectPDF(varList myVar, int bins=20, bool istoy=false){
+
+    if(debug) cout << "PlaygroundZH::projectionPDF()" << endl;
+    RooPlot* plot = varContainer[myVar]->frame(bins);
+    
+    if(debug) cout << "RooPlot: " << plot << endl;
+
+    if ( istoy ) {
+      if( !toyData ) return kDataEmpty; 
+      if ( debug ) std::cout << "Drawing toy dataset\n";  
+      toyData->plotOn(plot);
+      scalar->PDF->plotOn(plot);
+    } else {
+      sigData->plotOn(plot);
+      scalar->PDF->plotOn(plot);
+    }
+    
+    plot->Draw();
+
+    return kNoError;
+
+  }
+
 
 
 void calcfractionphase(double sqrts, double g1Re,  double g1Im,  double g2Re,   double g2Im,  double g4Re,  double g4Im, 
