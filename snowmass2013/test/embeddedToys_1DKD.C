@@ -1,10 +1,12 @@
 using namespace RooFit;
 
-enum sample {kScalar_fa3p0,kScalar_fa3p1,kScalar_fa3p5,kNumSamples};
-TString sampleName[kNumSamples] = {"fa3p0","fa3p1","fa3p5"};
-TString inputFileNames[kNumSamples] = {"/tmp/sbologne/14TeV/SMHiggsToZZTo4L_M-125_14TeV_2e2mu_withProbabilities.root",
-				       "/tmp/sbologne/14TeV/Higgs0Mf01ph0ToZZTo4L_M-125_14TeV_2e2mu_withProbabilities.root",
-				       "/tmp/sbologne/14TeV/Higgs0Mf05ph0ToZZTo4L_M-125_14TeV_2e2mu_withProbabilities.root"};
+enum sample {kScalar_fa3p0,kScalar_fa3p1,kScalar_fa3p5,kScalar_fa3p5phia390,kScalar_fa3p25,kNumSamples};
+TString sampleName[kNumSamples] = {"fa3p0","fa3p1","fa3p5","fa3p5phia390","fa3p25"};
+TString inputFileNames[kNumSamples] = {"samples/JHUpsMELA_m2cut_2e2mu/SMHiggsToZZTo4L_M-125_14TeV_2e2mu_withProbabilities.root",
+				       "samples/JHUpsMELA_m2cut_2e2mu/Higgs0Mf01ph0ToZZTo4L_M-125_14TeV_2e2mu_withProbabilities.root",
+				       "samples/JHUpsMELA_m2cut_2e2mu/Higgs0Mf05ph0ToZZTo4L_M-125_14TeV_2e2mu_withProbabilities.root",
+				       "samples/JHUpsMELA_m2cut_2e2mu/Higgs0Mf05ph90ToZZTo4L_M-125_14TeV_2e2mu_withProbabilities.root",
+				       "XZ-Higgs0Mf025ph0ToZZTo4l_M-125_14TeV_withDiscriminants_2e2mu_withProbabilities.root"};
 
 void embeddedToys_1DKD(int nEvts=50, int nToys=100,
 		  sample mySample = kScalar_fa3p0){
@@ -28,16 +30,31 @@ void embeddedToys_1DKD(int nEvts=50, int nToys=100,
   RooDataHist rdh_KD_sm("rdh_KD_sm","rdh_KD_sm",RooArgList(*kd),h_KD_sm);
   RooHistPdf pdf_KD_sm("pdf_KD_sm","pdf_KD_sm",RooArgList(*kd),rdh_KD_sm); 
 
-  RooRealVar rrv_fa3("fa3","fa3",0.5,0.,1.);  //free parameter of the model
-  RooAddPdf model("model","ps+sm",pdf_KD_ps,pdf_KD_sm,rrv_fa3);  
+  RooRealVar rrv_fa3("fa3","fa3",0.25,0.,1.);  //free parameter of the model
+  RooFormulaVar rfv_fa3Obs("fa3obs","1/ (1 + (1/@0 - 1)*0.93148)",RooArgList(rrv_fa3));
+  //RooAddPdf model("model","ps+sm",pdf_KD_ps,pdf_KD_sm,rrv_fa3);  
+  RooAddPdf model("model","ps+sm",pdf_KD_ps,pdf_KD_sm,rfv_fa3Obs);  
   rrv_fa3.setConstant(kFALSE);
+
+ TCanvas* c = new TCanvas("modelPlot","modelPlot",400,400);
+  rdh_KD_ps.plotOn(kdframe1,LineColor(kBlack));
+  pdf_KD_ps.plotOn(kdframe1,LineColor(kBlack));
+  rdh_KD_sm.plotOn(kdframe1,LineColor(kBlue));
+  pdf_KD_sm.plotOn(kdframe1,LineColor(kBlue));
+  model.plotOn(kdframe1,LineColor(kRed));
+  kdframe1->Draw();
+  c->SaveAs("model1DPlot.png");
+  c->SaveAs("model1DPlot.eps");
+
   double fa3Val=-99;
   if (mySample == kScalar_fa3p0)
     fa3Val=0.;
   else if (mySample == kScalar_fa3p1)
     fa3Val=0.1;
-  else if (mySample == kScalar_fa3p5)
+  else if (mySample == kScalar_fa3p5 || mySample == kScalar_fa3p5phia390)
     fa3Val=0.5;
+  else if (mySample == kScalar_fa3p25)
+    fa3Val=0.25;
   else{
     cout<<"fa3Val not correct!"<<endl;
       return 0;
@@ -61,7 +78,6 @@ void embeddedToys_1DKD(int nEvts=50, int nToys=100,
   }
   
    RooDataSet* data = new RooDataSet("data","data",myChain,RooArgSet(*kd),"");
-  //MISSING THE CUT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     cout << "Number of events in data: " << data->numEntries() << endl;
   
@@ -80,25 +96,27 @@ void embeddedToys_1DKD(int nEvts=50, int nToys=100,
   //---------------------------------
 
   RooDataSet* toyData;
-  int embedTracker;
+  int embedTracker=0;
   RooArgSet *tempEvent;
 
   RooFitResult *toyfitresults;
   RooRealVar *r_fa3;
 
   for(int i = 0 ; i<nToys ; i++){
-
+    cout <<i<<"<-----------------------------"<<endl;
     //if(toyData) delete toyData;
     toyData = new RooDataSet("toyData","toyData",RooArgSet(*kd));
 
     if(nEvts+embedTracker > data->sumEntries()){
       cout << "Playground::generate() - ERROR!!! Playground::data does not have enough events to fill toy!!!!  bye :) " << endl;
       toyData = NULL;
+      abort();
       return 0;
     }
 
     for(int iEvent=0; iEvent<nEvts; iEvent++){
-      cout << "generating event: " << iEvent << " embedTracker: " << embedTracker << endl;
+      if(iEvent==1)
+	cout << "generating event: " << iEvent << " embedTracker: " << embedTracker << endl;
       tempEvent = (RooArgSet*) data->get(embedTracker);
       toyData->add(*tempEvent);
       embedTracker++;
@@ -114,14 +132,14 @@ void embeddedToys_1DKD(int nEvts=50, int nToys=100,
 
     // fill TTree
     results->Fill();
-
+    //model.clear();
   }
 
   char nEvtsString[100];
   sprintf(nEvtsString,"_%iEvts",nEvts);
 
   // write tree to output file (ouputFileName set at top)
-  TFile *outputFile = new TFile("embeddedToys1DKD_"+sampleName[mySample]+nEvtsString+".root","RECREATE");
+  TFile *outputFile = new TFile("embeddedToys1DKD_fa3Corr_"+sampleName[mySample]+nEvtsString+".root","RECREATE");
   results->Write();
   outputFile->Close();
 

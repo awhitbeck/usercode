@@ -2,22 +2,26 @@
 
 using namespace PlaygroundHelpers;
 
-enum sample {kScalar_fa3p0,kScalar_fa3p1,kScalar_fa3p5,kNumSamples};
-TString sampleName[kNumSamples] = {"fa3p0","fa3p1","fa3p5"};
-enum freeParams {kfa3Only,kfa3phia3Only,kNumScenarios};
-TString scenario[kNumScenarios] = {"fa3_free","fa3_phia3_free"};
+enum sample {kScalar_fa3p0,kScalar_fa3p1,kScalar_fa3p5,kScalar_fa3p5phia390,kScalar_fa3p25,kScalar_fa2p1fa3p1,kNumSamples};
+TString sampleName[kNumSamples] = {"fa3p0","fa3p1","fa3p5","fa3p5phia390","fa3p25","fa2p1fa3p1"};
+enum freeParams {kfa3Only,kfa3phia3Only,kfa2Only,kfa2phia2Only,kfa2fa3Only,kAllFree,kNumScenarios};
+TString scenario[kNumScenarios] = {"fa3_free","fa3_phia3_free","fa2_free","fa2_phia2_free","fa2_fa3_free","all_free"};
 
-TString inputFileNames[kNumSamples] = {"/scratch0/hep/zhouxz/EventGeneration/Samples/14T125GSMHigges/XZ-SMHiggsToZZTo4L_M-125_14TeV.root",
-				       "/scratch0/hep/cyou/AllSamples/JHUGen_v3.1.7/0-_f01/ph0/rootfiles/Higgs0Mf01ph0ToZZTo4L_M-125_14TeV_2e2mu.root",
-				       "/scratch0/hep/cyou/AllSamples/JHUGen_v3.1.7/0-_f05/ph0/rootfiles/Higgs0Mf05ph0ToZZTo4L_M-125_14TeV_2e2mu.root"};
+TString inputFileNames[kNumSamples] = {"/afs/cern.ch/user/s/sbologne/workspace/multidimFit_newSamples/ZZMatrixElement/snowmass2013/test/SMHiggsToZZTo4L_M-125_14TeV_2e2mu_withProbabilities.root",
+				       "/afs/cern.ch/user/s/sbologne/workspace/multidimFit_newSamples/ZZMatrixElement/snowmass2013/test/Higgs0Mf01ph0ToZZTo4L_M-125_14TeV_2e2mu_withProbabilities.root",
+				       "/afs/cern.ch/user/s/sbologne/workspace/multidimFit_newSamples/ZZMatrixElement/snowmass2013/test/Higgs0Mf05ph0ToZZTo4L_M-125_14TeV_2e2mu_withProbabilities.root",
+				       "/afs/cern.ch/user/s/sbologne/workspace/multidimFit_newSamples/ZZMatrixElement/snowmass2013/test/Higgs0Mf05ph90ToZZTo4L_M-125_14TeV_2e2mu_withProbabilities.root",
+				       "/afs/cern.ch/user/s/sbologne/workspace/multidimFit_newSamples/ZZMatrixElement/snowmass2013/test/XZ-Higgs0Mf025ph0ToZZTo4l_M-125_14TeV_withDiscriminants_2e2mu_withProbabilities.root",
+				       "/afs/cern.ch/user/s/sbologne/workspace/multidimFit_newSamples/ZZMatrixElement/snowmass2013/test/Higgs0Mf01ph0Higgs0PHf01ph0ToZZTo4L_M-125_14TeV_withDiscriminants_2e2mu_withProbabilities.root"};
 
-bool fa3Constant [kNumScenarios]   = {false,false};
-bool fa2Constant [kNumScenarios]   = {true,true};
-bool phia3Constant [kNumScenarios] = {true,false};
-bool phia2Constant [kNumScenarios] = {true,true};
+bool fa3Constant [kNumScenarios]   = {false,false,true, true, false,false};
+bool fa2Constant [kNumScenarios]   = {true, true, false,false,false,false};
+bool phia3Constant [kNumScenarios] = {true, false,true, true, true, false};
+bool phia2Constant [kNumScenarios] = {true, true, true, false,true, false};
+
 
 void embeddedToys(int nEvts=21, int nToys=1000,
-		  bool runPureToys=true,
+		  bool runPureToys=false,
 		  sample mySample = kScalar_fa3p0, 
 		  freeParams myParams = kfa3Only){
 
@@ -62,7 +66,21 @@ void embeddedToys(int nEvts=21, int nToys=1000,
     myPG.scalar->_modelParams.fa3->setVal(0.0);
     myPG.scalar->_modelParams.phia2->setVal(0.0);
     myPG.scalar->_modelParams.phia3->setVal(0.0);
-
+    if(mySample == kScalar_fa3p1)
+      myPG.scalar->_modelParams.fa3->setVal(0.1);
+    if(mySample == kScalar_fa3p25)
+      myPG.scalar->_modelParams.fa3->setVal(0.25);
+    if(mySample == kScalar_fa3p5)
+      myPG.scalar->_modelParams.fa3->setVal(0.5);
+    if(mySample == kScalar_fa3p5phia390){
+      myPG.scalar->_modelParams.fa3->setVal(0.5);
+      myPG.scalar->_modelParams.phia3->setVal(1.570796);
+    }
+    if(mySample == kScalar_fa2p1fa3p1){
+      myPG.scalar->_modelParams.fa2->setVal(0.1);
+      myPG.scalar->_modelParams.fa3->setVal(0.1);
+    }
+ 
     cout << "=======================" << endl;
     cout << "=======================" << endl;
     cout << "=========" << i << "========" << endl;
@@ -95,7 +113,7 @@ void embeddedToys(int nEvts=21, int nToys=1000,
   sprintf(nEvtsString,"_%iEvts",nEvts);
 
   // write tree to output file (ouputFileName set at top)
-  TFile *outputFile = new TFile("XZ-pureToys_"+sampleName[mySample]+"_"+scenario[myParams]+nEvtsString+".root","RECREATE");
+  TFile *outputFile = new TFile("embeddedToys_"+sampleName[mySample]+"_"+scenario[myParams]+nEvtsString+".root","RECREATE");
   results->Write();
   outputFile->Close();
 

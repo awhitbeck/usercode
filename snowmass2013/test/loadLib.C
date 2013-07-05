@@ -4,6 +4,7 @@
   //gSystem->AddIncludePath("-I$ROOFITSYS/include/");
  
   // tools for X->ZZ studies
+  gROOT->LoadMacro("../src/RooqqZZ_JHU_ZgammaZZ_fast.cxx+");
   gROOT->LoadMacro("../src/RooSpinZero_7DComplex_withAccep.cc+");
   //gROOT->LoadMacro("../src/AngularPdfFactory.cc+");
   gROOT->LoadMacro("../src/ScalarPdfFactory.cc+");
