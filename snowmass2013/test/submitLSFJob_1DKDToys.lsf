@@ -1,0 +1,29 @@
+#!/bin/sh
+
+### MUST REMEMBER THIS!!!!
+nevts=21
+ntoys=3000
+sample=kScalar_fa3p5
+
+# The batch job directory (will vanish after job end):
+curdir=`pwd`
+workdir=/afs/cern.ch/user/s/sbologne/workspace/multidimFit_prophecy/ZZMatrixElement/snowmass2013/test
+
+# printing
+echo what is the workdir...$workdir
+echo what is the curdir....$curdir
+
+source  /afs/cern.ch/user/s/sbologne/setROOT.csh
+
+# tells the scheduler to put all output files into the directory where
+# we spawned from
+cd $workdir
+
+echo "ntoys: " $ntoys
+echo "nevts: " $nevts
+echo "sample: " $sample
+
+for counter in 1 2 3 4 5 6 7 8 9 10
+do
+root -l -n -b -q "embeddedToysWithBackgDetEffects_1DKD.C(${nevts},${ntoys},${sample},true,false,${counter})"
+done
