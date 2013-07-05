@@ -160,11 +160,26 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
       Double_t sigma2_e = 33.4674;  // was 32.1981 at 126 GeV
       Double_t sigma4_e = 7.9229;   // was 7.45502 at 126 GeV
 
-      // ILC numbers at 500 GeV with mH = 125 GeV ( narrow Z width approximation) 
+
+      // ILC nubmers at 350 GeV at mH = 125 GeV
+      if ( sqrts == 350. ) {
+	sigma1_e = 1.48872; 
+	sigma2_e = 125.387;  
+	sigma4_e = 75.3199;
+      }
+      
+      // ILC nubmers at 500 GeV at mH = 125 GeV
       if ( sqrts == 500. ) {
 	sigma1_e = 2.57246; 
 	sigma2_e = 516.556;  
 	sigma4_e = 414.378;
+      }
+      
+      // ILC nubmers at 1000 GeV at mH = 125 GeV
+      if ( sqrts == 1000. ) {
+	sigma1_e = 8.95721; 
+	sigma2_e = 8208.91;  
+	sigma4_e = 7800.2;
       }
       
       
@@ -302,13 +317,27 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
        Double_t sigma2_e = 33.4674;  // was 32.1981 at 126 GeV
        Double_t sigma4_e = 7.9229;   // was 7.45502 at 126 GeV
        
-       // ILC numbers at 500 GeV with mH = 125 GeV ( narrow Z width approximation) 
+       // ILC nubmers at 350 GeV at mH = 125 GeV
+       if ( sqrts == 350. ) {
+	 sigma1_e = 1.48872; 
+	 sigma2_e = 125.387;  
+	 sigma4_e = 75.3199;
+       }
+       
+       // ILC nubmers at 500 GeV at mH = 125 GeV
        if ( sqrts == 500. ) {
 	 sigma1_e = 2.57246; 
 	 sigma2_e = 516.556;  
 	 sigma4_e = 414.378;
        }
-
+       
+       // ILC nubmers at 1000 GeV at mH = 125 GeV
+       if ( sqrts == 1000. ) {
+	 sigma1_e = 8.95721; 
+	 sigma2_e = 8208.91;  
+	 sigma4_e = 7800.2;
+       }
+       
        double g1Mag = 1.;
        double g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma1_e/sigma2_e); 
        double g4Mag = sqrt(fa3/(1.-fa2-fa3))*sqrt(sigma1_e/sigma4_e); 
