@@ -279,14 +279,14 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
 
 Int_t RooSpinZero_3D_ZH_Acc::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const
 {
-  /*
+
   if ( !withAcc ) {
     if (matchArgs(allVars,analVars,RooArgSet(*h1.absArg(),*h2.absArg(),*Phi.absArg()))) return 4 ;
     if (matchArgs(allVars,analVars,h1,h2)) return 1 ;
     if (matchArgs(allVars,analVars,h1,Phi)) return 2 ;
     if (matchArgs(allVars,analVars,h2,Phi)) return 3 ;
   }
-  */
+
   return 0 ;
 }
 
