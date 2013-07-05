@@ -1,7 +1,7 @@
 #ifndef SCALAR_PDF_FACTORY
 #define SCALAR_PDF_FACTORY
 
-#include "RooSpinZero_3D_ZH.h"
+#include "RooSpinZero_3D_ZH_Acc.h"
 #include "RooRealVar.h"
 #include "TF1.h"
 #include "TMath.h"
@@ -30,6 +30,9 @@ public:
   RooRealVar* fa3;
   RooRealVar* phia2;
   RooRealVar* phia3;
+  RooRealVar* b2;
+  RooRealVar* cgaus;
+  RooRealVar* sgaus;
   bool withAcc; 
 
   RooRealVar* mZ;
@@ -38,7 +41,7 @@ public:
   RooRealVar* R1Val;
   RooRealVar* R2Val;
 
-  RooSpinZero_3D_ZH* PDF;
+  RooSpinZero_3D_ZH_Acc* PDF;
 
   ScalarPdfFactoryZH(){};
     
@@ -76,9 +79,13 @@ public:
     R1Val  = new RooRealVar("R1Val","R1Val",0.15);
     R2Val  = new RooRealVar("R2Val","R2Val",0.15);
 
+    b2  = new RooRealVar("b2","b2",-7.41520e-02,-10,10);
+    cgaus  = new RooRealVar("cgaus","cgaus",-3.04678e-01,-10,10);
+    sgaus  = new RooRealVar("sgaus","sgaus",4.97867e-02, 0, 1.);
+
     withAcc = withAcceptance;  
 
-    PDF = new RooSpinZero_3D_ZH("PDF","PDF",*h1,*h2,*Phi,*sqrts,*mX,*mZ,*R1Val,*R2Val,parameterization,*a1Val,*phi1Val,*a2Val,*phi2Val,*a3Val,*phi3Val,*g1Val,*g2Val,*g3Val,*g4Val,*g1ValIm,*g2ValIm,*g3ValIm,*g4ValIm,*fa2,*fa3,*phia2,*phia3,withAcc);
+    PDF = new RooSpinZero_3D_ZH_Acc("PDF","PDF",*h1,*h2,*Phi,*sqrts,*mX,*mZ,*R1Val,*R2Val,parameterization,*a1Val,*phi1Val,*a2Val,*phi2Val,*a3Val,*phi3Val,*g1Val,*g2Val,*g3Val,*g4Val,*g1ValIm,*g2ValIm,*g3ValIm,*g4ValIm,*fa2,*fa3,*phia2,*phia3,*b2,*cgaus,*sgaus,withAcc);
 
   };
 
@@ -113,7 +120,10 @@ public:
     delete sqrts;
     delete R1Val;
     delete R2Val;
-    
+
+    delete b2;
+    delete cgaus;
+    delete sgaus;
   };
   
   void makeSMHiggs(){

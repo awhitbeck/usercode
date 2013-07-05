@@ -116,9 +116,15 @@ public:
     TRandom3 rng_;
     rng_.SetSeed(seed_+toy_index); 
 
-    int nsigEvents = rng_.Poisson( nsig->getVal());
-    int nbkgEvents = rng_.Poisson( nbkg->getVal());
 
+    int nsigEvents = nsig->getVal();
+    int nbkgEvents = nbkg->getVal();
+    
+    if ( pure ) {
+      nsigEvents = rng_.Poisson( nsig->getVal());
+      nbkgEvents = rng_.Poisson( nbkg->getVal());
+    }
+    
     int nEvents = nsigEvents + nbkgEvents; 
     RooAddPdf* totalPdf = new RooAddPdf("totalPdf","totalPdf",RooArgList(*sigPdf,*bkgPdf),RooArgList(*nsig,*nbkg));
 
@@ -132,7 +138,14 @@ public:
 	std::cout << "Generating pure toy\n";  
       toyData = totalPdf->generate(RooArgSet(*costheta1,*costheta2,*phi), (int) nEvents);
     }  else{
-
+      
+      // reset the events starting point
+      embedTrackerSig = toy_index * nsigEvents;
+      embedTrackerBkg = toy_index * nbkgEvents;
+      
+      int isigEvent = toy_index * nsigEvents;
+      int ibkgEvent = toy_index * nbkgEvents;
+      
       RooArgSet *tempEvent;
       toyData = new RooDataSet("toyData","toyData",RooArgSet(*costheta1,*costheta2,*phi));
 
@@ -143,49 +156,29 @@ public:
 	return kNotEnoughEvents;
       }
 
-      for(int iEvent=0; iEvent<nsigEvents; iEvent++){
-	//if(debug) cout << "generating signal event: " << iEvent << " embedTrackerSig: " << embedTrackerSig << endl;
+      for(int iEvent=isigEvent; iEvent<isigEvent+nsigEvents; iEvent++){
+	if(debug) cout << "generating signal event: " << iEvent << " embedTrackerSig: " << embedTrackerSig << endl;
 	tempEvent = (RooArgSet*) sigData->get(embedTrackerSig);
 	toyData->add(*tempEvent);
 	embedTrackerSig++;
       }
 
-      for(int iEvent=0; iEvent<nbkgEvents; iEvent++){
-	// if(debug) cout << "generating background event: " << iEvent << " embedTrackerBkg: " << embedTrackerBkg << endl;
+      for(int iEvent=ibkgEvent; iEvent<ibkgEvent+nbkgEvents; iEvent++){
+	if(debug) cout << "generating background event: " << iEvent << " embedTrackerBkg: " << embedTrackerBkg << endl;
 	tempEvent = (RooArgSet*) bkgData->get(embedTrackerBkg);
 	toyData->add(*tempEvent);
 	embedTrackerBkg++;
       }
-    }
+      
+      /*
+	// example of adding pure toy data
+      RooDataSet* bkgToyData = bkgPdf->generate(RooArgSet(*costheta1,*costheta2,*phi), (int) nbkgEvents);
 
-    return kNoError;
-
-  };
-
-  int generate(int nEvents, bool pure=true){
-  
-    if(pure) {
-      if ( debug ) 
-	std::cout << "Generating pure toy\n";  
-      toyData = scalar->PDF->generate(RooArgSet(*costheta1,*costheta2,*phi), (int) nEvents);
-    }  else{
-
-      RooArgSet *tempEvent;
-      toyData = new RooDataSet("toyData","toyData",RooArgSet(*costheta1,*costheta2,*phi));
-
-      if( nEvents + embedTrackerSig > sigData->sumEntries() ){
-	cout << "PlaygroundZH::generate() - ERROR!!! PlaygroundZH::data does not have enough events to fill toy!!!!  bye :) " << endl;
-	toyData = NULL;
-	return kNotEnoughEvents;
+      for (int i = 0 ; i < nbkgEvents; i++ ) {
+	RooArgSet *tempbkgEvent = (RooArgSet*) bkgToyData->get(i);
+	toyData->add(*tempbkgEvent);
       }
-
-      for(int iEvent=0; iEvent<nEvents; iEvent++){
-	//if(debug) cout << "generating signal event: " << iEvent << " embedTrackerSig: " << embedTrackerSig << endl;
-	tempEvent = (RooArgSet*) sigData->get(embedTrackerSig);
-	toyData->add(*tempEvent);
-	embedTrackerSig++;
-      }
-
+      */
     }
 
     return kNoError;
@@ -194,7 +187,7 @@ public:
 
   int loadTree(RooDataSet* _data){
 
-    sigData = _data;
+    data = _data;
     return kNoError;
 
   }
@@ -252,17 +245,6 @@ public:
     
   };
 
-  RooFitResult* fitSigData(bool istoy = false, int PrintLevel = 1){
-
-    if ( istoy )  {
-      return ( scalar->PDF->fitTo(*toyData, RooFit::PrintLevel(PrintLevel), RooFit::Save(true), RooFit::Minimizer("Minuit","scan")) );
-    }
-    else  {
-      return ( scalar->PDF->fitTo(*sigData, RooFit::PrintLevel(PrintLevel), RooFit::Save(true), RooFit::Minimizer("Minuit","scan")) ); 
-    }
-    
-  };
-
   int projectPDF(varList myVar, RooAbsPdf* sigPdf, RooAbsPdf* bkgPdf, int bins=20, bool istoy=false, bool isbkg=false){
 
     if(debug) cout << "PlaygroundZH::projectionPDF()" << endl;
@@ -276,46 +258,23 @@ public:
       toyData->plotOn(plot);
       RooAddPdf* totalPdf = new RooAddPdf("totalPdf","totalPdf",RooArgList(*sigPdf,*bkgPdf),RooArgList(*nsig,*nbkg));
       totalPdf->plotOn(plot);
-    } else if ( isbkg ) {
-      if( ! bkgData ) return kDataEmpty;
-      bkgData->plotOn(plot);
-      bkgPdf->plotOn(plot);
     } else {
-      if( ! sigData ) return kDataEmpty;
-      sigData->plotOn(plot);
-      scalar->PDF->plotOn(plot);
+      if ( isbkg ) {
+	if( ! bkgData ) return kDataEmpty;
+	bkgData->plotOn(plot);
+	bkgPdf->plotOn(plot);
+      } else {
+	if(  !sigData ) return kDataEmpty;
+	sigData->plotOn(plot);
+	scalar->PDF->plotOn(plot);
+      }
     }
     
     plot->Draw();
-
+    
     return kNoError;
 
   }
-
-
-  int projectPDF(varList myVar, int bins=20, bool istoy=false){
-
-    if(debug) cout << "PlaygroundZH::projectionPDF()" << endl;
-    RooPlot* plot = varContainer[myVar]->frame(bins);
-    
-    if(debug) cout << "RooPlot: " << plot << endl;
-
-    if ( istoy ) {
-      if( !toyData ) return kDataEmpty; 
-      if ( debug ) std::cout << "Drawing toy dataset\n";  
-      toyData->plotOn(plot);
-      scalar->PDF->plotOn(plot);
-    } else {
-      sigData->plotOn(plot);
-      scalar->PDF->plotOn(plot);
-    }
-    
-    plot->Draw();
-
-    return kNoError;
-
-  }
-
 
 
 void calcfractionphase(double sqrts, double g1Re,  double g1Im,  double g2Re,   double g2Im,  double g4Re,  double g4Im, 
