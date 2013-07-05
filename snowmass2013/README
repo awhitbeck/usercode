@@ -5,6 +5,7 @@
 cvs co -d ZZMatrixElement/snowmass2013 UserCode/Whitbeck/snowmass2013
 cd ZZMatrixElement/snowmass2013
 
+#For multidimensional fit####################
 #JHU
 source /home/ntran/ROOTdistributions/myROOT528_fromSource/root/bin/thisroot.csh
 #lxplus
@@ -15,6 +16,25 @@ root -l -n loadLib.C
 Playground test(126.) 
 test.loadTree("root://eoscms.cern.ch//eos/cms/store/cmst3/user/mmozer/Higgs/Prophecy/root/prophecy_inputemu_126_unweighted.root","newTree")
 test.fitData()      
+
+#For KD fit (using tcsh shell)#############################
+source /afs/cern.ch/user/s/sbologne/public/setROOT.csh
+
+root -l -n
+#for gen-level signal only 1D KD fits, arguments: nEvts per toy, number of toys, model
+.x  embeddedToys_1DKD.C(50, 100, kScalar_fa3p0)
+
+#for signal + bkg with detector effects 1D KD fits, arguments: 
+#nEvts of signal per toy, number of toys, model, bool to switch on bakcground,
+#bool to float S/B (should be false unless you know what you are doing)
+#counter of the first event in toy (to parallelize toys generation)
+.x  embeddedToys_1DKD.C(50, 100, kScalar_fa3p0, true, false, 0)
+
+#for signal + bkg with detector effects 2D KDvsMZZ fits with sig and bkg floating, arguments: 
+#nEvts of signal per toy, number of toys, model, 
+#nEvts of bakcground per toy,
+#counter of the first event in toy (to parallelize toys generation)
+.x  embeddedToys_extended.C(50, 100, kScalar_fa3p0, 5 0)
 
 
 =========================
@@ -35,6 +55,9 @@ qsub submitPBSJobTemplate.pbs -v "pureToys=false,ntoysperjob=1000,seed_index=2"
 # see submitToys help documentation
 python submitToys.py -h 
 
+#submitting jobs for 1D KD fit to LSF queues on lxplus
+chmod +x submitLSFJob_1DKDToys.lsf
+bsub -q 8nh submitLSFJob_1DKDToys.lsf
 
 #==============================
 
