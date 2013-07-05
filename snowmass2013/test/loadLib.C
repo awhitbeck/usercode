@@ -13,9 +13,11 @@
   // tools for ILC studies 
   gROOT->LoadMacro("../src/RooSpinZero_5D_ZH.cc+");
   gROOT->LoadMacro("../src/RooSpinZero_3D_ZH.cc+");
+  gROOT->LoadMacro("../src/RooSpinZero_3D_ZH_Acc.cc+");
+  gROOT->LoadMacro("../src/RooZZ_3D.cc+");
   gROOT->LoadMacro("../src/ScalarPdfFactoryZH.cc+");
   gROOT->LoadMacro("../src/PlaygroundZH.cc+");
-  gROOT->LoadMacro("../src/RooZZ_3D.cc+");
+
 
   // stat tools from summer 2012 paper 
   gROOT->LoadMacro("../src/statsFactory.cc+");
