@@ -1,4 +1,4 @@
-#ifndef __CINT__
+ #ifndef __CINT__
 #include "RooGlobalFunc.h"
 #endif
 
@@ -21,7 +21,7 @@ bool weightedevents = false;
 void calcfractionphase(double sqrts, double g1Re,  double g1Im,  double g2Re,   double g2Im,  double g4Re,  double g4Im, 
 		       double & fa2, double & fa3, double & phia2, double & phia3);
 
-void plotPdf_5D_ZH(float mH = 125, float sqrtsVal = 250.) {
+void plotPdf_5D_ZH(float mH = 125, float sqrtsVal =  500.) {
     
     gROOT->ProcessLine(".L ~/tdrstyle.C");
     setTDRStyle();
@@ -47,19 +47,22 @@ void plotPdf_5D_ZH(float mH = 125, float sqrtsVal = 250.) {
     double r1val = (r1 + P_ele ) / (1 + r1*P_ele); 
     
     // these values define the generator couplings
-    TString modeName = Form("fa3_%.0fGeV_5M", sqrtsVal);
-    TString fileName = Form("Events_20130626/unweighted_%s_%s_false.root", beamPolarName.Data(), modeName.Data());
+    // TString modeName = Form("g1_1TeV_1M");
+    TString modeName = Form("g1_%.0fGeV_2M", sqrtsVal);
+    //TString modeName = Form("model8_2M");
+    TString fileName = Form("Events_20130701/unweighted_%s_%s_false.root", beamPolarName.Data(), modeName.Data());
+    
     double g1Gen =   1;
     double g1ImGen = 0.;
     double g2Gen =   0.; 
     double g2ImGen = 0.; 
     double g3Gen =   0.;
     double g3ImGen = 0.;
-    double g4Gen =  0.117316; 
+    double g4Gen =  0; //0.046863; // 0.0112957; //0.117316; 
     if ( modeName.Contains("fa3")  ) {
       g4Gen =  0.83265;
     } 
-    if ( sqrtsVal == 500. ) 
+    if ( sqrtsVal == 500. && modeName.Contains("f3") ) 
       g4Gen =  2.62636E-2;
 
     double g4ImGen = 0.; // 0.83265;
@@ -144,41 +147,41 @@ void plotPdf_5D_ZH(float mH = 125, float sqrtsVal = 250.) {
     // Generate toy Data
     // 
     
-    int nsig = 1e+6;
-    RooDataSet* sigToyData = myPDF->generate(RooArgSet(*h1,*h2,*hs,*Phi,*Phi1), nsig);
+    //    int nsig = 1e+6;
+    // RooDataSet* sigToyData = myPDF->generate(RooArgSet(*h1,*h2,*hs,*Phi,*Phi1), nsig);
 
     // 
     // Plotting frames
     // 
     
     RooPlot* h1frame =  h1->frame(20);
-    // data.plotOn(h1frame, LineColor(kBlack), MarkerStyle(24));
-    sigToyData.plotOn(h1frame, LineColor(kBlack), MarkerStyle(24));
+    data.plotOn(h1frame, LineColor(kBlack), MarkerStyle(24));
+    //sigToyData.plotOn(h1frame, LineColor(kBlack), MarkerStyle(24));
 
     if ( !drawbkg )
       myPDF->plotOn(h1frame, LineColor(kBlack));
 
     RooPlot* h2frame =  h2->frame(20);
-    // data.plotOn(h2frame, LineColor(kBlack), MarkerStyle(24));
-    sigToyData.plotOn(h2frame, LineColor(kBlack), MarkerStyle(24));
+    data.plotOn(h2frame, LineColor(kBlack), MarkerStyle(24));
+    //sigToyData.plotOn(h2frame, LineColor(kBlack), MarkerStyle(24));
     if ( !drawbkg ) 
       myPDF->plotOn(h2frame, LineColor(kBlack));
 
     RooPlot* hsframe =  hs->frame(20);
-    // data.plotOn(hsframe, LineColor(kBlack), MarkerStyle(24));
-    sigToyData.plotOn(hsframe, LineColor(kBlack), MarkerStyle(24));
+    data.plotOn(hsframe, LineColor(kBlack), MarkerStyle(24));
+    //sigToyData.plotOn(hsframe, LineColor(kBlack), MarkerStyle(24));
     if ( !drawbkg )
       myPDF->plotOn(hsframe, LineColor(kBlack));
 
     RooPlot* phiframe =  Phi->frame(20);
-    // data.plotOn(phiframe, LineColor(kBlack), MarkerStyle(24));
-    sigToyData.plotOn(phiframe, LineColor(kBlack), MarkerStyle(24));
+    data.plotOn(phiframe, LineColor(kBlack), MarkerStyle(24));
+    //sigToyData.plotOn(phiframe, LineColor(kBlack), MarkerStyle(24));
     if ( !drawbkg ) 
       myPDF->plotOn(phiframe, LineColor(kBlack));
     
     RooPlot* phi1frame =  Phi1->frame(20);
-    // data.plotOn(phi1frame, LineColor(kBlack), MarkerStyle(24));
-    sigToyData.plotOn(phi1frame, LineColor(kBlack), MarkerStyle(24));
+    data.plotOn(phi1frame, LineColor(kBlack), MarkerStyle(24));
+    //sigToyData.plotOn(phi1frame, LineColor(kBlack), MarkerStyle(24));
     if ( !drawbkg ) 
       myPDF->plotOn(phi1frame, LineColor(kBlack));
     
@@ -202,9 +205,6 @@ void plotPdf_5D_ZH(float mH = 125, float sqrtsVal = 250.) {
     phiframe->Draw();
     
     
-    
-
-
     TString plotName = Form("plots/ZX_mX%.0f_sqrts%.0f_%s_%s", mH, sqrtsVal, modeName.Data(), beamPolarName.Data());
     
     if ( drawbkg ) 
@@ -224,7 +224,14 @@ void calcfractionphase(double sqrts, double g1Re,  double g1Im,  double g2Re,   
   Double_t sigma1_e = 0.981396; // was 0.94696 at 126 GeV
   Double_t sigma2_e = 33.4674;  // was 32.1981 at 126 GeV
   Double_t sigma4_e = 7.9229;   // was 7.45502 at 126 GeV
-  
+ 
+  // ILC nubmers at 350 GeV at mH = 125 GeV
+  if ( sqrts == 350. ) {
+    sigma1_e = 1.48872; 
+    sigma2_e = 125.387;  
+    sigma4_e = 75.3199;
+  }
+
   // ILC nubmers at 500 GeV at mH = 125 GeV
   if ( sqrts == 500. ) {
     sigma1_e = 2.57246; 
@@ -232,6 +239,12 @@ void calcfractionphase(double sqrts, double g1Re,  double g1Im,  double g2Re,   
     sigma4_e = 414.378;
   }
 
+  // ILC nubmers at 1000 GeV at mH = 125 GeV
+  if ( sqrts == 1000. ) {
+    sigma1_e = 8.95721; 
+    sigma2_e = 8208.91;  
+    sigma4_e = 7800.2;
+  }
   
   Double_t g1 = sqrt(g1Re*g1Re + g1Im*g1Im);
   Double_t g2 = sqrt(g2Re*g2Re + g2Im*g2Im);

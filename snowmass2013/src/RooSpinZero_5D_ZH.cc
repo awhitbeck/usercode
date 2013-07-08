@@ -184,8 +184,21 @@ enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMpar
       
       
       double g1Mag = 1.;
-      double g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma1_e/sigma2_e); 
-      double g4Mag = sqrt(fa3/(1.-fa2-fa3))*sqrt(sigma1_e/sigma4_e); 
+      double g2Mag = 0.; 
+      double g4Mag = 0.; 
+      
+      if ( fa2 == 1. ) {
+	g1Mag = 0.;
+	g2Mag = 1.;
+	g4Mag = 0.; 
+      } else if ( fa3 == 1. ) {
+	g1Mag = 0.;
+	g2Mag = 0.;
+	g4Mag = 1.; 
+      } else {
+	g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma1_e/sigma2_e); 
+	g4Mag = sqrt(fa3/(1.-fa2-fa3))*sqrt(sigma1_e/sigma4_e); 
+      }
       
       g1   = g1Mag;
       g1Im = 0.0;
@@ -339,8 +352,21 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
        }
        
        double g1Mag = 1.;
-       double g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma1_e/sigma2_e); 
-       double g4Mag = sqrt(fa3/(1.-fa2-fa3))*sqrt(sigma1_e/sigma4_e); 
+       double g2Mag = 0.; 
+       double g4Mag = 0.; 
+
+       if ( fa2 == 1. ) {
+	 g1Mag = 0.;
+	 g2Mag = 1.;
+	 g4Mag = 0.; 
+       } else if ( fa3 == 1. ) {
+	 g1Mag = 0.;
+	 g2Mag = 0.;
+	 g4Mag = 1.; 
+       } else {
+	 g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma1_e/sigma2_e); 
+	 g4Mag = sqrt(fa3/(1.-fa2-fa3))*sqrt(sigma1_e/sigma4_e); 
+       }
        
        g1   = g1Mag;
        g1Im = 0.0;
@@ -350,8 +376,7 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
        g3Im = 0.0;
        g4   = - g4Mag*cos(phia3);
        g4Im = - g4Mag*sin(phia3);
-              
-       
+
      }else if(parameterization==kRealImag_Gs){
        
        g1   =  g1Val;
@@ -372,7 +397,7 @@ Double_t RooSpinZero_5D_ZH::analyticalIntegral(Int_t code, const char* rangeName
      a3Im = -2.*g4Im;
      
    }
-   
+    
    Double_t x = pow((mX*mX-sqrts*sqrts-mZ*mZ)/(2.*sqrts*mZ),2)-1;
    
    Double_t A00Real = - (a1*sqrt(1+x) + a2*(mZ*sqrts)/(mX*mX)*x);
