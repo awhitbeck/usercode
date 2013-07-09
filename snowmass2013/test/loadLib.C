@@ -17,7 +17,7 @@
   gROOT->LoadMacro("../src/RooZZ_3D.cc+");
   gROOT->LoadMacro("../src/ScalarPdfFactoryZH.cc+");
   gROOT->LoadMacro("../src/PlaygroundZH.cc+");
-
+  gROOT->LoadMacro("../src/KDcalcZH.cc+");
 
   // stat tools from summer 2012 paper 
   gROOT->LoadMacro("../src/statsFactory.cc+");
