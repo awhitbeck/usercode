@@ -5,7 +5,7 @@
 
 using namespace PlaygroundZHhelpers;
 
-void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=0) {
+void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index = 1) {
 
   //   gROOT->ProcessLine(".x  loadLib.C");
   
@@ -35,13 +35,26 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=0) {
   bool dotoys = true;
 
   float lumi = 250; // in unit of fb
+  if ( sqrtsVal == 350. ) lumi = 350; 
   if ( sqrtsVal == 500. ) lumi = 500; 
+  if ( sqrtsVal == 1000. ) lumi = 1000; 
+
   float nsigperfb = 8;
   float nbkgperfb = 0.8;
   
+  if ( sqrtsVal == 350. ) {
+    nsigperfb = 1500./350.;
+    nbkgperfb = 150./350.;
+  }
+
   if ( sqrtsVal == 500. ) {
     nsigperfb = 2.;
     nbkgperfb = 0.2;
+  }
+
+  if ( sqrtsVal == 1000. ) {
+    nsigperfb = 0.5;
+    nbkgperfb = 0.05;
   }
   
   float nsigEvents = lumi*nsigperfb; 
@@ -55,9 +68,6 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=0) {
   TString modeName = Form("f_3_%.0fGeV_5M", sqrtsVal);
   //TString modeName = Form("fa3_%.0fGeV_5M", sqrtsVal);
   TString fileName = Form("Events_20130626/unweighted_unpol_%s_%s.root", modeName.Data(), accName.Data());
-
-  //TString modeName = Form("g1_1M", sqrtsVal);
-  //TString fileName = Form("Events_20130618/unweighted_unpol_%s_%s.root", modeName.Data(), accName.Data());
   TString treeName = "SelectedTree";
   
   double g1Re = 1;
@@ -66,7 +76,7 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=0) {
   double g2Im = 0.;
   double g3Re = 0.;
   double g3Im = 0.;
-  double g4Re = 0.117316; // 0.83265;
+  double g4Re = 0.117316;
   if ( sqrtsVal == 500. ) 
     g4Re = 2.62636E-02;
   double g4Im = 0.; //
@@ -154,26 +164,36 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=0) {
   test.scalar->b2->setConstant(kTRUE);
   test.scalar->cgaus->setConstant(kTRUE);
   test.scalar->sgaus->setConstant(kTRUE);
-  
   // 
   // set up background PDF
   // 
+
   // directly from 3D Histogram
-  // 
   RooRealVar* costheta1 = new RooRealVar("costheta1","cos#theta_{1}",-1.,1.);
   RooRealVar* costheta2 = new RooRealVar("costheta2","cos#theta_{2}",-1.,1.);
   RooRealVar* phi = new RooRealVar("phi","#Phi", -TMath::Pi(),TMath::Pi());
 
-  costheta1->setBins(10);
-  costheta2->setBins(10);
-  phi->setBins(10);
+  int nbins_h1 = 20;
+  int nbins_h2 = 20;
+  int nbins_phi = 15;
+  
+  if ( sqrtsVal == 500. ) {
+    nbins_h1 = 50;
+    nbins_h2 = 10;
+    nbins_phi = 10;
+  }
+  costheta1->setBins(nbins_h1);
+  costheta2->setBins(nbins_h2);
+  phi->setBins(nbins_phi);
 
+  // From RooDataHist
   TChain *bkgTree = new TChain("SelectedTree");
   bkgTree->Add(Form("bkgData/ee_ZZ_llbb_%.0fGeV_25M_%s.root", sqrtsVal, accName.Data()));
   RooDataSet *bkgData = new RooDataSet("bkgData","bkgData",bkgTree,RooArgSet(*costheta1, *costheta2, *phi));
   RooDataHist *bkgHist = bkgData->binnedClone(0);
   RooHistPdf* bkgPdf = new RooHistPdf("bkgPdf", "bkgPdf", RooArgSet(*costheta1, *costheta2, *phi), *bkgHist);
   /*
+
   // From emphirical fit
   float h1pol2Val = 5.43096e-01;
   float h1pol4Val = 1.05202e+00;
@@ -239,7 +259,8 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=0) {
   
   RooZZ_3D*  bkgPdf = new RooZZ_3D("bkgPdf","bkgPdf", *(test.costheta1), *(test.costheta2), *(test.phi),
 				   *h1pol2,*h1pol4,*h1pol6,*h1pol8,*h2pol2,*phiconst,*twophiconst,withAcceptance);
-				   */
+	
+  */
   if ( fitData ) { 
     RooFitResult *fitresults = test.fitData(test.scalar->PDF, bkgPdf);
   }
@@ -325,13 +346,14 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=0) {
       test.scalar->phia3->setVal(phia3Val);
       test.nsig->setVal(nsigEvents);
       test.nbkg->setVal(nbkgEvents);
-      
       /*
       test.scalar->fa3->setConstant(kTRUE);
       test.scalar->phia3->setConstant(kTRUE);
       test.nsig->setConstant(kTRUE);
       test.nbkg->setConstant(kTRUE);
       */
+
+
 
       int toy_index = i + seed_index * ntoysperjob;
 
@@ -428,7 +450,7 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=0) {
     test.projectPDF(kcostheta2, test.scalar->PDF, bkgPdf, nbins, dotoys, drawbkg);
     
     c1->cd(3);
-    test.projectPDF(kphi, test.scalar->PDF, bkgPdf, 40, dotoys, drawbkg);
+    test.projectPDF(kphi, test.scalar->PDF, bkgPdf, nbins, dotoys, drawbkg);
 
     TString fitName = "nofit";
     if ( fitData ) 
@@ -436,8 +458,8 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index=0) {
     if ( dotoys ) 
       fitName = "toy";
 
-    c1->SaveAs(Form("ilcplots/projection_%s_%s_%s.eps", fitName.Data(), modeName.Data(), accName.Data()));
-    c1->Print(Form("ilcplots/projection_%s_%s_%s.png", fitName.Data(), modeName.Data(), accName.Data()));
+    c1->SaveAs(Form("ilcplots/projection_%s_%s.eps", fitName.Data(), modeName.Data()));
+    c1->Print(Form("ilcplots/projection_%s_%s.png", fitName.Data(), modeName.Data()));
 
     delete c1; 
   }
