@@ -72,9 +72,13 @@ public:
     phi->setVal(phi_);
 
     float SMHiggsProb = SMHiggs->PDF->getVal();
+    if(SMHiggsProb<0.0) cout << "KDcalcZH::computeKD - ERROR: SMHiggs prob is negative!!!" << endl;
     float altSignalProb = altSignal->PDF->getVal();
+    if(altSignalProb<0.0) cout << "KDcalcZH::computeKD - ERROR: altSig prob is negative!!!" << endl;
+    
+    float c = 0.844;
 
-    KD = SMHiggsProb/(SMHiggsProb+altSignalProb);
+    KD = SMHiggsProb/(SMHiggsProb+c*altSignalProb);
 
   };
 
@@ -87,8 +91,12 @@ public:
 		  TString phiBranch="phi"
 		  ){
     
-    TFile* f = new TFile(fileName,"UPDATE");
+    TFile* f = new TFile(fileName,"READ");
     TTree* t = (TTree*) f->Get(treeName);
+
+    fileName.ReplaceAll(".root","_withKD.root");
+    TFile* ff = new TFile(fileName,"RECREATE");
+    TTree* tt = (TTree*) t->CloneTree(0,"fast");
 
     float mH_,costheta1_,costheta2_,phi_;
     float KD_;
@@ -97,22 +105,34 @@ public:
     t->SetBranchAddress(costheta1Branch,&costheta1_);
     t->SetBranchAddress(costheta2Branch,&costheta2_);
     t->SetBranchAddress(phiBranch,&phi_);
-    t->Branch("pseudoMELA",&KD_,"pseudoMELA/D");
+    tt->Branch("pseudoMELA",&KD_,"pseudoMELA/F");
+    
+    cout << "t entries: "  << t->GetEntries() << endl;
 
-    int maxEvents = t->GetEntries();
+    for(int iEvt=0; iEvt<t->GetEntries(); iEvt++){
 
-    for(int iEvt=0; iEvt<maxEvents; iEvt++){
-
-      if(iEvt%100000==0) cout << iEvt << "/" << maxEvents << endl;
+      if(iEvt%100000==0)  cout << iEvt << "/" << t->GetEntries() << endl;
 
       t->GetEntry(iEvt);
+
       computeKD(mH_,costheta1_,costheta2_,phi_,KD_);
-      t->Fill();
+
+      /*
+      cout << "mH: " << mH_ << endl;
+      cout << "costheta1: " << costheta1_ << endl;
+      cout << "costheta2: " << costheta2_ << endl;
+      cout << "phi: " << phi_ << endl;
+      cout << "KD: " << KD_ << endl;
+      */
+
+      tt->Fill();
 
     }
 
-    t->Write();
-
+    ff->cd();
+    tt->Write("SelectedTree");
+    f->Close();
+    ff->Close();
   };
 
 };
