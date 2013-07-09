@@ -119,11 +119,12 @@ public:
 
     int nsigEvents = nsig->getVal();
     int nbkgEvents = nbkg->getVal();
-
+    /*
     if ( pure ) {
       nsigEvents = rng_.Poisson( nsig->getVal());
       nbkgEvents = rng_.Poisson( nbkg->getVal());
     }
+    */
     
     int nEvents = nsigEvents + nbkgEvents; 
     RooAddPdf* totalPdf = new RooAddPdf("totalPdf","totalPdf",RooArgList(*sigPdf,*bkgPdf),RooArgList(*nsig,*nbkg));
