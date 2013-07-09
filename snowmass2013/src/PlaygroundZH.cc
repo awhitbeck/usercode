@@ -119,7 +119,7 @@ public:
 
     int nsigEvents = nsig->getVal();
     int nbkgEvents = nbkg->getVal();
-    
+
     if ( pure ) {
       nsigEvents = rng_.Poisson( nsig->getVal());
       nbkgEvents = rng_.Poisson( nbkg->getVal());
@@ -280,17 +280,34 @@ public:
 void calcfractionphase(double sqrts, double g1Re,  double g1Im,  double g2Re,   double g2Im,  double g4Re,  double g4Im, 
 		       double & fa2, double & fa3, double & phia2, double & phia3) 
   {
+
+    
     // ILC numbers at 250 GeV at mH= 125 GeV (narrow Z width approximation)
     Double_t sigma1_e = 0.981396; // was 0.94696 at 126 GeV
     Double_t sigma2_e = 33.4674;  // was 32.1981 at 126 GeV
     Double_t sigma4_e = 7.9229;   // was 7.45502 at 126 GeV
     
-    // ILC numbers at 500 GeV with mH = 125 GeV ( narrow Z width approximation) 
+    // ILC nubmers at 350 GeV at mH = 125 GeV
+    if ( sqrts == 350. ) {
+      sigma1_e = 1.48872; 
+      sigma2_e = 125.387;  
+      sigma4_e = 75.3199;
+    }
+    
+    // ILC nubmers at 500 GeV at mH = 125 GeV
     if ( sqrts == 500. ) {
       sigma1_e = 2.57246; 
       sigma2_e = 516.556;  
       sigma4_e = 414.378;
     }
+    
+    // ILC nubmers at 1000 GeV at mH = 125 GeV
+    if ( sqrts == 1000. ) {
+      sigma1_e = 8.95721; 
+      sigma2_e = 8208.91;  
+      sigma4_e = 7800.2;
+    }
+
     
     Double_t g1 = sqrt(g1Re*g1Re + g1Im*g1Im);
     Double_t g2 = sqrt(g2Re*g2Re + g2Im*g2Im);
