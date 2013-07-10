@@ -20,13 +20,14 @@ public:
   ScalarPdfFactoryZH* SMHiggs;
   ScalarPdfFactoryZH* altSignal;
 
-  KDcalcZH(){
+  KDcalcZH(double sqrtsVal, double mX){
 
     costheta1 = new RooRealVar("costheta1","costheta1",-1.,1.);
     costheta2 = new RooRealVar("costheta2","costheta2",-1.,1.);
     phi       = new RooRealVar("phi","phi",-TMath::Pi(),TMath::Pi());
     
     mH        = new RooRealVar("mH","mH",100.,1000.);
+    mH->setVal(mX);
 
     SMHiggs   = new ScalarPdfFactoryZH(costheta1,
 				       costheta2,
@@ -39,7 +40,7 @@ public:
     SMHiggs->fa3->setVal(0.0);
     SMHiggs->phia2->setVal(0.0);
     SMHiggs->phia3->setVal(0.0);
-
+    SMHiggs->sqrts->setVal(sqrtsVal);
 
     altSignal = new ScalarPdfFactoryZH(costheta1,
 					  costheta2,
@@ -52,6 +53,7 @@ public:
     altSignal->fa3->setVal(0.999999);
     altSignal->phia2->setVal(0.0);
     altSignal->phia3->setVal(0.0);
+    altSignal->sqrts->setVal(sqrtsVal);
 
     SMHiggs->makeParamsConst(true);
     altSignal->makeParamsConst(true);
@@ -76,7 +78,7 @@ public:
     float altSignalProb = altSignal->PDF->getVal();
     if(altSignalProb<0.0) cout << "KDcalcZH::computeKD - ERROR: altSig prob is negative!!!" << endl;
     
-    float c = 0.844;
+    float c = 0.84;
 
     KD = SMHiggsProb/(SMHiggsProb+c*altSignalProb);
 
@@ -110,6 +112,8 @@ public:
     cout << "t entries: "  << t->GetEntries() << endl;
 
     for(int iEvt=0; iEvt<t->GetEntries(); iEvt++){
+
+      // if ( iEvt > 10000 ) continue;
 
       if(iEvt%100000==0)  cout << iEvt << "/" << t->GetEntries() << endl;
 
