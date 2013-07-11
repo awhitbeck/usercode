@@ -4,14 +4,14 @@
 ntoys=3000
 nevts=21
 sample=kScalar_fa3p5
-#params=kfa3Only
-#params=kfa3phia3Only
 params=kAllFree
-
+bkg=true
+iter=0
+pure=false
 
 # The batch job directory (will vanish after job end):
 curdir=`pwd`
-workdir=/afs/cern.ch/user/s/sbologne/workspace/multidimFit_newSamples/ZZMatrixElement/snowmass2013/test
+workdir=/afs/cern.ch/user/s/sbologne/workspace/multidimFit_addBackg/ZZMatrixElement/snowmass2013/test
 
 # printing
 echo what is the workdir...$workdir
@@ -27,7 +27,10 @@ echo "ntoys: " $ntoys
 echo "nevts: " $nevts
 echo "sample: " $sample
 echo "params: " $params
+echo "bakcground: " $bkg
+echo "iteration: " $iter
+echo "pure: " $pure
 
 
-root -l -n -b -q loadLib.C "embeddedToys.C(${nevts},${ntoys},false,${sample},${params})"
+root -l -n -b -q loadLib.C "embeddedToys.C(${nevts},${ntoys},${pure},${sample},${params},${bkg},${iter})"
 
