@@ -13,7 +13,7 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index = 1) {
   RooRandom::randomGenerator()->SetSeed(random_seed);
   bool debug = false;
   float mH = 125.;
-  float sqrtsVal = 250.;
+  float sqrtsVal = 250;
   bool withAcceptance = false;
 
   TString accName = "false";
@@ -68,17 +68,29 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index = 1) {
   TString modeName = Form("f_3_%.0fGeV_5M", sqrtsVal);
   //TString modeName = Form("fa3_%.0fGeV_5M", sqrtsVal);
   TString fileName = Form("Events_20130626/unweighted_unpol_%s_%s.root", modeName.Data(), accName.Data());
+  if ( sqrtsVal == 350. ) {
+    modeName = Form("model8_2M", sqrtsVal);
+    fileName = Form("Events_20130701/unweighted_unpol_%s_%s.root", modeName.Data(), accName.Data());
+  }
+  if ( sqrtsVal == 1000. ) {
+    modeName = Form("model9_1M", sqrtsVal);
+    fileName = Form("Events_20130701/unweighted_unpol_%s_%s.root", modeName.Data(), accName.Data());
+  }
   TString treeName = "SelectedTree";
   
   double g1Re = 1;
   double g1Im = 0.;
-  double g2Re = 0.; //0.54071;
+  double g2Re = 0.;
   double g2Im = 0.;
   double g3Re = 0.;
   double g3Im = 0.;
   double g4Re = 0.117316;
-  if ( sqrtsVal == 500. ) 
+  if ( sqrtsVal == 350.)
+    g4Re = 0.046863;
+  if ( sqrtsVal == 500 ) 
     g4Re = 2.62636E-02;
+  if ( sqrtsVal == 1000.) 
+    g4Re = 0.011296;
   double g4Im = 0.; //
 
   // below will be recalculated once Playground is defined
@@ -105,8 +117,9 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index = 1) {
   if ( loadSigData ) 
     test.loadSigTree(fileName, treeName);
   if(debug) cout << test.data << endl;
-  if ( loadBkgData ) 
+  if ( loadBkgData ) {
     test.loadBkgTree(Form("bkgData/ee_ZZ_llbb_%.0fGeV_25M_%s.root", sqrtsVal, accName.Data()), treeName);
+  }
   
   // 
    // setting the siganl pdf
@@ -177,8 +190,14 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index = 1) {
   int nbins_h2 = 20;
   int nbins_phi = 15;
   
-  if ( sqrtsVal == 500. ) {
+  if ( sqrtsVal > 250. && sqrtsVal < 1000.) {
     nbins_h1 = 50;
+    nbins_h2 = 10;
+    nbins_phi = 10;
+  }
+
+  if ( sqrtsVal == 1000. ) {
+    nbins_h1 = 100;
     nbins_h2 = 10;
     nbins_phi = 10;
   }
@@ -346,12 +365,12 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index = 1) {
       test.scalar->phia3->setVal(phia3Val);
       test.nsig->setVal(nsigEvents);
       test.nbkg->setVal(nbkgEvents);
-      /*
-      test.scalar->fa3->setConstant(kTRUE);
-      test.scalar->phia3->setConstant(kTRUE);
+
+      //test.scalar->fa3->setConstant(kTRUE);
+      //test.scalar->phia3->setConstant(kTRUE);
       test.nsig->setConstant(kTRUE);
       test.nbkg->setConstant(kTRUE);
-      */
+
 
 
 
