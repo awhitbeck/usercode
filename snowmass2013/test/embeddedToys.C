@@ -4,8 +4,8 @@
 
 using namespace PlaygroundHelpers;
 
-enum sample {kScalar_fa3p0,kScalar_fa3p1,kScalar_fa3p5,kScalar_fa3p5phia390,kScalar_fa3p25,kScalar_fa2p1fa3p1,kNumSamples};
-TString sampleName[kNumSamples] = {"fa3p0","fa3p1","fa3p5","fa3p5phia390","fa3p25","fa2p1fa3p1"};
+enum sample {kScalar_fa3p0,kScalar_fa3p1,kScalar_fa3p5,kScalar_fa3p5phia390,kScalar_fa3p25,kScalar_fa2p1fa3p1,kScalar_fa3p06,kScalar_fa3p18,kNumSamples};
+TString sampleName[kNumSamples] = {"fa3p0","fa3p1","fa3p5","fa3p5phia390","fa3p25","fa2p1fa3p1","fa3p06","fa3p18"};
 enum freeParams {kfa3Only,kfa3phia3Only,kfa2Only,kfa2phia2Only,kfa2fa3Only,kAllFree,kNumScenarios};
 TString scenario[kNumScenarios] = {"fa3_free","fa3_phia3_free","fa2_free","fa2_phia2_free","fa2_fa3_free","all_free"};
 
@@ -14,7 +14,11 @@ TString inputFileNames[kNumSamples] = {"/afs/cern.ch/user/s/sbologne/workspace/m
 				       "/afs/cern.ch/user/s/sbologne/workspace/multidimFit_prophecy/ZZMatrixElement/snowmass2013/test/samples/JHUpsMELA_m2cut_2e2mu/Higgs0Mf05ph0ToZZTo4L_M-125_14TeV_2e2mu_withProbabilities.root",
 				       "/afs/cern.ch/user/s/sbologne/workspace/multidimFit_prophecy/ZZMatrixElement/snowmass2013/test/samples/JHUpsMELA_m2cut_2e2mu/Higgs0Mf05ph90ToZZTo4L_M-125_14TeV_2e2mu_withProbabilities.root",
 				       "/afs/cern.ch/user/s/sbologne/workspace/multidimFit_prophecy/ZZMatrixElement/snowmass2013/test/samples/analyticalpsMELA/m2cut_2e2mu/XZ-Higgs0Mf025ph0ToZZTo4l_M-125_14TeV_withDiscriminants_2e2mu.root",
-				       "/afs/cern.ch/user/s/sbologne/workspace/multidimFit_prophecy/ZZMatrixElement/snowmass2013/test/samples/JHUpsMELA_m2cut_2e2mu/Higgs0Mf01ph0Higgs0PHf01ph0ToZZTo4L_M-125_14TeV_withDiscriminants_2e2mu_withProbabilities.root"};
+				       "/afs/cern.ch/user/s/sbologne/workspace/multidimFit_prophecy/ZZMatrixElement/snowmass2013/test/samples/JHUpsMELA_m2cut_2e2mu/Higgs0Mf01ph0Higgs0PHf01ph0ToZZTo4L_M-125_14TeV_withDiscriminants_2e2mu_withProbabilities.root",
+
+				       //dummy for now!!!
+				       "/afs/cern.ch/user/s/sbologne/workspace/multidimFit_prophecy/ZZMatrixElement/snowmass2013/test/samples/JHUpsMELA_m2cut_2e2mu/SMHiggsToZZTo4L_M-125_14TeV_2e2mu_withProbabilities.root",
+				       "/afs/cern.ch/user/s/sbologne/workspace/multidimFit_prophecy/ZZMatrixElement/snowmass2013/test/samples/JHUpsMELA_m2cut_2e2mu/SMHiggsToZZTo4L_M-125_14TeV_2e2mu_withProbabilities.root"};
 /*
 TString inputFileNames[kNumSamples] = {"/afs/cern.ch/user/s/sbologne/workspace/multidimFit_prophecy/ZZMatrixElement/snowmass2013/test/samples/analyticalpsMELA/m2cut_2e2mu/SMHiggsToZZTo4L_M-125_14TeV_withDiscriminants_2e2mu.root",
 				       "/afs/cern.ch/user/s/sbologne/workspace/multidimFit_prophecy/ZZMatrixElement/snowmass2013/test/samples/analyticalpsMELA/m2cut_2e2mu/Higgs0Mf01ph0ToZZTo4L_M-125_14TeV_withDiscriminants_2e2mu.root",
@@ -56,13 +60,13 @@ void embeddedToys(int nEvts=50, int nToys=10,
   results->Branch("phia2Error",&phia2Error,"phia2Error/D");
   //---------------------------------
   
-  Playground myPG(125., true, 2, false, bkg,3.75);
+  Playground myPG(125., true, 2, false, bkg,2.5);
   myPG.setEmbeddingCounter(iteration*nEvts*nToys);
 
   // load tree to draw toys from
   myPG.loadTree(inputFileNames[mySample],"SelectedTree");
   if(bkg)
-    myPG.loadTree_bkg("/afs/cern.ch/user/s/sbologne/workspace/multidimFit_prophecy/ZZMatrixElement/snowmass2013/test/samples/analyticalpsMELA/m2cut_2e2mu/pwgevents_hadd_withDiscriminants_2e2mu.root","SelectedTree");
+    myPG.loadTree_bkg("/afs/cern.ch/user/s/sbologne/workspace/multidimFit_prophecy/ZZMatrixElement/snowmass2013/test/samples/analyticalpsMELA/m2cut_2e2mu/pwgevents_hadd_withDiscriminants_2e2mu_mzz120130.root","SelectedTree");
 
   // configure parameter for which ones
   // you would like to fit
@@ -93,6 +97,12 @@ void embeddedToys(int nEvts=50, int nToys=10,
     if(mySample == kScalar_fa2p1fa3p1){
       myPG.scalar->_modelParams.fa2->setVal(0.1);
       myPG.scalar->_modelParams.fa3->setVal(0.1);
+    }
+    if(mySample == kScalar_fa3p06){
+      myPG.scalar->_modelParams.fa3->setVal(0.06);
+    }
+    if(mySample == kScalar_fa3p18){
+      myPG.scalar->_modelParams.fa3->setVal(0.18);
     }
  
     cout << "=======================" << endl;

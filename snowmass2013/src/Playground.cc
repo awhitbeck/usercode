@@ -66,7 +66,8 @@ public:
     phi = new RooRealVar("helphi","#Phi",0.,-TMath::Pi(),TMath::Pi());
     phi1 = new RooRealVar("phistarZ1","#Phi_{1}",0.,-TMath::Pi(),TMath::Pi());
       
-    mzz = new RooRealVar("ZZMass","m_{ZZ}",mH,106,141);
+    //mzz = new RooRealVar("ZZMass","m_{ZZ}",mH,106,141);
+    mzz = new RooRealVar("ZZMass","m_{ZZ}",mH,120,130);
 
     varContainer.push_back(z1mass);
     varContainer.push_back(z2mass);

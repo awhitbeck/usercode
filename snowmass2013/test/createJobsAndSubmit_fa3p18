@@ -1,0 +1,26 @@
+#!/bin/sh
+
+for counter in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40
+do
+
+echo '#!/bin/sh' > jobPureBkg${counter}_fa3p18_fa3_free_600evts
+
+echo 'ntoys=5' >> jobPureBkg${counter}_fa3p18_fa3_free_600evts
+echo 'nevts=600'  >> jobPureBkg${counter}_fa3p18_fa3_free_600evts
+echo 'sample=kScalar_fa3p18' >> jobPureBkg${counter}_fa3p18_fa3_free_600evts
+echo 'params=kfa3Only' >> jobPureBkg${counter}_fa3p18_fa3_free_600evts
+echo 'bkg=true' >> jobPureBkg${counter}_fa3p18_fa3_free_600evts
+echo 'iter='${counter} >> jobPureBkg${counter}_fa3p18_fa3_free_600evts
+echo 'pure=true' >> jobPureBkg${counter}_fa3p18_fa3_free_600evts
+
+tail -n 24 submitLSFJob_embeddedToys.lsf >> jobPureBkg${counter}_fa3p18_fa3_free_600evts
+
+chmod +x jobPureBkg${counter}_fa3p18_fa3_free_600evts
+
+bsub -q 1nh jobPureBkg${counter}_fa3p18_fa3_free_600evts
+
+done
+
+
+
+
