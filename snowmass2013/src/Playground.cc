@@ -2,8 +2,12 @@
 #define PLAYGROUND
 
 #include "RooSpinZero_7DComplex_withAccep.h"
-#include "RooqqZZ_JHU_ZgammaZZ_fast.h"
+//#include "RooqqZZ_JHU_ZgammaZZ_fast.h"
+//#include "RooFlat.h"
+#include "RooProjectedBkg.h"
 #include "RooPlot.h"
+#include "RooRealVar.h"
+#include "RooProdPdf.h"
 #include "RooAddPdf.h"
 #include "AngularPdfFactory.cc"
 #include "ScalarPdfFactory.cc"
@@ -38,7 +42,16 @@ public:
 
   ScalarPdfFactory* scalar;
   bool background_;
-  RooqqZZ_JHU_ZgammaZZ_fast* PDF_qqZZ;
+  //RooqqZZ_JHU_ZgammaZZ_fast* PDF_qqZZ;
+  //RooFlat* PDF_qqZZ;
+  RooProdPdf* PDF_qqZZ;
+  RooPolynomial* costhetastar_PDF;
+  RooPolynomial* costheta1_PDF;
+  RooPolynomial* costheta2_PDF;
+  RooGenericPdf* phi1_PDF;
+  RooGenericPdf* phi_PDF;
+  RooGenericPdf* masses_PDF;
+
   RooRealVar* upfrac;
   RooRealVar* bkg_frac;
   double SoverB_;
@@ -51,6 +64,35 @@ public:
   int embedTracker;
   int embedTracker_bkg;
 
+  RooRealVar* a0;
+  RooRealVar* a1;
+  RooRealVar* a2;
+  RooRealVar* a3;
+  RooRealVar* a4;
+ 
+  RooRealVar* b0;
+  RooRealVar* b1;
+  RooRealVar* b2;
+  RooRealVar* b3;
+  RooRealVar* b4;
+ 
+  RooRealVar* c0;
+  RooRealVar* c1;
+  RooRealVar* c2;
+  RooRealVar* c3;
+  RooRealVar* c4;
+ 
+  RooRealVar* d0;
+  RooRealVar* d1;
+  RooRealVar* d2;
+ 
+  RooRealVar* e0;
+  RooRealVar* e1;
+  RooRealVar* e2;
+  RooRealVar* e3;
+  RooRealVar* e4;
+  RooRealVar* e5;
+ 
   Playground(double mH, bool debug_=false, int parameterization_=2, bool acceptance=false, bool background=false, double SoverB=0){
     
     debug=debug_;
@@ -65,7 +107,7 @@ public:
     costheta2 = new RooRealVar("helcosthetaZ2","cos#theta_{2}",0.,-1.,1.);
     phi = new RooRealVar("helphi","#Phi",0.,-TMath::Pi(),TMath::Pi());
     phi1 = new RooRealVar("phistarZ1","#Phi_{1}",0.,-TMath::Pi(),TMath::Pi());
-      
+    
     //mzz = new RooRealVar("ZZMass","m_{ZZ}",mH,106,141);
     mzz = new RooRealVar("ZZMass","m_{ZZ}",mH,120,130);
 
@@ -101,21 +143,96 @@ public:
     background_=background;
     if(background_){
       SoverB_ = SoverB;
-      upfrac = new RooRealVar("upfrac","upfrac",0.5,0.,1.);
-      upfrac->setConstant(kTRUE);
-      //Bakcground fraction over total S+B
+      /*upfrac = new RooRealVar("upfrac","upfrac",0.5,0.,1.);
+	upfrac->setConstant(kTRUE);
+	//Bakcground fraction over total S+B
+	bkg_frac = new RooRealVar("bkg_frac","bkg_frac",1/(SoverB_+1),0.,10.);
+	bkg_frac->setConstant(kTRUE);
+	PDF_qqZZ= new RooqqZZ_JHU_ZgammaZZ_fast("PDF_qqZZ","PDF_qqZZ",
+	*z1mass, *z2mass, *costheta1, *costheta2, *phi, *costhetastar, *phi1, *mzz,
+	*upfrac);
+	model = new RooAddPdf("model","background+signal",*PDF_qqZZ,*(scalar->PDF),*bkg_frac);  
+      */
       bkg_frac = new RooRealVar("bkg_frac","bkg_frac",1/(SoverB_+1),0.,10.);
       bkg_frac->setConstant(kTRUE);
-      PDF_qqZZ= new RooqqZZ_JHU_ZgammaZZ_fast("PDF_qqZZ","PDF_qqZZ",
-					      *z1mass, *z2mass, *costheta1, *costheta2, *phi, *costhetastar, *phi1, *mzz,
-					      *upfrac);
+      //PDF_qqZZ= new RooFlat("PDF_qqZZ","PDF_qqZZ",
+      //			    *z1mass, *z2mass, *costheta1, *costheta2, *phi, *costhetastar, *phi1); 
+
+      a0= new RooRealVar("a0","a0",0.9,0,10);
+      a1=new RooRealVar("a1","a1",0,0,1); 
+      a2=new RooRealVar("a2","a2",0,0,1) ;
+      a3=new RooRealVar("a3","a4",0,0,1) ;
+      a4=new RooRealVar("a4","a4",1.1,0,10) ;
+      a1->setConstant(kTRUE);
+      a2->setConstant(kTRUE);
+      a3->setConstant(kTRUE);
+      a0->setConstant(kTRUE);
+      a4->setConstant(kTRUE);
+
+      b0=new RooRealVar("b0","b0",9.05,0,10) ;
+      b1=new RooRealVar("b1","b1",0,0,1); 
+      b2=new RooRealVar("b2","b2",1.034,0,10) ;
+      b3=new RooRealVar("b3","b3",0,0,1) ;
+      b4=new RooRealVar("b4","b4",0.351,0,1) ;
+      b0->setConstant(kTRUE);
+      b1->setConstant(kTRUE);
+      b2->setConstant(kTRUE);
+      b3->setConstant(kTRUE);
+      b4->setConstant(kTRUE);
+ 
+      c0=new RooRealVar("c0","c0",23.4,10,100) ;
+      c1=new RooRealVar("c1","c1",0,0,1); 
+      c2=new RooRealVar("c2","c2",-6.4,-10,10) ;
+      c3=new RooRealVar("c3","c4",0,0,1) ;
+      c4=new RooRealVar("c4","c4",-13.7,-100,10) ;
+      c0->setConstant(kTRUE);
+      c1->setConstant(kTRUE);
+      c2->setConstant(kTRUE);
+      c3->setConstant(kTRUE);
+      c4->setConstant(kTRUE);
+
+      d0=new RooRealVar("d0","d0",100,100,200) ;
+      d1=new RooRealVar("d1","d1",1.9,0,10);
+      d2=new RooRealVar("d2","d2",3.18,0,10);
+      d0->setConstant(kTRUE);
+      d1->setConstant(kTRUE);
+      d2->setConstant(kTRUE);
+
+      e0=new RooRealVar("e0","e0",27.42,10,200) ;
+      e1=new RooRealVar("e1","e1",1.92,0,10);
+      e2=new RooRealVar("e2","e2",14.40,0,50);
+      e3=new RooRealVar("e3","e3",4.08,0,10);
+      e4=new RooRealVar("e4","e4",3.59,0,100);
+      e5=new RooRealVar("e5","e5",2.39,0,100);
+      e0->setConstant(kTRUE);
+      e1->setConstant(kTRUE);
+      e2->setConstant(kTRUE);
+      e3->setConstant(kTRUE);
+      e4->setConstant(kTRUE);
+      e5->setConstant(kTRUE);
+ 
+      costhetastar_PDF= new RooPolynomial ("costhetastar_PDF","costhetastar_PDF",*costhetastar,RooArgList(*a0,*a1,*a2,*a3,*a4),0);
+
+      costheta1_PDF= new RooPolynomial ("costheta1_PDF","costheta1_PDF",*costheta1,RooArgList(*b0,*b1,*b2,*b3,*b4),0);
+
+      costheta2_PDF= new RooPolynomial ("costheta2_PDF","costheta2_PDF",*costheta2,RooArgList(*c0,*c1,*c2,*c3,*c4),0);
+  
+      phi_PDF= new RooGenericPdf ("phi_PDF","phi_PDF","d0+d2*TMath::Cos(d1*helphi)",RooArgList(*phi, *d0,*d1,*d2));
+
+      phi1_PDF= new RooGenericPdf ("phi1_PDF","phi1_PDF","e0+e2*TMath::Sin(TMath::Exp(-e3*phistarZ1*phistarZ1)+TMath::Exp(-e4*(phistarZ1-3.14)*(phistarZ1-3.14))+TMath::Exp(-e5*(phistarZ1+3.4)*(phistarZ1+3.14))+e1)",RooArgList(*phi1, *e0,*e1,*e2,*e3,*e4,*e5));
+
+      masses_PDF= new RooGenericPdf ("masses_PDF","masses_PDF",
+				     "(1-(Z1Mass+Z2Mass)*(Z1Mass+Z2Mass)/125*125)*(1-(Z1Mass+Z2Mass)*(Z1Mass+Z2Mass)/125*125)*(1-(Z1Mass-Z2Mass)*(Z1Mass-Z2Mass)/125*125)*(1-(Z1Mass-Z2Mass)*(Z1Mass-Z2Mass)/125*125)*Z1Mass*Z1Mass*Z1Mass/((Z1Mass*Z1Mass-91*91)*(Z1Mass*Z1Mass-91*91)+91*91*2.5*2.5)/(Z2Mass*Z2Mass)",RooArgList(*z1mass,*z2mass));
+
+      PDF_qqZZ= new RooProdPdf("PDF_qqZZ","PDF_qqZZ",RooArgList(*costhetastar_PDF,*costheta1_PDF,*costheta2_PDF,*phi1_PDF,*phi_PDF,*masses_PDF));
+
       model = new RooAddPdf("model","background+signal",*PDF_qqZZ,*(scalar->PDF),*bkg_frac);  
     }
-   }
+  }
     
-   ~Playground(){
+  ~Playground(){
 
-     //std::cout << "~Playground" << std::endl;
+    //std::cout << "~Playground" << std::endl;
 
     delete scalar;
     delete PDF_qqZZ;
@@ -215,7 +332,7 @@ public:
  int generate_sigbkg(int nEvents, bool pure=true){
 
     if(debug)
-      cout << "Playground::generate_sigbkg()" << endl;
+      cout << "Playground::generate_sigbkg() with pure " <<pure<< endl;
 
     if(!background_){
       cout<<"Error in Playground: you asked to generate bkg but you didn't setup Palyground to have background included!! Aborting..."<<endl;
