@@ -26,7 +26,7 @@ void readOutAngles_ILC(std::string filename, bool applyAcc=false, bool debug = f
     std::cout << "Processing " << filenameT << std::endl;
     fin.open(filenameT.c_str());
     
-    int maxEvents = 10000000;
+    int maxEvents = 100000000;
 	
     char oname[250];
     sprintf(oname,"%s.root",filename.c_str());
@@ -40,6 +40,7 @@ void readOutAngles_ILC(std::string filename, bool applyAcc=false, bool debug = f
     Float_t m_ptlminus, m_etalminus, m_philminus;
     Float_t m_ptb, m_etab, m_phib;
     Float_t m_ptbbar, m_etabbar, m_phibbar;
+    Float_t m_ptH; 
     Float_t m_wt; 
 
     Float_t ptlminus_ALT,ptlplus_ALT;
@@ -75,6 +76,8 @@ void readOutAngles_ILC(std::string filename, bool applyAcc=false, bool debug = f
     tree->Branch("ptbbar"     , &m_ptbbar, "ptbbar/F");
     tree->Branch("etabbar"    , &m_etabbar,"etabbar/F");
     tree->Branch("phibbar"    , &m_phibbar,"phibbar/F");
+
+    tree->Branch("ptH", &m_ptH, "ptH/F");
 
     tree->Branch("wt"           , &m_wt, "wt/F");
 
@@ -175,14 +178,20 @@ void readOutAngles_ILC(std::string filename, bool applyAcc=false, bool debug = f
       m_etabbar = p_bbar.Eta();
       m_phibbar = p_bbar.Phi();
 
+      m_ptH = pH.Pt();
+
       m_wt = weight;
 
       vector<TLorentzVector> lep_4vec = Calculate4Momentum(m_zhmass,91.188,125.,acos(m_costheta1),acos(m_costheta2),acos(0),m_phi,0);
       
       ptlminus_ALT = lep_4vec[0].Pt();
       ptlplus_ALT = lep_4vec[1].Pt();
-      etalminus_ALT = lep_4vec[0].Eta();
-      etalplus_ALT = lep_4vec[1].Eta();
+
+      if ( ptlminus_ALT > 0.  && ptlplus_ALT > 0.) {
+	etalminus_ALT = lep_4vec[0].Eta();
+	etalplus_ALT = lep_4vec[1].Eta();
+      }
+
       if ( m_hmass  < 115. ) continue;
       if ( m_hmass  > 140. ) continue;
 
