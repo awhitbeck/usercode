@@ -14,7 +14,7 @@ git pull origin master
 ########
 
 git commit foo.txt
-git push 
+git push origin
 
 ########
 # setup
