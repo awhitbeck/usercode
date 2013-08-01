@@ -3,11 +3,18 @@
 #########
 
 git init myWorkingArea
-cd snowmass2013/
+cd myWorkingArea
 git remote add origin https://github.com/awhitbeck/usercode
 git config core.sparsecheckout true
 echo snowmass2013/ >> .git/info/sparse-checkout
 git pull origin master
+
+######## 
+# commit changes to remote repository
+########
+
+git commit foo.txt
+git push 
 
 ########
 # setup
