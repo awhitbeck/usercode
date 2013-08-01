@@ -5,8 +5,8 @@ using namespace std;
 
 enum process {kLHC_HZZs_mH125,
 	      kLHC_HZZs_mH126,
-	      kLHC_VBF_14TeV_mH126,
-	      kLHC_H2J_14TeV_mH126,
+	      kLHC_VBF_14TeV_mH125,
+	      kLHC_H2J_14TeV_mH125,
 	      kILC_250_mH125,
 	      kILC_250_mH126,
 	      kILC_350,
@@ -42,18 +42,18 @@ fa3Converter::fa3Converter(process _from, process _to ){
 
   sigma1.push_back(1.860351);  // kLHC_HZZs_mH125 
   sigma1.push_back(2.03971);   // kLHC_HZZs_mH126 
-  sigma1.push_back(4687.9);    // kLHC_VBF_14TeV_mH126
-  sigma1.push_back(6783.68);   // kLHC_VBF_14TeV_mH126
+  sigma1.push_back(4687.9);    // kLHC_VBF_14TeV_mH125
+  sigma1.push_back(6783.68);   // kLHC_H2J_14TeV_mH125
   sigma1.push_back(0.981396);  // kILC_250_mH125  
-  sigma1.push_back(0.77517);   // kILC_250_mH126  
+  sigma1.push_back(0.94692);   // kILC_250_mH126  
   sigma1.push_back(1.48872);   // kILC_350	  
   sigma1.push_back(2.57246);   // kILC_500        
   sigma1.push_back(8.95721);   // kILC_1000        
 
   sigma2.push_back(0.672859);  // kLHC_HZZs_mH125 
   sigma2.push_back(0.77517);   // kLHC_HZZs_mH126 
-  sigma2.push_back(0.0);       // kLHC_VBF_14TeV_mH126
-  sigma2.push_back(0.0);       // kLHC_VBF_14TeV_mH126
+  sigma2.push_back(1.0e-30);   // kLHC_VBF_14TeV_mH125
+  sigma2.push_back(1.0e-30);   // kLHC_H2J_14TeV_mH125
   sigma2.push_back(33.4674);   // kILC_250_mH125  
   sigma2.push_back(32.1981);   // kILC_250_mH126  
   sigma2.push_back(125.387);   // kILC_350	  
@@ -62,8 +62,8 @@ fa3Converter::fa3Converter(process _from, process _to ){
 
   sigma4.push_back(0.284353);  // kLHC_HZZs_mH125 
   sigma4.push_back(0.32689);   // kLHC_HZZs_mH126 
-  sigma4.push_back(84932.1);   // kLHC_VBF_14TeV_mH126
-  sigma4.push_back(6583.72);   // kLHC_VBF_14TeV_mH126
+  sigma4.push_back(84932.1);   // kLHC_VBF_14TeV_mH125
+  sigma4.push_back(6583.72);   // kLHC_H2J_14TeV_mH125
   sigma4.push_back(7.9229);    // kILC_250_mH125  
   sigma4.push_back(7.45502);   // kILC_250_mH126  
   sigma4.push_back(75.3199);   // kILC_350	  
