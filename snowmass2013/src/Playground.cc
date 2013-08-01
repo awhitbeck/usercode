@@ -4,7 +4,6 @@
 #include "RooSpinZero_7DComplex_withAccep.h"
 //#include "RooqqZZ_JHU_ZgammaZZ_fast.h"
 //#include "RooFlat.h"
-#include "RooProjectedBkg.h"
 #include "RooPlot.h"
 #include "RooRealVar.h"
 #include "RooProdPdf.h"
