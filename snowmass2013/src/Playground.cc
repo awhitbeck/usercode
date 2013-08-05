@@ -8,6 +8,7 @@
 #include "RooRealVar.h"
 #include "RooProdPdf.h"
 #include "RooAddPdf.h"
+#include "RooGenericPdf.h"
 #include "AngularPdfFactory.cc"
 #include "ScalarPdfFactory.cc"
 #include "RooDataSet.h"
