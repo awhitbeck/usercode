@@ -12,7 +12,7 @@
 using namespace RooFit ;
 
 
-void plotPdf_3D_ZZ(float sqrtsVal = 1000.) {
+void plotPdf_3D_ZZ(float sqrtsVal = 250.) {
     
     gROOT->ProcessLine(".L ~/tdrstyle.C");
     setTDRStyle();
