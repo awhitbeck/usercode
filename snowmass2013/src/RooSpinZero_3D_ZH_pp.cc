@@ -273,13 +273,6 @@ Double_t RooSpinZero_3D_ZH_pp::evaluate() const
     Double_t fp0 = Ap0Real*Ap0Real + Ap0Imag*Ap0Imag;
     Double_t fm0 = Am0Real*Am0Real + Am0Imag*Am0Imag;
     
-    Double_t ftotal = f00 + fp0 + fm0;
-    
-    // normalize to the total
-    f00 = f00 / ftotal;
-    fp0 = fp0 / ftotal;
-    fm0 = fm0 / ftotal;
-    
     Double_t phi00=atan2(A00Imag,A00Real);
     Double_t phip0=atan2(Ap0Imag,Ap0Real)-phi00;
     Double_t phim0=atan2(Am0Imag,Am0Real)-phi00;
@@ -307,11 +300,35 @@ Double_t RooSpinZero_3D_ZH_pp::evaluate() const
     }
     double beta_psf = sqrt( (m*m-(mZ+mX)*(mZ+mX))*(m*m-(mZ-mX)*(mZ-mX)))/(m*m);
     double sigma_SM_psf = beta_psf*(beta_psf*beta_psf+12.*mZ*mZ/(m*m))/(m*m*(1-mZ*mZ/(m*m))*(1-mZ*mZ/(m*m)));
-    double angularPartIntegral = 0.;
-    angularPartIntegral += (32*f00*Power(Pi(),2))/9.;
-    angularPartIntegral += (32*fp0*Power(Pi(),2))/9.;
-    angularPartIntegral += (32*fm0*Power(Pi(),2))/9.;
-    double phaseSpaceFactor = sigma_SM_psf/angularPartIntegral;
+
+    double angularPartIntegral_SM = 0.;
+    // calculate the SM integrals
+    // use g1 = 1., and all others 0.
+    double a1_SM = mZ*mZ/(mX*mX);
+    double a1Im_SM =  0.;
+    double a2_SM  = 0.;
+    double a2Im_SM = 0.;
+    double a3_SM = 0.;
+    double a3Im_SM = 0.;
+
+    Double_t A00Real_SM = - (a1_SM*sqrt(1+x) + a2_SM*(mZ*m)/(mX*mX)*x);
+    Double_t A00Imag_SM = - (a1Im_SM*sqrt(1+x) + a2Im_SM*(mZ*m)/(mX*mX)*x);
+    
+    Double_t Ap0Real_SM = a1_SM - a3Im_SM*(mZ*m)/(mX*mX)*sqrt(x);
+    Double_t Ap0Imag_SM = a1Im_SM + a3_SM*(mZ*m)/(mX*mX)*sqrt(x);
+    
+    Double_t Am0Real_SM = a1_SM + a3Im_SM*(mZ*m)/(mX*mX)*sqrt(x);
+    Double_t Am0Imag_SM = a1Im_SM - a3_SM*(mZ*m)/(mX*mX)*sqrt(x);
+    
+    Double_t f00_SM = A00Real_SM*A00Real_SM + A00Imag_SM*A00Imag_SM;
+    Double_t fp0_SM = Ap0Real_SM*Ap0Real_SM + Ap0Imag_SM*Ap0Imag_SM;
+    Double_t fm0_SM = Am0Real_SM*Am0Real_SM + Am0Imag_SM*Am0Imag_SM;
+    
+    angularPartIntegral_SM += (32*f00_SM*Power(Pi(),2))/9.;
+    angularPartIntegral_SM += (32*fp0_SM*Power(Pi(),2))/9.;
+    angularPartIntegral_SM += (32*fm0_SM*Power(Pi(),2))/9.;
+    double phaseSpaceFactor = sigma_SM_psf/angularPartIntegral_SM;
+
     value *= phaseSpaceFactor;
     
     //std::cout << "phaseSpaceFactor = " << phaseSpaceFactor << ", sigma_SM_psf = " << sigma_SM_psf << ", angularPartIntegral = " << angularPartIntegral << std::endl;
@@ -474,13 +491,6 @@ Double_t RooSpinZero_3D_ZH_pp::analyticalIntegral(Int_t code, const char* rangeN
     Double_t fp0 = Ap0Real*Ap0Real + Ap0Imag*Ap0Imag;
     Double_t fm0 = Am0Real*Am0Real + Am0Imag*Am0Imag;
     
-    Double_t ftotal = f00 + fp0 + fm0;
-    
-    // normalize to the total
-    f00 = f00 / ftotal;
-    fp0 = fp0 / ftotal;
-    fm0 = fm0 / ftotal;
-    
     Double_t phi00=atan2(A00Imag,A00Real);
     Double_t phip0=atan2(Ap0Imag,Ap0Real)-phi00;
     Double_t phim0=atan2(Am0Imag,Am0Real)-phi00;
@@ -491,11 +501,34 @@ Double_t RooSpinZero_3D_ZH_pp::analyticalIntegral(Int_t code, const char* rangeN
     }
     double beta_psf = sqrt( (m*m-(mZ+mX)*(mZ+mX))*(m*m-(mZ-mX)*(mZ-mX)))/(m*m);
     double sigma_SM_psf = beta_psf*(beta_psf*beta_psf+12.*mZ*mZ/(m*m))/(m*m*(1-mZ*mZ/(m*m))*(1-mZ*mZ/(m*m)));
-    double angularPartIntegral = 0.;
-    angularPartIntegral += (32*f00*Power(Pi(),2))/9.;
-    angularPartIntegral += (32*fp0*Power(Pi(),2))/9.;
-    angularPartIntegral += (32*fm0*Power(Pi(),2))/9.;
-    double phaseSpaceFactor = sigma_SM_psf/angularPartIntegral;
+    double angularPartIntegral_SM = 0.;
+    // calculate the SM integrals
+    // use g1 = 1., and all others 0.
+    double a1_SM = mZ*mZ/(mX*mX);
+    double a1Im_SM =  0.;
+    double a2_SM  = 0.;
+    double a2Im_SM = 0.;
+    double a3_SM = 0.;
+    double a3Im_SM = 0.;
+
+    Double_t A00Real_SM = - (a1_SM*sqrt(1+x) + a2_SM*(mZ*m)/(mX*mX)*x);
+    Double_t A00Imag_SM = - (a1Im_SM*sqrt(1+x) + a2Im_SM*(mZ*m)/(mX*mX)*x);
+    
+    Double_t Ap0Real_SM = a1_SM - a3Im_SM*(mZ*m)/(mX*mX)*sqrt(x);
+    Double_t Ap0Imag_SM = a1Im_SM + a3_SM*(mZ*m)/(mX*mX)*sqrt(x);
+    
+    Double_t Am0Real_SM = a1_SM + a3Im_SM*(mZ*m)/(mX*mX)*sqrt(x);
+    Double_t Am0Imag_SM = a1Im_SM - a3_SM*(mZ*m)/(mX*mX)*sqrt(x);
+    
+    Double_t f00_SM = A00Real_SM*A00Real_SM + A00Imag_SM*A00Imag_SM;
+    Double_t fp0_SM = Ap0Real_SM*Ap0Real_SM + Ap0Imag_SM*Ap0Imag_SM;
+    Double_t fm0_SM = Am0Real_SM*Am0Real_SM + Am0Imag_SM*Am0Imag_SM;
+    
+    angularPartIntegral_SM += (32*f00_SM*Power(Pi(),2))/9.;
+    angularPartIntegral_SM += (32*fp0_SM*Power(Pi(),2))/9.;
+    angularPartIntegral_SM += (32*fm0_SM*Power(Pi(),2))/9.;
+    double phaseSpaceFactor = sigma_SM_psf/angularPartIntegral_SM;
+    
     //std::cout << "phaseSpaceFactor = " << phaseSpaceFactor << ", sigma_SM_psf = " << sigma_SM_psf << ", angularPartIntegral = " << angularPartIntegral << std::endl;
 
     

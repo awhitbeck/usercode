@@ -11,6 +11,7 @@
 #include "RooPlot.h"
 using namespace RooFit ;
 
+bool weightedevents = true;
 
 void plot_ZH_pp() {
     
@@ -27,30 +28,32 @@ void plot_ZH_pp() {
     TString accName = "false";
     if ( withAcc ) 
         accName = "true";
-    TString modeName = "pp_ZZ_llbb_250GeV_25M";
-    
+
+    TString modeName = "JHUGen_weighted_pp_ZH_llbb_0m_1M";
+    //TString modeName = "pp_ZH_llbb_14TeV_1M";
+
     //
     // Signal files
     // 
     
     // generated values
-    double g1Gen =   1;
-    double g1ImGen = 0.;
-    double g2Gen =   0.;
-    double g2ImGen = 0.;
-    double g3Gen =   0.;
-    double g3ImGen = 0.;
-    double g4Gen =  0.;
-    double g4ImGen = 0.;
-    double fa2Gen = 0.;
+    double g1Gen    = 0.;
+    double g1ImGen  = 0.;
+    double g2Gen    = 0.;
+    double g2ImGen  = 0.;
+    double g3Gen    = 0.;
+    double g3ImGen  = 0.;
+    double g4Gen    = 1.;
+    double g4ImGen  = 0.;
+    double fa2Gen   = 0.;
     double phia2Gen = 0.;
-    double fa3Gen = 0.;
+    double fa3Gen   = 0.;
     double phia3Gen = 0.;
         
     // 
     // Read input file
     // 
-    TFile *fin_signal = new TFile("samples/pp_ZH/pp_ZH_llbb_14TeV_10M_false.root");
+    TFile *fin_signal = new TFile(Form("samples/pp_ZH/%s_%s.root", modeName.Data(),accName.Data()));
     TTree* tin_signal = (TTree*) fin_signal->Get("SelectedTree");
     
     // Observables (5D)
@@ -70,8 +73,8 @@ void plot_ZH_pp() {
     RooRealVar* mX = new RooRealVar("mX","mX", 125.);
     RooRealVar* mZ = new RooRealVar("mZ","mZ", 91.1876);
     RooRealVar* gamZ = new RooRealVar("gamZ","gamZ",2.4952);
-    //RooRealVar* R1Val = new RooRealVar("R1Val","R1Val", 0.15);
-    RooRealVar* R1Val = new RooRealVar("R1Val","R1Val", 0.);    
+    RooRealVar* R1Val = new RooRealVar("R1Val","R1Val", 0.);
+    // RooRealVar* R1Val = new RooRealVar("R1Val","R1Val", 0.67);    
     RooRealVar* R2Val = new RooRealVar("R2Val","R2Val", 0.15);
     
     // amplitude parameters
@@ -108,29 +111,61 @@ void plot_ZH_pp() {
                                                       *g1Val, *g2Val, *g3Val, *g4Val, *g1ValIm, *g2ValIm, *g3ValIm, *g4ValIm,
                                                       *fa2, *fa3, *phia2, *phia3, withAcc);
 
+    // set the PDF for the other 
+    
+    RooRealVar* g1Val0m  = new RooRealVar("g1Val0m","g1Val0m",0.);
+    RooRealVar* g2Val0m  = new RooRealVar("g2Val0m","g2Val0m",0.);
+    RooRealVar* g3Val0m  = new RooRealVar("g3Val0m","g3Val0m",0.);
+    RooRealVar* g4Val0m  = new RooRealVar("g4Val0m","g4Val0m",1.);
+    
+    RooRealVar* g1Val0mIm  = new RooRealVar("g1Val0mIm","g1Val0mIm", 0.);
+    RooRealVar* g2Val0mIm  = new RooRealVar("g2Val0mIm","g2Val0mIm", 0.);
+    RooRealVar* g3Val0mIm  = new RooRealVar("g3Val0mIm","g3Val0mIm", 0.);
+    RooRealVar* g4Val0mIm  = new RooRealVar("g4Val0mIm","g4Val0mIm", 0.);
+
+
+    RooSpinZero_3D_ZH_pp *sigPdf_pp_0m = new RooSpinZero_3D_ZH_pp("sigPdf_pp","sigPdf_pp",
+                                                      *h1,*h2,*Phi, *m, *Y,
+                                                      *sqrts, *mX, *mZ, *R1Val, *R2Val, para, 
+                                                      *a1Val, *phi1Val, *a2Val, *phi2Val,*a3Val, *phi3Val, 
+                                                      *g1Val0m, *g2Val0m, *g3Val0m, *g4Val0m, *g1Val0mIm, *g2Val0mIm, *g3Val0mIm, *g4Val0mIm,
+                                                      *fa2, *fa3, *phia2, *phia3, withAcc);
+
     
     // set the data
-    RooDataSet sigData_pp = RooDataSet("sigData","sigData",RooArgSet(*h1,*h2,*Phi,*m,*Y),Import(*tin_signal));    
+
     
+    // get the data
+    if ( weightedevents ) {
+      RooDataSet dataTMP("dataTMP","dataTMP", tin_signal, RooArgSet(*h1,*h2,*Phi,*m,*Y, *wt));
+      RooDataSet sigData_pp = RooDataSet("sigData","sigData",RooArgList(*h1,*h2,*Phi,*m, *Y, *wt), WeightVar("wt"), Import(dataTMP));
+    } else {
+      RooDataSet sigData_pp = RooDataSet("sigData","sigData",RooArgSet(*h1,*h2,*Phi,*m,*Y),Import(*tin_signal));    
+    }
     RooPlot* h1frame =  h1->frame(20);
     sigData_pp.plotOn(h1frame, LineColor(kBlack), MarkerStyle(24));
-    sigPdf_pp->plotOn(h1frame, LineColor(kBlack));
+    // sigPdf_pp->plotOn(h1frame, LineColor(kBlack));
+    sigPdf_pp_0m->plotOn(h1frame, LineColor(kRed));
     
     RooPlot* h2frame =  h2->frame(20);
     sigData_pp.plotOn(h2frame, LineColor(kBlack), MarkerStyle(24));
-    sigPdf_pp->plotOn(h2frame, LineColor(kBlack));
+    // sigPdf_pp->plotOn(h2frame, LineColor(kBlack));
+    sigPdf_pp_0m->plotOn(h2frame, LineColor(kRed));
     
     RooPlot* phiframe =  Phi->frame(20);
     sigData_pp.plotOn(phiframe, LineColor(kBlack), MarkerStyle(24));
-    sigPdf_pp->plotOn(phiframe, LineColor(kBlack));
+    //     sigPdf_pp->plotOn(phiframe, LineColor(kBlack));
+    sigPdf_pp_0m->plotOn(phiframe, LineColor(kRed));
 
     RooPlot* mframe =  m->frame(20);
     sigData_pp.plotOn(mframe, LineColor(kBlack), MarkerStyle(24));
-    sigPdf_pp->plotOn(mframe, LineColor(kBlack));
+    // sigPdf_pp->plotOn(mframe, LineColor(kBlack));
+    sigPdf_pp_0m->plotOn(mframe, LineColor(kRed));
 
     RooPlot* Yframe =  Y->frame(20);
     sigData_pp.plotOn(Yframe, LineColor(kBlack), MarkerStyle(24));
-    sigPdf_pp->plotOn(Yframe, LineColor(kBlack));
+    // sigPdf_pp->plotOn(Yframe, LineColor(kBlack));
+    sigPdf_pp_0m->plotOn(Yframe, LineColor(kRed));
 
 
     TCanvas* czz = new TCanvas( "czz", "czz", 1200, 800 );
