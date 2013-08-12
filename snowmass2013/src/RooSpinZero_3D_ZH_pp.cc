@@ -22,7 +22,6 @@ using namespace TMath;
 
 enum parameterizationList {kMagPhase_As=0,kRealImag_Gs=1,kFracPhase_Gs=2,kNUMparameterizations=3};
 
-
 ClassImp(RooSpinZero_3D_ZH_pp) 
 
 RooSpinZero_3D_ZH_pp::RooSpinZero_3D_ZH_pp(const char *name, const char *title, 
@@ -182,32 +181,10 @@ Double_t RooSpinZero_3D_ZH_pp::evaluate() const
             double nanval = sqrt(1 - fa2 - fa3);
             if (nanval != nanval) return 0.0;
             
-            // convert fraction and phase to g1,g2...etc
-            // ILC numbers at 250 GeV at mH= 125 GeV (narrow Z width approximation)
-            Double_t sigma1_e = 0.981396; // was 0.94696 at 126 GeV
-            Double_t sigma2_e = 33.4674;  // was 32.1981 at 126 GeV
-            Double_t sigma4_e = 7.9229;   // was 7.45502 at 126 GeV
-            
-            // ILC nubmers at 350 GeV at mH = 125 GeV
-            if ( m == 350. ) {
-                sigma1_e = 1.48872; 
-                sigma2_e = 125.387;  
-                sigma4_e = 75.3199;
-            }
-            
-            // ILC nubmers at 500 GeV at mH = 125 GeV
-            if ( m == 500. ) {
-                sigma1_e = 2.57246; 
-                sigma2_e = 516.556;  
-                sigma4_e = 414.378;
-            }
-            
-            // ILC nubmers at 1000 GeV at mH = 125 GeV
-            if ( m == 1000. ) {
-                sigma1_e = 8.95721; 
-                sigma2_e = 8208.91;  
-                sigma4_e = 7800.2;
-            }
+	    // LHC numbers at mH= 125 GeV (JHUGen) based on Decay
+	    Double_t sigma1_p = 1.860351; // was 2.03971 at 126 GeV
+	    Double_t sigma2_p = 0.672859; // was 0.77517 at 126 GeV
+	    Double_t sigma4_p = 0.284353; // was 0.32689 at 126 GeV
             
             double g1Mag = 1.;
             double g2Mag = 0.;
@@ -222,8 +199,8 @@ Double_t RooSpinZero_3D_ZH_pp::evaluate() const
                 g2Mag = 0.;
                 g4Mag = 1.; 
             } else {
-                g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma1_e/sigma2_e); 
-                g4Mag = sqrt(fa3/(1.-fa2-fa3))*sqrt(sigma1_e/sigma4_e); 
+                g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma1_p/sigma2_p); 
+                g4Mag = sqrt(fa3/(1.-fa2-fa3))*sqrt(sigma1_p/sigma4_p); 
             }
             
             g1   = g1Mag;
@@ -401,32 +378,10 @@ Double_t RooSpinZero_3D_ZH_pp::analyticalIntegral(Int_t code, const char* rangeN
             double nanval = sqrt(1 - fa2 - fa3);
             if (nanval != nanval) return 0.0;
             
-            // convert fraction and phase to g1,g2...etc
-            // ILC numbers at 250 GeV at mH= 125 GeV (narrow Z width approximation)
-            Double_t sigma1_e = 0.981396; // was 0.94696 at 126 GeV
-            Double_t sigma2_e = 33.4674;  // was 32.1981 at 126 GeV
-            Double_t sigma4_e = 7.9229;   // was 7.45502 at 126 GeV
-            
-            // ILC nubmers at 350 GeV at mH = 125 GeV
-            if ( m == 350. ) {
-                sigma1_e = 1.48872; 
-                sigma2_e = 125.387;  
-                sigma4_e = 75.3199;
-            }
-            
-            // ILC nubmers at 500 GeV at mH = 125 GeV
-            if ( m == 500. ) {
-                sigma1_e = 2.57246; 
-                sigma2_e = 516.556;  
-                sigma4_e = 414.378;
-            }
-            
-            // ILC nubmers at 1000 GeV at mH = 125 GeV
-            if ( m == 1000. ) {
-                sigma1_e = 8.95721; 
-                sigma2_e = 8208.91;  
-                sigma4_e = 7800.2;
-            }
+	    // LHC numbers at mH= 125 GeV (JHUGen) based on Decay
+	    Double_t sigma1_p = 1.860351; // was 2.03971 at 126 GeV
+	    Double_t sigma2_p = 0.672859; // was 0.77517 at 126 GeV
+	    Double_t sigma4_p = 0.284353; // was 0.32689 at 126 GeV
             
             double g1Mag = 1.;
             double g2Mag = 0.;
@@ -441,8 +396,8 @@ Double_t RooSpinZero_3D_ZH_pp::analyticalIntegral(Int_t code, const char* rangeN
                 g2Mag = 0.;
                 g4Mag = 1.; 
             } else {
-                g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma1_e/sigma2_e); 
-                g4Mag = sqrt(fa3/(1.-fa2-fa3))*sqrt(sigma1_e/sigma4_e); 
+                g2Mag = sqrt(fa2/(1.-fa2-fa3))*sqrt(sigma1_p/sigma2_p); 
+                g4Mag = sqrt(fa3/(1.-fa2-fa3))*sqrt(sigma1_p/sigma4_p); 
             }
             
             g1   = g1Mag;
