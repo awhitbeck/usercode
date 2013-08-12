@@ -143,7 +143,7 @@ Double_t RooSpinZero_3D_ZH_pp::evaluate() const
     
     if ( withAcc ) {
         
-        vector<TLorentzVector> lep_4vecs = Calculate4Momentum(sqrts,mZ,mX,acos(h1),acos(h2),acos(0),Phi,0);
+        vector<TLorentzVector> lep_4vecs = Calculate4Momentum(m,mZ,mX,acos(h1),acos(h2),acos(0),Phi,0);
         
         
         double pt_plus_sq = pow(lep_4vecs[1].Px(),2) + pow(lep_4vecs[1].Py(),2);
@@ -152,10 +152,13 @@ Double_t RooSpinZero_3D_ZH_pp::evaluate() const
         double sinh2_eta_plus = pow(lep_4vecs[1].Pz(),2)/pt_plus_sq;
         double sinh2_eta_minus = pow(lep_4vecs[0].Pz(),2)/pt_minus_sq;
         
-        if( pt_minus_sq<25.0 
-           || pt_plus_sq<25.0 
+	double higgsPtSq = pow((lep_4vecs[2]+lep_4vecs[3]).Pt(),2);
+	// std::cout << __LINE__ << "\t " << higgsPtSq << "\n";
+	if( pt_minus_sq<400.0 
+           || pt_plus_sq<400.0 
            || sinh2_eta_minus>pow(sinh(2.4),2) 
            || sinh2_eta_plus>pow(sinh(2.4),2) 
+           || higgsPtSq < (150.*150)
            ) return 1e-30;
     }
     //-------------------------------------------------
@@ -339,12 +342,16 @@ Double_t RooSpinZero_3D_ZH_pp::analyticalIntegral(Int_t code, const char* rangeN
         
         double sinh2_eta_plus = pow(lep_4vecs[1].Pz(),2)/pt_plus_sq;
         double sinh2_eta_minus = pow(lep_4vecs[0].Pz(),2)/pt_minus_sq;
-        
-        if( pt_minus_sq<25.0 
-           || pt_plus_sq<25.0 
+
+	double higgsPtSq = pow((lep_4vecs[2]+lep_4vecs[3]).Pt(),2);
+	
+	if( pt_minus_sq<400.0 
+           || pt_plus_sq<400.0 
            || sinh2_eta_minus>pow(sinh(2.4),2) 
            || sinh2_eta_plus>pow(sinh(2.4),2) 
+           || higgsPtSq < (150.*150)
            ) return 1e-30;
+
     }
     
     // the beta and gamma are velocities of the Z in the C.O.M
