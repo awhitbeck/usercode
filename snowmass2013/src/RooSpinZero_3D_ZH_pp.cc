@@ -158,7 +158,7 @@ Double_t RooSpinZero_3D_ZH_pp::evaluate() const
            || pt_plus_sq<400.0 
            || sinh2_eta_minus>pow(sinh(2.4),2) 
            || sinh2_eta_plus>pow(sinh(2.4),2) 
-           || higgsPtSq < (150.*150)
+           || higgsPtSq < (200.*200)
            ) return 1e-30;
     }
     //-------------------------------------------------
@@ -349,7 +349,7 @@ Double_t RooSpinZero_3D_ZH_pp::analyticalIntegral(Int_t code, const char* rangeN
            || pt_plus_sq<400.0 
            || sinh2_eta_minus>pow(sinh(2.4),2) 
            || sinh2_eta_plus>pow(sinh(2.4),2) 
-           || higgsPtSq < (150.*150)
+           || higgsPtSq < (200.*200)
            ) return 1e-30;
 
     }
