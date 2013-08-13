@@ -19,6 +19,12 @@
   gROOT->LoadMacro("../src/PlaygroundZH.cc+");
   gROOT->LoadMacro("../src/KDcalcZH.cc+");
 
+  // tools for PP->ZH studies
+  gROOT->LoadMacro("../src/RooSpinZero_3D_ZH_pp.cc+");
+  gROOT->LoadMacro("../src/ScalarPdfFactoryPPZH.cc+");
+  gROOT->LoadMacro("../src/PlaygroundPPZH.cc+");
+  gROOT->LoadMacro("../src/KDcalcPPZH.cc+");
+
   // stat tools from summer 2012 paper 
   gROOT->LoadMacro("../src/statsFactory.cc+");
   
