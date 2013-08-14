@@ -13,6 +13,8 @@ using namespace RooFit ;
 
 bool weightedevents = true;
 
+typedef enum{ZEROPLUS, ZEROMINUS, ALL} PlotLevel; 
+
 void plot_ZH_pp() {
     
     gROOT->ProcessLine(".L ~/tdrstyle.C");
@@ -29,8 +31,24 @@ void plot_ZH_pp() {
     if ( withAcc ) 
         accName = "true";
 
+    PlotLevel plot = ZEROMINUS;
+    
     //TString modeName = "JHUGen_weighted_pp_ZH_llbb_0m_1M";
-    TString modeName = "pp_ZH_llbb_14TeV_1M";
+    // TString modeName = "pp_ZH_llbb_14TeV_1M";
+    /*
+      TString modeName_0p = "uu_ZH_llbb_1M_debug";
+      TString modeName_0m = "uu_ZH_llbb_0m_1M_debug";
+      TString plotAppendix= "uu_ZH_llbb_debug";
+    */
+
+    TString modeName_0p = "dd_ZH_llbb_1M_debug";
+    TString modeName_0m = "dd_ZH_llbb_0m_1M_debug";
+    TString plotAppendix= "dd_ZH_llbb_debug";
+
+
+    if ( plot == ZEROPLUS )  plotAppendix = modeName_0p;
+    if ( plot == ZEROMINUS ) plotAppendix = modeName_0m;
+
 
     //
     // Signal files
@@ -50,19 +68,13 @@ void plot_ZH_pp() {
     double fa3Gen   = 0.;
     double phia3Gen = 0.;
         
-    // 
-    // Read input file
-    // 
-    TFile *fin_signal = new TFile(Form("samples/pp_ZH/%s_%s.root", modeName.Data(),accName.Data()));
-    TTree* tin_signal = (TTree*) fin_signal->Get("SelectedTree");
-    
     // Observables (5D)
     RooRealVar* h1 = new RooRealVar("costheta1","h1",-1,1);
     RooRealVar* h2 = new RooRealVar("costheta2","h2",-1,1);
     RooRealVar* Phi = new RooRealVar("phi","Phi",-TMath::Pi(),TMath::Pi());
     RooRealVar* hs = new RooRealVar("costhetastar","hs",-1,1);
     RooRealVar* Phi1 = new RooRealVar("phistar1","Phi1",-TMath::Pi(),TMath::Pi());
-    RooRealVar* m= new RooRealVar("m","m", 150, 500);
+    RooRealVar* m= new RooRealVar("m","m", 150, 1000);
     RooRealVar* Y= new RooRealVar("Y","Y", -4, 4);
     
     // additional variables
@@ -73,8 +85,9 @@ void plot_ZH_pp() {
     RooRealVar* mX = new RooRealVar("mX","mX", 125.);
     RooRealVar* mZ = new RooRealVar("mZ","mZ", 91.1876);
     RooRealVar* gamZ = new RooRealVar("gamZ","gamZ",2.4952);
-    RooRealVar* R1Val = new RooRealVar("R1Val","R1Val", 0.);
-    // RooRealVar* R1Val = new RooRealVar("R1Val","R1Val", 0.67);    
+    //RooRealVar* R1Val = new RooRealVar("R1Val","R1Val", 0.);
+    //RooRealVar* R1Val = new RooRealVar("R1Val","R1Val", 0.67);  // for uu
+    RooRealVar* R1Val = new RooRealVar("R1Val","R1Val", 0.94);     // for dd
     RooRealVar* R2Val = new RooRealVar("R2Val","R2Val", 0.15);
     
     // amplitude parameters
@@ -124,7 +137,7 @@ void plot_ZH_pp() {
     RooRealVar* g4Val0mIm  = new RooRealVar("g4Val0mIm","g4Val0mIm", 0.);
 
 
-    RooSpinZero_3D_ZH_pp *sigPdf_pp_0m = new RooSpinZero_3D_ZH_pp("sigPdf_pp","sigPdf_pp",
+    RooSpinZero_3D_ZH_pp *sigPdf_pp0m = new RooSpinZero_3D_ZH_pp("sigPdf_pp","sigPdf_pp",
                                                       *h1,*h2,*Phi, *m, *Y,
                                                       *sqrts, *mX, *mZ, *R1Val, *R2Val, para, 
                                                       *a1Val, *phi1Val, *a2Val, *phi2Val,*a3Val, *phi3Val, 
@@ -132,41 +145,78 @@ void plot_ZH_pp() {
                                                       *fa2, *fa3, *phia2, *phia3, withAcc);
 
     
-    // set the data
-
-    
-    // get the data
+    // 
+    // Read 0+ input file
+    // 
+    TFile *fin_signal = new TFile(Form("samples/pp_ZH/%s_%s.root", modeName_0p.Data(),accName.Data()));
+    TTree* tin_signal = (TTree*) fin_signal->Get("SelectedTree");
     if ( weightedevents ) {
       RooDataSet dataTMP("dataTMP","dataTMP", tin_signal, RooArgSet(*h1,*h2,*Phi,*m,*Y, *wt));
-      RooDataSet sigData_pp = RooDataSet("sigData","sigData",RooArgList(*h1,*h2,*Phi,*m, *Y, *wt), WeightVar("wt"), Import(dataTMP));
+      RooDataSet sigData_pp0p = RooDataSet("sigData_pp0p","sigData_pp0p",RooArgList(*h1,*h2,*Phi,*m, *Y, *wt), WeightVar("wt"), Import(dataTMP));
     } else {
-      RooDataSet sigData_pp = RooDataSet("sigData","sigData",RooArgSet(*h1,*h2,*Phi,*m,*Y),Import(*tin_signal));    
+      RooDataSet sigData_pp0p = RooDataSet("sigData_pp0p","sigData_pp0p",RooArgSet(*h1,*h2,*Phi,*m,*Y),Import(*tin_signal));    
     }
-    RooPlot* h1frame =  h1->frame(20);
-    sigData_pp.plotOn(h1frame, LineColor(kBlack), MarkerStyle(24));
-    sigPdf_pp->plotOn(h1frame, LineColor(kBlack));
-    //sigPdf_pp_0m->plotOn(h1frame, LineColor(kRed));
+
+    // 
+    // Read 0- input file
+    // 
+    TFile *fin_signal_0m = new TFile(Form("samples/pp_ZH/%s_%s.root", modeName_0m.Data(),accName.Data()));
+    TTree* tin_signal_0m = (TTree*) fin_signal_0m->Get("SelectedTree");
+    if ( weightedevents ) {
+      RooDataSet dataTMP("dataTMP","dataTMP", tin_signal_0m, RooArgSet(*h1,*h2,*Phi,*m,*Y, *wt));
+      RooDataSet sigData_pp0m = RooDataSet("sigData_pp0m","sigData_pp0m",RooArgList(*h1,*h2,*Phi,*m, *Y, *wt), WeightVar("wt"), Import(dataTMP));
+    } else {
+      RooDataSet sigData_pp0m = RooDataSet("sigData_pp0m","sigData_pp0m",RooArgSet(*h1,*h2,*Phi,*m,*Y),Import(*tin_signal_0m));    
+    }
+
     
+
+    RooPlot* h1frame =  h1->frame(20);
+    if ( plot == ZEROPLUS || plot == ALL ) {
+      sigData_pp0p.plotOn(h1frame, MarkerColor(kBlack), MarkerStyle(24));
+      sigPdf_pp->plotOn(h1frame, LineColor(kBlack));
+    }
+    if ( plot == ZEROMINUS || plot == ALL ) {
+      sigData_pp0m.plotOn(h1frame, MarkerColor(kRed), MarkerStyle(20));
+      sigPdf_pp0m->plotOn(h1frame, LineColor(kRed));
+    }
     RooPlot* h2frame =  h2->frame(20);
-    sigData_pp.plotOn(h2frame, LineColor(kBlack), MarkerStyle(24));
-    sigPdf_pp->plotOn(h2frame, LineColor(kBlack));
-    //sigPdf_pp_0m->plotOn(h2frame, LineColor(kRed));
+    if ( plot == ZEROPLUS || plot == ALL ) {
+      sigData_pp0p.plotOn(h2frame, MarkerColor(kBlack), MarkerStyle(24));
+      sigPdf_pp->plotOn(h2frame, LineColor(kBlack));
+    }
+    if ( plot == ZEROMINUS || plot == ALL ) {
+      sigData_pp0m.plotOn(h2frame, MarkerColor(kRed), MarkerStyle(20));
+      sigPdf_pp0m->plotOn(h2frame, LineColor(kRed));
+    }
     
     RooPlot* phiframe =  Phi->frame(20);
-    sigData_pp.plotOn(phiframe, LineColor(kBlack), MarkerStyle(24));
-    sigPdf_pp->plotOn(phiframe, LineColor(kBlack));
-    //sigPdf_pp_0m->plotOn(phiframe, LineColor(kRed));
-
+    if ( plot == ZEROPLUS || plot == ALL ) {
+      sigData_pp0p.plotOn(phiframe, MarkerColor(kBlack), MarkerStyle(24));
+      sigPdf_pp->plotOn(phiframe, LineColor(kBlack));
+    } 
+    if ( plot == ZEROMINUS || plot == ALL ) {
+      sigData_pp0m.plotOn(phiframe, MarkerColor(kRed), MarkerStyle(22));
+      sigPdf_pp0m->plotOn(phiframe, LineColor(kRed));
+    }
     RooPlot* mframe =  m->frame(20);
-    sigData_pp.plotOn(mframe, LineColor(kBlack), MarkerStyle(24));
-    sigPdf_pp->plotOn(mframe, LineColor(kBlack));
-    //sigPdf_pp_0m->plotOn(mframe, LineColor(kRed));
-
+    if ( plot == ZEROPLUS || plot == ALL ) {
+      sigData_pp0p.plotOn(mframe, MarkerColor(kBlack), MarkerStyle(24));
+      sigPdf_pp->plotOn(mframe, LineColor(kBlack));
+    }
+    if ( plot == ZEROMINUS || plot == ALL ) {
+      sigData_pp0m.plotOn(mframe, MarkerColor(kRed), MarkerStyle(20));
+      sigPdf_pp0m->plotOn(mframe, LineColor(kRed));
+    }
     RooPlot* Yframe =  Y->frame(20);
-    sigData_pp.plotOn(Yframe, LineColor(kBlack), MarkerStyle(24));
-    sigPdf_pp->plotOn(Yframe, LineColor(kBlack));
-    //sigPdf_pp_0m->plotOn(Yframe, LineColor(kRed));
-
+    if ( plot == ZEROPLUS || plot == ALL ) {
+      sigData_pp0p.plotOn(Yframe, MarkerColor(kBlack), MarkerStyle(24));
+      sigPdf_pp->plotOn(Yframe, LineColor(kBlack));
+    }
+    if ( plot == ZEROMINUS|| plot == ALL ) {
+      sigData_pp0m.plotOn(Yframe, MarkerColor(kRed), MarkerStyle(20));
+      sigPdf_pp0m->plotOn(Yframe, LineColor(kRed));
+    }
 
     TCanvas* czz = new TCanvas( "czz", "czz", 1200, 800 );
     czz->Divide(3,2);
@@ -186,7 +236,7 @@ void plot_ZH_pp() {
     czz->cd(5);
     Yframe->Draw();
     
-    TString plotName = Form("plots/%s_acc%s", modeName.Data(), accName.Data());
+    TString plotName = Form("plots_ppzh/%s_acc%s", plotAppendix.Data(), accName.Data());
     
     czz->SaveAs(Form("%s.eps", plotName.Data()));
     czz->SaveAs(Form("%s.png", plotName.Data()));
