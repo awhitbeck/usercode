@@ -38,11 +38,14 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 1000 ) {
   float lumi = 3000; // in unit of fb
   
   float nsigperfb = 0.1;
-  float nbkgperfb = 0.5;
+  float nbkgperfb = 0;
   
   float nsigEvents = lumi*nsigperfb; 
   float nbkgEvents = lumi*nbkgperfb; 
   
+  if ( nbkgperfb == 0. ) 
+    fa3Val = 0.15;
+
   //
   //  1D KD observable
   // 
@@ -56,7 +59,7 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 1000 ) {
   // Background
   // 
   TChain *bkgTree = new TChain("SelectedTree");
-  TString bkgModeName = Form("unweighted_pp_ZZ_llbb");
+  TString bkgModeName = Form("pp_ZZ_llbb_25M");
   bkgTree->Add(Form("samples/pp_ZH/%s_%s_withKD.root", bkgModeName.Data(), accName.Data()));
   RooDataSet *bkgData = new RooDataSet("bkgData","bkgData",bkgTree,RooArgSet(*kd));
   RooDataHist *bkgHist = bkgData->binnedClone(0);
@@ -220,7 +223,9 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 1000 ) {
   // 
   g1Val->setVal(1.);
   g4Val->setVal(0.852604);
-  fa3->setVal(fa3Val);
+  double fa3_suppression = 250.;
+  if ( withAcc ) fa3_suppression = 750.;
+  fa3->setVal(fa3Val/fa3_suppression);
 
   std::cout << "fa2 = " << fa2->getVal() << "\n";
   std::cout << "fa3 = " << fa3->getVal() << "\n";
@@ -275,7 +280,11 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 1000 ) {
     // Fit the dataset
     // 
     
-    TFile *toyresults = new TFile(Form("toyresults_ppzh/toyresults_KD_%s_%.0fGeV_acc%s.root", isPureName.Data(), sqrtsVal, accName.Data()), "RECREATE");
+    TString nbkgName = "";
+    if ( nbkgperfb == 0. ) nbkgName = "_sigonly";
+
+    TFile *toyresults = new TFile(Form("toyresults_ppzh/toyresults_KD_%s_%.0fGeV_acc%s%s.root", 
+				       isPureName.Data(), sqrtsVal, accName.Data(), nbkgName.Data()), "RECREATE");
     gROOT->cd();
     
     TTree *tree_fit = new TTree("fittree", "fittree");
@@ -365,8 +374,8 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 1000 ) {
       // zeroplusPdf->plotOn(kdframe, LineColor(kRed), LineStyle(kDashed));
       zeroplusToyPdf->plotOn(kdframe, LineColor(kRed));
       zerominusToyPdf->plotOn(kdframe, LineColor(kBlue));
-      double bkgscale = 150.;
-      if ( withAcc ) bkgscale = 400.;
+      double bkgscale = 6.;
+      if ( withAcc ) bkgscale = 15.;
       bkgData->plotOn(kdframe, LineColor(kBlack), Rescale(bkgscale));
       bkgPdf->plotOn(kdframe, LineColor(kBlack), Normalization(bkgscale));
     }
