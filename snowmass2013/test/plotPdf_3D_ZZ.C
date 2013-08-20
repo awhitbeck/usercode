@@ -21,6 +21,10 @@ void plotPdf_3D_ZZ(float sqrtsVal = 250.) {
     gROOT->ProcessLine(".L ../src/RooSpinZero_3D_ZH_Acc.cc+");
     gSystem->Load("../src/RooSpinZero_3D_ZH_Acc.cc");
 
+    // Declaration of the PDFs to use
+    gROOT->ProcessLine(".L ../src/RooZZ_3D.cc+");
+    gSystem->Load("../src/RooZZ_3D.cc");
+
     // these values define the generator couplings
     bool withAcc = false;
     TString accName = "false";
@@ -32,24 +36,90 @@ void plotPdf_3D_ZZ(float sqrtsVal = 250.) {
     RooRealVar* h1 = new RooRealVar("costheta1","cos#theta_{1}",0, -1,1);
     RooRealVar* h2 = new RooRealVar("costheta2","cos#theta_{2}",0, -1,1);
     RooRealVar* Phi = new RooRealVar("phi","#Phi",0, -TMath::Pi(),TMath::Pi());
+    
+    h1->setBins(40);
+    h2->setBins(40);
+    Phi->setBins(40);
+    
+    /*
+    float h1pol2Val = 5.43096e-01;
+    float h1pol4Val = 1.05202e+00;
+    float h1pol6Val = 1.61973e-02;
+    float h1pol8Val = 0.;
+    float h2pol2Val = 0.246235;
+    float phiconstVal = -1.96298e-02;
+    float twophiconstVal =-1.37763e-01;
 
-    h1->setBins(20);
-    h2->setBins(20);
-    Phi->setBins(20);
+    float h1pol2Val_acc = 7.31558e-01;
+    float h1pol4Val_acc = 3.65903e-01;
+    float h1pol6Val_acc = 5.59806e-01;
+    float h2pol2Val_acc = 2.15611e-01;
+    float phiconstVal_acc = -1.98335e-02;
+    float twophiconstVal_acc =-2.00570e-01;
+    float h1pol8Val_acc = 0.;
+    
+    if ( sqrtsVal == 500. ) {
+      
+      h1pol2Val = 2.21788e+00;
+      h1pol4Val = 2.61190e+00;
+      h1pol6Val = -3.31434e+01;
+      h1pol8Val = 5.19676e+01;
+      h2pol2Val = 8.39666e-01;
+      phiconstVal = 4.71922e-03;
+      twophiconstVal = -5.36814e-02;
+      
+      h1pol2Val_acc = 2.43918e+00;
+      h1pol4Val_acc = 9.76446e+00;
+      h1pol6Val_acc = -51;
+      h1pol8Val_acc = 61;
+      h2pol2Val_acc = 5.93641e-01;
+      phiconstVal_acc = 1.26742e-02;
+      twophiconstVal_acc = -1.82704e-01;
+      
+    }
+    
+    
+    RooRealVar* h1pol2  = new RooRealVar("h1pol2","h1pol2", h1pol2Val);
+    RooRealVar* h1pol4  = new RooRealVar("h1pol4","h1pol4", h1pol4Val);
+    RooRealVar* h1pol6  = new RooRealVar("h1pol6","h1pol6", h1pol6Val);
+    RooRealVar* h1pol8  = new RooRealVar("h1pol8","h1pol8", h1pol8Val);
+    RooRealVar* h2pol2  = new RooRealVar("h2pol2","h2pol2", h2pol2Val);
+    RooRealVar* phiconst  = new RooRealVar("phicons","phiconst", phiconstVal);
+    RooRealVar* twophiconst  = new RooRealVar("twophicons","twophiconst", twophiconstVal);
 
-    // From RooDataHist
+    // set the PDF
+    RooZZ_3D *bkgPdf = new RooZZ_3D("bkgPdf","bkgPdf", *h1,*h2,*Phi,
+				    *h1pol2,*h1pol4,*h1pol6,*h1pol8,*h2pol2,*phiconst,*twophiconst,false);
+    
+    RooRealVar* h1pol2_acc = new RooRealVar("h1pol2_acc","h1pol2_acc", h1pol2Val_acc);
+    RooRealVar* h1pol4_acc = new RooRealVar("h1pol4_acc","h1pol4_acc", h1pol4Val_acc);
+    RooRealVar* h1pol6_acc = new RooRealVar("h1pol6_acc","h1pol6_acc", h1pol6Val_acc);
+    RooRealVar* h1pol8_acc = new RooRealVar("h1pol8_acc","h1pol8_acc", h1pol8Val_acc);
+    RooRealVar* h2pol2_acc = new RooRealVar("h2pol2_acc","h2pol2_acc", h2pol2Val_acc);
+    RooRealVar* phiconst_acc = new RooRealVar("phicons_acc","phiconst_acc", phiconstVal_acc);
+    RooRealVar* twophiconst_acc = new RooRealVar("twophicons","twophiconst_acc", twophiconstVal_acc);
+
+    // set the PDF
+    RooZZ_3D *bkgPdf_acc = new RooZZ_3D("bkgPdf_acc","bkgPdf_acc", *h1,*h2,*Phi,
+					*h1pol2_acc,*h1pol4_acc,*h1pol6_acc,*h1pol8_acc,*h2pol2_acc,*phiconst_acc,*twophiconst_acc,true);
+
+    */
+    
+    // data points
     TChain *bkgTree = new TChain("SelectedTree");
     bkgTree->Add(Form("bkgData/%s_false.root", modeName.Data()));
     RooDataSet *bkgData = new RooDataSet("bkgData","bkgData",bkgTree,RooArgSet(*h1, *h2, *Phi));
-    RooDataHist *bkgHist = bkgData->binnedClone(0);
-    RooHistPdf* bkgPdf = new RooHistPdf("bkgPdf", "bkgPdf", RooArgSet(*h1, *h2, *Phi), *bkgHist);
-
+    
     TChain *bkgTree_acc = new TChain("SelectedTree");
     bkgTree_acc->Add(Form("bkgData/%s_true.root", modeName.Data()));
     RooDataSet *bkgData_acc = new RooDataSet("bkgData_acc","bkgData_acc",bkgTree_acc,RooArgSet(*h1, *h2, *Phi));
+
+    RooDataHist *bkgHist = bkgData->binnedClone(0);
+    RooHistPdf* bkgPdf = new RooHistPdf("bkgPdf", "bkgPdf", RooArgSet(*h1, *h2, *Phi), *bkgHist);
+
     RooDataHist *bkgHist_acc = bkgData_acc->binnedClone(0);
     RooHistPdf* bkgPdf_acc = new RooHistPdf("bkgPdf_acc", "bkgPdf_acc", RooArgSet(*h1, *h2, *Phi), *bkgHist_acc);
-
+    
     //
     // Signal files
     // 
@@ -169,16 +239,6 @@ void plotPdf_3D_ZZ(float sqrtsVal = 250.) {
 							      *b2, *cgaus, *sgaus, true);
 
     
-
-    /*
-    RooSpinZero_3D_ZH *sigPdf = new RooSpinZero_3D_ZH("sigPdf","sigPdf",
-							   *h1,*h2,*Phi,
-							  *sqrts, *mX, *mZ, *R1Val, *R2Val, para, 
-							  *a1Val, *phi1Val, *a2Val, *phi2Val,*a3Val, *phi3Val, 
-							  *g1Val, *g2Val, *g3Val, *g4Val, *g1ValIm, *g2ValIm, *g3ValIm, *g4ValIm,
-							  *fa2, *fa3, *phia2, *phia3, withAcc);
-							  */
-
     // 
     // Read input file
     // 
@@ -218,19 +278,19 @@ void plotPdf_3D_ZZ(float sqrtsVal = 250.) {
     // Plotting frames
     // 
     
-    double rescale = 0.001;
+    double rescale = 0.05;
 
     
     //
     // h1 
     // 
-    RooPlot* h1frame =  h1->frame(20);
+    RooPlot* h1frame =  h1->frame(40);
     h1frame->GetXaxis()->CenterTitle();
     h1frame->GetYaxis()->CenterTitle();
     h1frame->GetYaxis()->SetTitle(" ");
     
     double ymax_h1;                                                                                                                
-    TH1F *h1_test = new TH1F("h1_test", "h1_test", 20, -1, 1);                                                                  
+    TH1F *h1_test = new TH1F("h1_test", "h1_test", 40, -1, 1);                                                                  
     tin_signal->Project("h1_test", "costheta1");                                                                                         
     ymax_h1 = h1_test->GetMaximum(); 
     tin_signal->Project("h1_test", "costheta1");                                                                                         
@@ -242,26 +302,26 @@ void plotPdf_3D_ZZ(float sqrtsVal = 250.) {
     sigData_acc.plotOn(h1frame, LineColor(kRed), MarkerColor(kRed), MarkerStyle(25), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale));
     sigPdf_acc->plotOn(h1frame, LineColor(kRed), LineStyle(kDashed), Normalization(rescale));
 
-    bkgData->plotOn(h1frame, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(20), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale*2));
-    bkgPdf->plotOn(h1frame, LineColor(kBlack), Normalization(rescale*2));
+    bkgData->plotOn(h1frame, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(20), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale*2.5));
+    bkgPdf->plotOn(h1frame, LineColor(kBlack), Normalization(rescale*2.5));
 
-    bkgData_acc->plotOn(h1frame, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(21), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale*2));
-    bkgPdf_acc->plotOn(h1frame, LineColor(kBlack), LineStyle(kDashed), Normalization(rescale*2));
+    bkgData_acc->plotOn(h1frame, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(21), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale*2.5));
+    bkgPdf_acc->plotOn(h1frame, LineColor(kBlack), LineStyle(kDashed), Normalization(rescale*2.5));
 
     if ( rescale != 1. )                                                                                                           
-      h1frame->GetYaxis()->SetRangeUser(0, ymax_h1  * rescale * 1.2);                                                                                 
+      h1frame->GetYaxis()->SetRangeUser(0, ymax_h1  * rescale * 1.1);                                                                                 
     
     //
     // h2 
     // 
 
-    RooPlot* h2frame =  h2->frame(20);
+    RooPlot* h2frame =  h2->frame(40);
     h2frame->GetXaxis()->CenterTitle();
     h2frame->GetYaxis()->CenterTitle();
     h2frame->GetYaxis()->SetTitle(" ");
     
     double ymax_h2;                                                                                                                
-    TH1F *h2_test = new TH1F("h2_test", "h2_test", 20, -1, 1);
+    TH1F *h2_test = new TH1F("h2_test", "h2_test", 40, -1, 1);
     tin_signal->Project("h2_test", "costheta2");  
     ymax_h2 = h2_test->GetMaximum(); 
     tin_signal->Project("h2_test", "costheta2");                                                                                         
@@ -273,27 +333,27 @@ void plotPdf_3D_ZZ(float sqrtsVal = 250.) {
     sigData_acc.plotOn(h2frame, LineColor(kRed), MarkerColor(kRed), MarkerStyle(25), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale));
     sigPdf_acc->plotOn(h2frame, LineColor(kRed), LineStyle(kDashed), Normalization(rescale));
 
-    bkgData->plotOn(h2frame, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(20), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale*2));
-    bkgPdf->plotOn(h2frame, LineColor(kBlack), Normalization(rescale*2));
+    bkgData->plotOn(h2frame, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(20), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale*2.5));
+    bkgPdf->plotOn(h2frame, LineColor(kBlack), Normalization(rescale*2.5));
 
-    bkgData_acc->plotOn(h2frame, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(21), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale*2));
-    bkgPdf_acc->plotOn(h2frame, LineColor(kBlack), LineStyle(kDashed), Normalization(rescale*2));
+    bkgData_acc->plotOn(h2frame, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(21), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale*2.5));
+    bkgPdf_acc->plotOn(h2frame, LineColor(kBlack), LineStyle(kDashed), Normalization(rescale*2.5));
 
     if ( rescale != 1. )                                                                                                           
-      h2frame->GetYaxis()->SetRangeUser(0, ymax_h2  * rescale * 1.2);   
+      h2frame->GetYaxis()->SetRangeUser(0, ymax_h2  * rescale * 1.1);   
 
 
     //
     // phi 
     // 
 
-    RooPlot* phiframe =  Phi->frame(20);
+    RooPlot* phiframe =  Phi->frame(40);
     phiframe->GetXaxis()->CenterTitle();
     phiframe->GetYaxis()->CenterTitle();
     phiframe->GetYaxis()->SetTitle(" ");
     
     double ymax_phi;                                                                                                                
-    TH1F *phi_test = new TH1F("phi_test", "phi_test", 20, -3.2, 3.2);                                                                  
+    TH1F *phi_test = new TH1F("phi_test", "phi_test", 40, -3.2, 3.2);                                                                  
     tin_signal->Project("phi_test", "phi");                                                                                         
     ymax_phi = phi_test->GetMaximum(); 
     tin_signal->Project("phi_test", "phi");                                                                                         
@@ -305,14 +365,14 @@ void plotPdf_3D_ZZ(float sqrtsVal = 250.) {
     sigData_acc.plotOn(phiframe, LineColor(kRed), MarkerColor(kRed), MarkerStyle(25), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale));
     sigPdf_acc->plotOn(phiframe, LineColor(kRed), LineStyle(kDashed), Normalization(rescale));
 
-    bkgData->plotOn(phiframe, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(20), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale*2));
-    bkgPdf->plotOn(phiframe, LineColor(kBlack), Normalization(rescale*2));
+    bkgData->plotOn(phiframe, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(20), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale*2.5));
+    bkgPdf->plotOn(phiframe, LineColor(kBlack), Normalization(rescale*2.5));
 
-    bkgData_acc->plotOn(phiframe, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(21), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale*2));
-    bkgPdf_acc->plotOn(phiframe, LineColor(kBlack), LineStyle(kDashed), Normalization(rescale*2));
+    bkgData_acc->plotOn(phiframe, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(21), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale*2.5));
+    bkgPdf_acc->plotOn(phiframe, LineColor(kBlack), LineStyle(kDashed), Normalization(rescale*2.5));
 
     if ( rescale != 1. )                                                                                                           
-      phiframe->GetYaxis()->SetRangeUser(0, ymax_phi  * rescale * 1.2);   
+      phiframe->GetYaxis()->SetRangeUser(0, ymax_phi  * rescale * 1.1);   
 
 
     TCanvas* czz = new TCanvas( "czz", "czz", 600, 600 );
@@ -332,11 +392,9 @@ void plotPdf_3D_ZZ(float sqrtsVal = 250.) {
     czz->SaveAs(Form("paperplots/phi_ee_%.0fGeV_acc.eps", sqrtsVal));
     czz->SaveAs(Form("paperplots/phi_ee_%.0fGeV_acc.png", sqrtsVal));
 
-    delete bkgData;
-    delete bkgData_acc;
 
-    delete bkgPdf;
-    delete bkgPdf_acc;
+    delete bkgTree;
+    delete bkgTree_acc;
     
     
 }
