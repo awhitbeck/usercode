@@ -73,8 +73,8 @@ void drawilcfitresult()
   }
   
   // 2D plots
-  draw2dsingle("pure_f_2_p15_f_3_250GeV_accfalse", "fa2", "fa3", "f_{2}", "f_{3}", 100, 0, 0.5, 100, 0, 0.5);
-  draw2dsingle("pure_f_3_250GeV_accfalse", "fa3", "phia3",  "f_{3}", "#phi_{3}", 100, 0, 0.5, 100, -3.14, 3.14);
+  draw2dsingle("pure_f_2_p15_f_3_250GeV_accfalse", "fa2", "fa3", "f_{2}", "f_{3}", 50, 0, 0.4, 50, 0, 0.4, 0.15, 0.1);
+  draw2dsingle("pure_f_3_250GeV_accfalse", "fa3", "phia3",  "f_{3}", "#phi_{3}", 50, 0, 0.4, 50, -1.6, 1.6, 0.1, 0);
     
   
 }
@@ -107,8 +107,8 @@ void drawsingle(float sqrtsVal, float f2gen, float f3gen, TString toyName, int v
   
   // assume the expected err is 1/3 of the generated values
   xerr = xgen / 3.;
-  float xMin = TMath::Max(xgen-4.*xerr,0.);
-  float xMax = TMath::Min(xgen+4.*xerr,1.);
+  float xMin = TMath::Max(xgen-6.*xerr,0.);
+  float xMax = TMath::Min(xgen+6.*xerr,1.);
   
 
   TH1F *h_var = new TH1F("h_var", "h_var", nBins, xMin, xMax);
@@ -170,15 +170,16 @@ void drawsingle(float sqrtsVal, float f2gen, float f3gen, TString toyName, int v
 
   TCanvas *c1 = new TCanvas("c1", "c1", 600, 600);
   c1->cd();
-  c1->SetRightMargin(0.11);
+  if ( variable == kFA3 ) 
+    c1->SetRightMargin(0.11);
   h_var->Draw("hist");
-  // h_var->Fit("gaus");
+  h_var->Fit("gaus");
   c1->SaveAs(Form("toyresults_ilc/plots/%s_fitresults_%s.eps", var.Data(), toyName.Data()));
   c1->SaveAs(Form("toyresults_ilc/plots//%s_fitresults_%s.png", var.Data(), toyName.Data()));
 
   c1->Clear();
   h_var_pull->Draw("hist");
-  //h_var_pull->Fit("gaus");
+  h_var_pull->Fit("gaus");
   
   c1->SaveAs(Form("toyresults_ilc/plots/%s_pull_fitresults_%s.eps", var.Data(), toyName.Data()));
   c1->SaveAs(Form("toyresults_ilc/plots/%s_pull_fitresults_%s.png", var.Data(), toyName.Data()));
@@ -192,7 +193,7 @@ void drawsingle(float sqrtsVal, float f2gen, float f3gen, TString toyName, int v
 
 
 void draw2dsingle(TString toyName, TString xVar, TString yVar, TString xTitle, TString yTitle, 
-		  int nBinsX, double xMin, double xMax, int nBinsY, double yMin, double yMax) 
+		  int nBinsX, double xMin, double xMax, int nBinsY, double yMin, double yMax, double xgen, double ygen) 
 {
 
   gROOT->ProcessLine(".L tdrstyle.C");
@@ -289,12 +290,24 @@ void draw2dsingle(TString toyName, TString xVar, TString yVar, TString xTitle, T
   }
   gStyle->SetPalette(n, colors); 
 
+  //
+  // Add a marker to the generated value
+  // 
+
+  Double_t x[1]; 
+  Double_t y[1];
+  x[0] = xgen;
+  y[0] = ygen;
+  
+  TGraph *gr = new TGraph(1, x, y);
+  gr->SetMarkerStyle(34);
+  gr->SetMarkerSize(2.5);
 
   TCanvas *c1 = new TCanvas("c1", "c1", 600, 600);
   c1->cd();
   c1->SetLeftMargin(0.17);
-  c1->SetRightMargin(0.14);
-  h_var_clone->Draw("COLZ");
+  //c1->SetRightMargin(0.14);
+  h_var_clone->Draw("COL");
   h_var->SetLineColor(1);
   h_var->SetLineWidth(2);
   h_var->Draw("cont3same");
@@ -302,6 +315,7 @@ void draw2dsingle(TString toyName, TString xVar, TString yVar, TString xTitle, T
   h_clone->SetLineWidth(2);
   h_clone->SetLineStyle(2);
   h_clone->Draw("cont3same");
+  gr->Draw("samep");
   
   c1->SaveAs(Form("toyresults_ilc/plots/%s_vs_%s_fitresults_%s.eps", yVar.Data(), xVar.Data(), toyName.Data()));
   c1->SaveAs(Form("toyresults_ilc/plots/%s_vs_%s_fitresults_%s.png", yVar.Data(), xVar.Data(), toyName.Data()));
