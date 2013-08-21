@@ -302,10 +302,10 @@ void plotPdf_3D_ZZ(float sqrtsVal = 250.) {
     sigData_acc.plotOn(h1frame, LineColor(kRed), MarkerColor(kRed), MarkerStyle(25), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale));
     sigPdf_acc->plotOn(h1frame, LineColor(kRed), LineStyle(kDashed), Normalization(rescale));
 
-    bkgData->plotOn(h1frame, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(20), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale*2.5));
+    bkgData->plotOn(h1frame, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(26), MarkerSize(0), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale*2.5));
     bkgPdf->plotOn(h1frame, LineColor(kBlack), Normalization(rescale*2.5));
 
-    bkgData_acc->plotOn(h1frame, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(21), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale*2.5));
+    bkgData_acc->plotOn(h1frame, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(27), MarkerSize(0),  XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale*2.5));
     bkgPdf_acc->plotOn(h1frame, LineColor(kBlack), LineStyle(kDashed), Normalization(rescale*2.5));
 
     if ( rescale != 1. )                                                                                                           
@@ -333,10 +333,10 @@ void plotPdf_3D_ZZ(float sqrtsVal = 250.) {
     sigData_acc.plotOn(h2frame, LineColor(kRed), MarkerColor(kRed), MarkerStyle(25), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale));
     sigPdf_acc->plotOn(h2frame, LineColor(kRed), LineStyle(kDashed), Normalization(rescale));
 
-    bkgData->plotOn(h2frame, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(20), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale*2.5));
+    bkgData->plotOn(h2frame, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(20), XErrorSize(0), MarkerSize(0), DataError(RooAbsData::None), Rescale(rescale*2.5));
     bkgPdf->plotOn(h2frame, LineColor(kBlack), Normalization(rescale*2.5));
 
-    bkgData_acc->plotOn(h2frame, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(21), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale*2.5));
+    bkgData_acc->plotOn(h2frame, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(21), XErrorSize(0), MarkerSize(0), DataError(RooAbsData::None), Rescale(rescale*2.5));
     bkgPdf_acc->plotOn(h2frame, LineColor(kBlack), LineStyle(kDashed), Normalization(rescale*2.5));
 
     if ( rescale != 1. )                                                                                                           
@@ -365,10 +365,10 @@ void plotPdf_3D_ZZ(float sqrtsVal = 250.) {
     sigData_acc.plotOn(phiframe, LineColor(kRed), MarkerColor(kRed), MarkerStyle(25), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale));
     sigPdf_acc->plotOn(phiframe, LineColor(kRed), LineStyle(kDashed), Normalization(rescale));
 
-    bkgData->plotOn(phiframe, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(20), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale*2.5));
+    bkgData->plotOn(phiframe, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(20), XErrorSize(0), MarkerSize(0), DataError(RooAbsData::None), Rescale(rescale*2.5));
     bkgPdf->plotOn(phiframe, LineColor(kBlack), Normalization(rescale*2.5));
 
-    bkgData_acc->plotOn(phiframe, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(21), XErrorSize(0), DataError(RooAbsData::None), Rescale(rescale*2.5));
+    bkgData_acc->plotOn(phiframe, LineColor(kBlack), MarkerColor(kBlack), MarkerStyle(21), XErrorSize(0), MarkerSize(0), DataError(RooAbsData::None), Rescale(rescale*2.5));
     bkgPdf_acc->plotOn(phiframe, LineColor(kBlack), LineStyle(kDashed), Normalization(rescale*2.5));
 
     if ( rescale != 1. )                                                                                                           
