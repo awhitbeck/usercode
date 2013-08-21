@@ -12,12 +12,13 @@
 using namespace RooFit ;
 
 bool weightedevents = true;
+bool paperplots = true;
 
 typedef enum{ZEROPLUS, ZEROMINUS, ALL} PlotLevel; 
 
 void plot_ZH_pp() {
     
-    gROOT->ProcessLine(".L ~/tdrstyle.C");
+    gROOT->ProcessLine(".L tdrstyle.C");
     setTDRStyle();
     gStyle->SetPadLeftMargin(0.16);
     
@@ -31,14 +32,15 @@ void plot_ZH_pp() {
     if ( withAcc ) 
         accName = "true";
 
-    PlotLevel plot = ZEROMINUS;
+    PlotLevel plot = ALL;
     
     //TString modeName = "JHUGen_weighted_pp_ZH_llbb_0m_1M";
     // TString modeName = "pp_ZH_llbb_14TeV_1M";
+    
     /*
-      TString modeName_0p = "uu_ZH_llbb_1M_debug";
-      TString modeName_0m = "uu_ZH_llbb_0m_1M_debug";
-      TString plotAppendix= "uu_ZH_llbb_debug";
+    TString modeName_0p = "uu_ZH_llbb_1M_debug";
+    TString modeName_0m = "uu_ZH_llbb_0m_1M_debug";
+    TString plotAppendix= "uu_ZH_llbb_debug";
     */
 
     TString modeName_0p = "dd_ZH_llbb_1M_debug";
@@ -69,13 +71,13 @@ void plot_ZH_pp() {
     double phia3Gen = 0.;
         
     // Observables (5D)
-    RooRealVar* h1 = new RooRealVar("costheta1","h1",-1,1);
-    RooRealVar* h2 = new RooRealVar("costheta2","h2",-1,1);
-    RooRealVar* Phi = new RooRealVar("phi","Phi",-TMath::Pi(),TMath::Pi());
-    RooRealVar* hs = new RooRealVar("costhetastar","hs",-1,1);
-    RooRealVar* Phi1 = new RooRealVar("phistar1","Phi1",-TMath::Pi(),TMath::Pi());
-    RooRealVar* m= new RooRealVar("m","m", 150, 1000);
-    RooRealVar* Y= new RooRealVar("Y","Y", -4, 4);
+    RooRealVar* h1 = new RooRealVar("costheta1","cos#theta_{1}",-1,1);
+    RooRealVar* h2 = new RooRealVar("costheta2","cos#theta_{2}",-1,1);
+    RooRealVar* Phi = new RooRealVar("phi","#Phi",-TMath::Pi(),TMath::Pi());
+    RooRealVar* hs = new RooRealVar("costhetastar","cos#theta^{*}",-1,1);
+    RooRealVar* Phi1 = new RooRealVar("phistar1","#Phi_{1}",-TMath::Pi(),TMath::Pi());
+    RooRealVar* m= new RooRealVar("m","m_{VH} [GeV]", 150, 1000);
+    RooRealVar* Y= new RooRealVar("Y","Rapidity (VH)", -4, 4);
     
     // additional variables
     // event weight
@@ -172,74 +174,120 @@ void plot_ZH_pp() {
     
 
     RooPlot* h1frame =  h1->frame(20);
+    h1frame->GetXaxis()->CenterTitle();
+    h1frame->GetYaxis()->CenterTitle();
+    h1frame->GetYaxis()->SetTitle(" ");
+    
     if ( plot == ZEROPLUS || plot == ALL ) {
-      sigData_pp0p.plotOn(h1frame, MarkerColor(kBlack), MarkerStyle(24));
-      sigPdf_pp->plotOn(h1frame, LineColor(kBlack));
+      sigData_pp0p.plotOn(h1frame, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(10.));
+      sigPdf_pp->plotOn(h1frame, LineColor(kRed),LineWidth(2), Normalization(10.));
     }
     if ( plot == ZEROMINUS || plot == ALL ) {
-      sigData_pp0m.plotOn(h1frame, MarkerColor(kRed), MarkerStyle(20));
-      sigPdf_pp0m->plotOn(h1frame, LineColor(kRed));
+      sigData_pp0m.plotOn(h1frame, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0),DataError(RooAbsData::None));
+      sigPdf_pp0m->plotOn(h1frame, LineColor(kBlue),LineWidth(2));
     }
+
+
     RooPlot* h2frame =  h2->frame(20);
+    h2frame->GetXaxis()->CenterTitle();
+    h2frame->GetYaxis()->CenterTitle();
+    h2frame->GetYaxis()->SetTitle(" ");
+    
     if ( plot == ZEROPLUS || plot == ALL ) {
-      sigData_pp0p.plotOn(h2frame, MarkerColor(kBlack), MarkerStyle(24));
-      sigPdf_pp->plotOn(h2frame, LineColor(kBlack));
+      sigData_pp0p.plotOn(h2frame, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(10.));
+      sigPdf_pp->plotOn(h2frame, LineColor(kRed),LineWidth(2), Normalization(10.));
     }
     if ( plot == ZEROMINUS || plot == ALL ) {
-      sigData_pp0m.plotOn(h2frame, MarkerColor(kRed), MarkerStyle(20));
-      sigPdf_pp0m->plotOn(h2frame, LineColor(kRed));
+      sigData_pp0m.plotOn(h2frame, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0),DataError(RooAbsData::None));
+      sigPdf_pp0m->plotOn(h2frame, LineColor(kBlue),LineWidth(2));
     }
     
-    RooPlot* phiframe =  Phi->frame(20);
+    RooPlot* Phiframe =  Phi->frame(20);
+    Phiframe->GetXaxis()->CenterTitle();
+    Phiframe->GetYaxis()->CenterTitle();
+    Phiframe->GetYaxis()->SetTitle(" ");
+
     if ( plot == ZEROPLUS || plot == ALL ) {
-      sigData_pp0p.plotOn(phiframe, MarkerColor(kBlack), MarkerStyle(24));
-      sigPdf_pp->plotOn(phiframe, LineColor(kBlack));
-    } 
-    if ( plot == ZEROMINUS || plot == ALL ) {
-      sigData_pp0m.plotOn(phiframe, MarkerColor(kRed), MarkerStyle(22));
-      sigPdf_pp0m->plotOn(phiframe, LineColor(kRed));
+      sigData_pp0p.plotOn(Phiframe, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(10.));
+      sigPdf_pp->plotOn(Phiframe, LineColor(kRed),LineWidth(2), Normalization(10.));
     }
+    if ( plot == ZEROMINUS || plot == ALL ) {
+      sigData_pp0m.plotOn(Phiframe, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0),DataError(RooAbsData::None));
+      sigPdf_pp0m->plotOn(Phiframe, LineColor(kBlue),LineWidth(2));
+    }
+
     RooPlot* mframe =  m->frame(20);
+    mframe->GetXaxis()->CenterTitle();
+    mframe->GetYaxis()->CenterTitle();
+    mframe->GetYaxis()->SetTitle(" ");
+
     if ( plot == ZEROPLUS || plot == ALL ) {
-      sigData_pp0p.plotOn(mframe, MarkerColor(kBlack), MarkerStyle(24));
-      sigPdf_pp->plotOn(mframe, LineColor(kBlack));
+      sigData_pp0p.plotOn(mframe, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(10.));
+      sigPdf_pp->plotOn(mframe, LineColor(kRed),LineWidth(2), Normalization(10.));
     }
     if ( plot == ZEROMINUS || plot == ALL ) {
-      sigData_pp0m.plotOn(mframe, MarkerColor(kRed), MarkerStyle(20));
-      sigPdf_pp0m->plotOn(mframe, LineColor(kRed));
+      sigData_pp0m.plotOn(mframe, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0),DataError(RooAbsData::None));
+      sigPdf_pp0m->plotOn(mframe, LineColor(kBlue),LineWidth(2));
     }
+
     RooPlot* Yframe =  Y->frame(20);
+    Yframe->GetXaxis()->CenterTitle();
+    Yframe->GetYaxis()->CenterTitle();
+    Yframe->GetYaxis()->SetTitle(" ");
+    
     if ( plot == ZEROPLUS || plot == ALL ) {
-      sigData_pp0p.plotOn(Yframe, MarkerColor(kBlack), MarkerStyle(24));
-      sigPdf_pp->plotOn(Yframe, LineColor(kBlack));
+      sigData_pp0p.plotOn(Yframe, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(10.));
+      sigPdf_pp->plotOn(Yframe, LineColor(kRed),LineWidth(2), Normalization(10.));
     }
-    if ( plot == ZEROMINUS|| plot == ALL ) {
-      sigData_pp0m.plotOn(Yframe, MarkerColor(kRed), MarkerStyle(20));
-      sigPdf_pp0m->plotOn(Yframe, LineColor(kRed));
+    if ( plot == ZEROMINUS || plot == ALL ) {
+      sigData_pp0m.plotOn(Yframe, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0),DataError(RooAbsData::None));
+      sigPdf_pp0m->plotOn(Yframe, LineColor(kBlue),LineWidth(2));
     }
 
-    TCanvas* czz = new TCanvas( "czz", "czz", 1200, 800 );
-    czz->Divide(3,2);
-    
-    czz->cd(1);
-    h1frame->Draw();
-    
-    czz->cd(2);
-    h2frame->Draw();
-    
-    czz->cd(3);
-    phiframe->Draw();
+    if ( paperplots ) {
+      TCanvas* czz = new TCanvas( "czz", "czz", 600, 600); 
 
-    czz->cd(4);
-    mframe->Draw();
+      h1frame->Draw();
+      czz->SaveAs(Form("paperplots/h1_ppzh_%s_acc%s.eps", plotAppendix.Data(), accName.Data()));;
+      
+      h2frame->Draw();
+      czz->SaveAs(Form("paperplots/h2_ppzh_%s_acc%s.eps", plotAppendix.Data(), accName.Data()));;
+      
+      Phiframe->Draw();
+      czz->SaveAs(Form("paperplots/phi_ppzh_%s_acc%s.eps", plotAppendix.Data(), accName.Data()));;
+      
+      mframe->Draw();
+      czz->SaveAs(Form("paperplots/mvh_ppzh_%s_acc%s.eps", plotAppendix.Data(), accName.Data()));;
+      
+      Yframe->Draw();
+      czz->SaveAs(Form("paperplots/Yvh_ppzh_%s_acc%s.eps", plotAppendix.Data(), accName.Data()));;
+      
 
-    czz->cd(5);
-    Yframe->Draw();
-    
-    TString plotName = Form("plots_ppzh/%s_acc%s", plotAppendix.Data(), accName.Data());
-    
-    czz->SaveAs(Form("%s.eps", plotName.Data()));
-    czz->SaveAs(Form("%s.png", plotName.Data()));
+
+    }  else {
+      TCanvas* czz = new TCanvas( "czz", "czz", 1200, 800 );
+      czz->Divide(3,2);
+      
+      czz->cd(1);
+      h1frame->Draw();
+      
+      czz->cd(2);
+      h2frame->Draw();
+      
+      czz->cd(3);
+      phiframe->Draw();
+      
+      czz->cd(4);
+      mframe->Draw();
+      
+      czz->cd(5);
+      Yframe->Draw();
+      
+      TString plotName = Form("plots_ppzh/%s_acc%s", plotAppendix.Data(), accName.Data());
+      
+      czz->SaveAs(Form("%s.eps", plotName.Data()));
+      czz->SaveAs(Form("%s.png", plotName.Data()));
+    } 
     
 }
 
