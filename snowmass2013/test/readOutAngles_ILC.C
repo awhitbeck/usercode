@@ -12,6 +12,7 @@
 #include "TRandom.h"
 #include "TLorentzVector.h"
 #include "TLorentzRotation.h"
+#include "Math/VectorUtil.h"
 
 using namespace std;
 
@@ -142,17 +143,24 @@ void readOutAngles_ILC(std::string filename, bool applyAcc=false, bool debug = f
         TLorentzVector pZstar = pZ + pH; 
         
         if ( debug ) {
-            std::cout << "p4(l+): "   << p_lplus.Px()  << ", " <<  p_lplus.Py()  << ", " << p_lplus.Pz()  << ", " << p_lplus.E() << "\n";
-            std::cout << "p4(l-): "   << p_lminus.Px() << ", " <<  p_lminus.Py() << ", " << p_lminus.Pz() << ", " << p_lminus.E() << "\n";
-            std::cout << "p4(b): "    << p_b.Px()      << ", " <<  p_b.Py()      << ", " << p_b.Pz()      << ", " << p_b.E() << "\n";
-            std::cout << "p4(bbar): " << p_bbar.Px()   << ", " <<  p_bbar.Py()   << ", " << p_bbar.Pz()   << ", " << p_bbar.E() << "\n";
-            std::cout << "pZ: "       << pZ.Px()       << ", " <<  pZ.Py()       << ", " << pZ.Pz()       << ", " << pZ.E() << "\n";
-            std::cout << "pH: "       << pH.Px()       << ", " <<  pH.Py()       << ", " << pH.Pz()       << ", " << pH.E() << "\n";
-            std::cout << "p(H+Z): "   << (pH+pZ).Px()       << ", " <<  (pH+pZ).Py()       << ", " << (pH+pZ).Pz()       << ", " << (pH+pZ).E() << "\n";
+	     std::cout << "=====================p4 Inputs =====================\n";
+	     std::cout << "p4(l+): "   << p_lplus.Px()  << ", " <<  p_lplus.Py()  << ", " << p_lplus.Pz()  << ", " << p_lplus.E() 
+		       << "\t (pt, eta)" << p_lplus.Pt() << ", " << p_lplus.Eta() << "\n";
+	     std::cout << "p4(l-): "   << p_lminus.Px() << ", " <<  p_lminus.Py() << ", " << p_lminus.Pz() << ", " << p_lminus.E() 
+		       << "\t (pt, eta)" << p_lminus.Pt() << ", " << p_lminus.Eta() << "\n";
+	     std::cout << "p4(b): "    << p_b.Px()      << ", " <<  p_b.Py()      << ", " << p_b.Pz()      << ", " << p_b.E() 
+		       << "\t (pt, eta)" << p_b.Pt() << ", " << p_b.Eta() << "\n";
+	     std::cout << "p4(bbar): " << p_bbar.Px()   << ", " <<  p_bbar.Py()   << ", " << p_bbar.Pz()   << ", " << p_bbar.E()
+		      << "\t (pt, eta)" << p_bbar.Pt() << ", " << p_bbar.Eta() << "\n";
+	     std::cout << "====================================================\n";
+	     std::cout << "pZ: "       << pZ.Px()       << ", " <<  pZ.Py()       << ", " << pZ.Pz()       << ", " << pZ.E() << "\n";
+	     std::cout << "pH: "       << pH.Px()       << ", " <<  pH.Py()       << ", " << pH.Pz()       << ", " << pH.E() << "\n";
+	     std::cout << "p(H+Z): "   << (pH+pZ).Px()       << ", " <<  (pH+pZ).Py()       << ", " << (pH+pZ).Pz()       << ", " << (pH+pZ).E() << "\n";
+	     
         }
         
         double angle_costheta1, angle_costheta2, angle_phi, angle_costhetastar, angle_phistar1, angle_phistar2, angle_phistar12, angle_phi1, angle_phi2;
-	// calculateAngles( pZstar, pZ, p_lminus, p_lplus, pH, p_b, p_bbar, angle_costheta1, angle_costheta2, angle_phi, angle_costhetastar, angle_phistar1, angle_phistar2, angle_phistar12, angle_phi1, angle_phi2);
+	//calculateAngles( pZstar, pZ, p_lminus, p_lplus, pH, p_b, p_bbar, angle_costheta1, angle_costheta2, angle_phi, angle_costhetastar, angle_phistar1, angle_phistar2, angle_phistar12, angle_phi1, angle_phi2);
 	// use the new calcualtions..
 	computeAngles( pZstar, pZ, p_lminus, p_lplus, pH, p_b, p_bbar, angle_costheta1, angle_costheta2, angle_phi, angle_costhetastar, angle_phistar1);
 	
@@ -188,8 +196,26 @@ void readOutAngles_ILC(std::string filename, bool applyAcc=false, bool debug = f
         
         m_wt = weight;
         
-        vector<TLorentzVector> lep_4vec = Calculate4Momentum(m_m,91.188,125.,acos(m_costheta1),acos(m_costheta2),acos(0),m_phi,0);
+	vector<TLorentzVector> lep_4vec = Calculate4Momentum(m_m,91.188,125.,acos(m_costheta1),acos(m_costheta2),acos(0),m_phi,0);
+	//vector<TLorentzVector> lep_4vec = Calculate4Momentum(m_m,m_zmass,m_hmass,acos(m_costheta1),acos(m_costheta2),acos(m_costhetastar),m_phi,m_phistar1);
         
+	// now boost the 4leptons to the original frame
+	TLorentzVector pZstar_new;
+	// calculate pz and E based on m and Y
+	double pz_Zstar_new = m_m*sqrt((pow(exp(2*m_Y),2) -1)/(4*exp(2*m_Y)));
+	pZstar_new.SetPxPyPzE(0, 0, pz_Zstar_new, sqrt(pz_Zstar_new*pz_Zstar_new+m_m*m_m));
+	TVector3 boost_pZstar = pZstar_new.BoostVector();
+	
+	for (int i = 0 ; i < 4 ; i++ )
+	  lep_4vec[i].Boost(boost_pZstar); 
+	
+	if ( debug ) 
+	  std::cout << "p(H+Z) after recalculation: " 
+		    << pZstar_new.Px() << ", " 
+		    << pZstar_new.Py() << ", " 
+		    << pZstar_new.Pz() << ", " 
+		    << pZstar_new.E() << "\n";
+	
         ptlminus_ALT = lep_4vec[0].Pt();
         ptlplus_ALT = lep_4vec[1].Pt();
         
@@ -207,6 +233,20 @@ void readOutAngles_ILC(std::string filename, bool applyAcc=false, bool debug = f
             if ( ptlminus_ALT < 5. ) continue;
             if ( TMath::Abs(etalminus_ALT) > 2.4 ) continue;
         }
+
+	if ( debug ) {
+	  std::cout << "=======After recalculation based on the angles=========\n"; 
+	  std::cout << "p4(l+): "   << lep_4vec[1].Px()  << ", " <<  lep_4vec[1].Py()  << ", " << lep_4vec[1].Pz()  << ", " << lep_4vec[1].E() 
+		    << "\t (pt, eta)" << lep_4vec[1].Pt() << ", " << lep_4vec[1].Eta() << "\n";
+	  std::cout << "p4(l-): "   << lep_4vec[0].Px() << ", " <<  lep_4vec[0].Py() << ", " << lep_4vec[0].Pz() << ", " << lep_4vec[0].E() 
+		    << "\t (pt, eta)" << lep_4vec[0].Pt() << ", " << lep_4vec[0].Eta() << "\n";
+	  std::cout << "p4(b): "    << lep_4vec[2].Px()      << ", " <<  lep_4vec[2].Py()      << ", " << lep_4vec[2].Pz()      << ", " << lep_4vec[2].E() 
+		    << "\t (pt, eta)" << lep_4vec[2].Pt() << ", " << lep_4vec[2].Eta() << "\n";
+	  std::cout << "p4(bbar): " << lep_4vec[3].Px()   << ", " <<  lep_4vec[3].Py()   << ", " << lep_4vec[3].Pz()   << ", " << lep_4vec[3].E() 
+		    << "\t (pt, eta)" << lep_4vec[3].Pt() << ", " << lep_4vec[3].Eta() << "\n";
+	  std::cout << "deltaR(l+,l-): " << ROOT::Math::VectorUtil::DeltaR(p_lminus, p_lplus) << ", after calculation " << ROOT::Math::VectorUtil::DeltaR(lep_4vec[0], lep_4vec[1]) << "\n";
+	  std::cout << "======================================================\n";
+	}
         
         tree->Fill();
         
