@@ -88,7 +88,17 @@ public:
     double mZ = 91.1876;
     if ( withAcc ) {
       vector<TLorentzVector> lep_4vecs = Calculate4Momentum(m_,mZ,mH_,acos(costheta1_),acos(costheta2_),acos(0),phi_,0);
-      
+
+	// now boost the 4leptons to the original frame
+	TLorentzVector pZstar_new;
+	// calculate pz and E based on m and Y
+	double pz_Zstar_new = m_*sqrt((pow(exp(2*Y_),2) -1)/(4*exp(2*Y_)));
+	pZstar_new.SetPxPyPzE(0, 0, pz_Zstar_new, sqrt(pz_Zstar_new*pz_Zstar_new+m_*m_));
+	TVector3 boost_pZstar = pZstar_new.BoostVector();
+	
+	for (int i = 0 ; i < 4 ; i++ )
+	  lep_4vecs[i].Boost(boost_pZstar); 
+	
       double pt_plus_sq = pow(lep_4vecs[1].Px(),2) + pow(lep_4vecs[1].Py(),2);
       double pt_minus_sq = pow(lep_4vecs[0].Px(),2) + pow(lep_4vecs[0].Py(),2);
       
