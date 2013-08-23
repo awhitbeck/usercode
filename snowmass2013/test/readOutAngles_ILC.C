@@ -28,7 +28,8 @@ void readOutAngles_ILC(std::string filename, bool applyAcc=false, bool debug = f
     std::cout << "Processing " << filenameT << std::endl;
     fin.open(filenameT.c_str());
     
-    int maxEvents = 100000000;
+    //    int maxEvents = 100000000;
+    int maxEvents = 1;
     
     char oname[250];
     sprintf(oname,"%s.root",filename.c_str());
@@ -138,7 +139,7 @@ void readOutAngles_ILC(std::string filename, bool applyAcc=false, bool debug = f
         }
         
         TLorentzVector pZ = p_lplus + p_lminus;
-        TLorentzVector pH = p_b + p_bbar; 
+	TLorentzVector pH = p_b + p_bbar; 
         TLorentzVector pZstar = pZ + pH; 
         
         if ( debug ) {
@@ -162,7 +163,10 @@ void readOutAngles_ILC(std::string filename, bool applyAcc=false, bool debug = f
         double angle_costheta1, angle_costheta2, angle_phi, angle_costhetastar, angle_phistar1, angle_phistar2, angle_phistar12, angle_phi1, angle_phi2;
 	//calculateAngles( pZstar, pZ, p_lminus, p_lplus, pH, p_b, p_bbar, angle_costheta1, angle_costheta2, angle_phi, angle_costhetastar, angle_phistar1, angle_phistar2, angle_phistar12, angle_phi1, angle_phi2);
 	// use the new calcualtions..
-	computeAngles( pZstar, pZ, p_lminus, p_lplus, pH, p_b, p_bbar, angle_costheta1, angle_costheta2, angle_phi, angle_costhetastar, angle_phistar1);
+
+	//	computeAngles( pZstar, pZ, p_lminus, p_lplus, pH, p_b, p_bbar, angle_costheta1, angle_costheta2, angle_phi, angle_costhetastar, angle_phistar1);
+
+	computeAngles( pZstar, pZ, p_lminus, p_lplus, pH, pH, pH, angle_costheta1, angle_costheta2, angle_phi, angle_costhetastar, angle_phistar1);
 	
         // replace the angles 
         m_costheta1 = float(angle_costhetastar);
