@@ -17,7 +17,6 @@
 using namespace std;
 
 void calculateAngles(TLorentzVector p4H, TLorentzVector p4Z1, TLorentzVector p4M11, TLorentzVector p4M12, TLorentzVector p4Z2, TLorentzVector p4M21, TLorentzVector p4M22, double& costheta1, double& costheta2, double& phi, double& costhetastar, double& phistar1, double& phistar2, double& phistar12, double& phi1, double& phi2);
-
 void computeAngles(TLorentzVector thep4H, TLorentzVector thep4Z1, TLorentzVector thep4M11, TLorentzVector thep4M12, TLorentzVector thep4Z2, TLorentzVector thep4M21, TLorentzVector thep4M22, double& costheta1, double& costheta2, double& Phi, double& costhetastar, double& Phi1);
 
 vector<TLorentzVector> Calculate4Momentum(float Mx,float M1,float M2,float theta,float theta1,float theta2,float _Phi1_,float _Phi_); 
@@ -154,7 +153,8 @@ void readOutAngles_ILC(std::string filename, bool applyAcc=false, bool debug = f
 		      << "\t (pt, eta)" << p_bbar.Pt() << ", " << p_bbar.Eta() << "\n";
 	     std::cout << "====================================================\n";
 	     std::cout << "pZ: "       << pZ.Px()       << ", " <<  pZ.Py()       << ", " << pZ.Pz()       << ", " << pZ.E() << "\n";
-	     std::cout << "pH: "       << pH.Px()       << ", " <<  pH.Py()       << ", " << pH.Pz()       << ", " << pH.E() << "\n";
+	     std::cout << "pH: "       << pH.Px()       << ", " <<  pH.Py()       << ", " << pH.Pz()       << ", " << pH.E() 
+		       << "\t (pt, eta)" << pH.Pt() << ", " << pH.Eta() << "\n";
 	     std::cout << "p(H+Z): "   << (pH+pZ).Px()       << ", " <<  (pH+pZ).Py()       << ", " << (pH+pZ).Pz()       << ", " << (pH+pZ).E() << "\n";
 	     
         }
@@ -202,20 +202,41 @@ void readOutAngles_ILC(std::string filename, bool applyAcc=false, bool debug = f
 	// now boost the 4leptons to the original frame
 	TLorentzVector pZstar_new;
 	// calculate pz and E based on m and Y
-	double pz_Zstar_new = m_m*sqrt((pow(exp(2*m_Y),2) -1)/(4*exp(2*m_Y)));
-	pZstar_new.SetPxPyPzE(0, 0, pz_Zstar_new, sqrt(pz_Zstar_new*pz_Zstar_new+m_m*m_m));
+	double E_Zstar_new =  m_m*(exp(2*m_Y)+1)/(2*exp(m_Y));
+	double pz_Zstar_new = (exp(2*m_Y)-1)/(exp(2*m_Y)+1)*E_Zstar_new;
+	pZstar_new.SetPxPyPzE(0, 0, pz_Zstar_new, E_Zstar_new);
 	TVector3 boost_pZstar = pZstar_new.BoostVector();
-	
+
 	for (int i = 0 ; i < 4 ; i++ )
 	  lep_4vec[i].Boost(boost_pZstar); 
-	
-	if ( debug ) 
+
+	TLorentzVector pH_new = lep_4vec[2]+lep_4vec[3];
+
+
+		
+	if ( debug ) {
 	  std::cout << "p(H+Z) after recalculation: " 
 		    << pZstar_new.Px() << ", " 
 		    << pZstar_new.Py() << ", " 
 		    << pZstar_new.Pz() << ", " 
 		    << pZstar_new.E() << "\n";
-	
+	  std::cout << "pt(H) after recalculation: " 
+		    << pH_new.Pt() << "\n"; 
+
+	  // calculate again the angles 
+	  TLorentzVector pZ_new = lep_4vec[1]+lep_4vec[0];
+	  TLorentzVector p_lminus_new = lep_4vec[0];
+	  TLorentzVector p_lplus_new = lep_4vec[1];
+	  TLorentzVector p_b_new = lep_4vec[2];
+	  TLorentzVector p_bbar_new = lep_4vec[3];
+
+	  computeAngles( pZstar_new, pZ_new, p_lminus_new, p_lplus_new, pH_new, p_b_new, p_bbar_new, angle_costheta1, angle_costheta2, angle_phi, angle_costhetastar, angle_phistar1);
+	  
+	  std::cout << "costheta1 = " << angle_costhetastar << "\n";
+	  std::cout << "costheta2 = " << angle_costheta1 << "\n";
+	  std::cout << "phi = " << angle_phistar1 << "\n";
+
+	}
         ptlminus_ALT = lep_4vec[0].Pt();
         ptlplus_ALT = lep_4vec[1].Pt();
         
