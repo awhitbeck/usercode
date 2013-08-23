@@ -145,6 +145,15 @@ Double_t RooSpinZero_3D_ZH_pp::evaluate() const
         
         vector<TLorentzVector> lep_4vecs = Calculate4Momentum(m,mZ,mX,acos(h1),acos(h2),acos(0),Phi,0);
         
+	// now boost the 4leptons to the original frame
+	TLorentzVector pZstar_new;
+	// calculate pz and E based on m and Y
+	double pz_Zstar_new = m*sqrt((pow(exp(2*Y),2) -1)/(4*exp(2*Y)));
+	pZstar_new.SetPxPyPzE(0, 0, pz_Zstar_new, sqrt(pz_Zstar_new*pz_Zstar_new+m*m));
+	TVector3 boost_pZstar = pZstar_new.BoostVector();
+	
+	for (int i = 0 ; i < 4 ; i++ )
+	  lep_4vecs[i].Boost(boost_pZstar); 
         
         double pt_plus_sq = pow(lep_4vecs[1].Px(),2) + pow(lep_4vecs[1].Py(),2);
         double pt_minus_sq = pow(lep_4vecs[0].Px(),2) + pow(lep_4vecs[0].Py(),2);
@@ -337,6 +346,16 @@ Double_t RooSpinZero_3D_ZH_pp::analyticalIntegral(Int_t code, const char* rangeN
         
         vector<TLorentzVector> lep_4vecs = Calculate4Momentum(m,mZ,mX,acos(h1),acos(h2),acos(0),Phi,0);
         
+	// now boost the 4leptons to the original frame
+	TLorentzVector pZstar_new;
+	// calculate pz and E based on m and Y
+	double pz_Zstar_new = m*sqrt((pow(exp(2*Y),2) -1)/(4*exp(2*Y)));
+	pZstar_new.SetPxPyPzE(0, 0, pz_Zstar_new, sqrt(pz_Zstar_new*pz_Zstar_new+m*m));
+	TVector3 boost_pZstar = pZstar_new.BoostVector();
+	
+	for (int i = 0 ; i < 4 ; i++ )
+	  lep_4vecs[i].Boost(boost_pZstar); 
+	
         double pt_plus_sq = pow(lep_4vecs[1].Px(),2) + pow(lep_4vecs[1].Py(),2);
         double pt_minus_sq = pow(lep_4vecs[0].Px(),2) + pow(lep_4vecs[0].Py(),2);
         
@@ -656,8 +675,8 @@ float RooSpinZero_3D_ZH_pp::partonicLuminosity(float mVal, float YVal, float sqr
 	Double_t weightc = 1.0;
 	Double_t weights = 1.0;
 	Double_t weightb = 1.0;
-	
     
+
 	// PDF parameters
 	// up params
 	Double_t u0par0 = 0.03134; Double_t u0par1 =-2.068e-05; Double_t u0par2 = 1.283e-08; 
