@@ -26,19 +26,19 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 1000 ) {
   
   float mH=125.;
   bool withAcc = true;
-  VerbosityLevel verb = INFO;
-  PlotLevel plot = NOPLOTS;
-  ToyLevel toy = PURE; 
+  VerbosityLevel verb = ERROR;
+  PlotLevel plot = SIG;
+  ToyLevel toy = NOTOYS;
   
   double fa3Val = 0.5;
   TString accName = "false";
   if ( withAcc ) 
     accName = "true";
   
-  float lumi = 3000; // in unit of fb
+  float lumi =3000; // in unit of fb
   
   float nsigperfb = 0.1;
-  float nbkgperfb = 0;
+  float nbkgperfb = 0.5;
   
   float nsigEvents = lumi*nsigperfb; 
   float nbkgEvents = lumi*nbkgperfb; 
@@ -224,7 +224,7 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 1000 ) {
   g1Val->setVal(1.);
   g4Val->setVal(0.852604);
   double fa3_suppression = 250.;
-  if ( withAcc ) fa3_suppression = 750.;
+  if ( withAcc ) fa3_suppression = 800.;
   fa3->setVal(fa3Val/fa3_suppression);
 
   std::cout << "fa2 = " << fa2->getVal() << "\n";
@@ -283,8 +283,8 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 1000 ) {
     TString nbkgName = "";
     if ( nbkgperfb == 0. ) nbkgName = "_sigonly";
 
-    TFile *toyresults = new TFile(Form("toyresults_ppzh/toyresults_KD_%s_%.0fGeV_acc%s%s.root", 
-				       isPureName.Data(), sqrtsVal, accName.Data(), nbkgName.Data()), "RECREATE");
+    TFile *toyresults = new TFile(Form("toyresults_ppzh/toyresults_KD_%s_%.0fGeV_acc%s%s_%.0fifb.root", 
+				       isPureName.Data(), sqrtsVal, accName.Data(), nbkgName.Data(), lumi), "RECREATE");
     gROOT->cd();
     
     TTree *tree_fit = new TTree("fittree", "fittree");
@@ -316,7 +316,7 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 1000 ) {
       nsig->setConstant(kTRUE);
       nbkg->setConstant(kTRUE);
 
-      int printlevel =  1; // set to -1 to suppress all outputs
+      int printlevel =  -1; // set to -1 to suppress all outputs
 
       if ( verb == INFO ) 
 	printlevel  = 1; 
