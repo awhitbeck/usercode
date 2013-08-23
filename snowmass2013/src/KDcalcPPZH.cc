@@ -89,13 +89,12 @@ public:
     if ( withAcc ) {
       vector<TLorentzVector> lep_4vecs = Calculate4Momentum(m_,mZ,mH_,acos(costheta1_),acos(costheta2_),acos(0),phi_,0);
       // have to calculate this before the boost
-      double higgsPtSq = pow((lep_4vecs[2]+lep_4vecs[3]).Pt(),2);
-      
       // now boost the 4leptons to the original frame
       TLorentzVector pZstar_new;
       // calculate pz and E based on m and Y
-      double pz_Zstar_new = m_*sqrt((pow(exp(2*Y_),2) -1)/(4*exp(2*Y_)));
-      pZstar_new.SetPxPyPzE(0, 0, pz_Zstar_new, sqrt(pz_Zstar_new*pz_Zstar_new+m_*m_));
+      double E_Zstar_new =  m_*(exp(2*Y_)+1)/(2*exp(Y_));
+      double pz_Zstar_new = (exp(2*Y_)-1)/(exp(2*Y_)+1)*E_Zstar_new;
+      pZstar_new.SetPxPyPzE(0, 0, pz_Zstar_new, E_Zstar_new);
       TVector3 boost_pZstar = pZstar_new.BoostVector();
       
       for (int i = 0 ; i < 4 ; i++ )
@@ -106,6 +105,8 @@ public:
       
       double sinh2_eta_plus = pow(lep_4vecs[1].Pz(),2)/pt_plus_sq;
       double sinh2_eta_minus = pow(lep_4vecs[0].Pz(),2)/pt_minus_sq;
+      
+      double higgsPtSq = pow((lep_4vecs[2]+lep_4vecs[3]).Pt(),2);
       
       if( pt_minus_sq<400.0 
 	  || pt_plus_sq<400.0 
