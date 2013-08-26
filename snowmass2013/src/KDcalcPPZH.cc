@@ -159,8 +159,11 @@ void addDtoTree(TString fileName,
   t->SetBranchAddress(phiBranch,&phi_);
   t->SetBranchAddress(mBranch,&m_);
   t->SetBranchAddress(YBranch,&Y_);
-  
-  tt->Branch("pseudoMELA",&KD_,"pseudoMELA/F");
+
+  if ( t->GetBranchStatus("pseudoMELA") )
+    tt->SetBranchAddress("pseudoMELA",&KD_);
+  else 
+    tt->Branch("pseudoMELA",&KD_,"pseudoMELA/F");
   
   cout << "t entries: "  << t->GetEntries() << endl;
   
