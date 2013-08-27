@@ -119,7 +119,6 @@ public:
       }
     }
     
-    
     float SMHiggsProb = SMHiggs->PDF->getVal();
     if(SMHiggsProb<0.0) cout << "KDcalcPPZH::computeKD - ERROR: SMHiggs prob is negative!!!" << endl;
     float altSignalProb = altSignal->PDF->getVal();

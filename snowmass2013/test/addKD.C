@@ -2,13 +2,10 @@
 // 
 // run by root -l -n loadlib.C addKD.C
 // 
-void addKD() {
+void addKD(TString fileDir, TString fileName, double sqrtsVal) 
+{
   
-  double sqrtsVal = 250;
   double mH = 125.;
   KDcalcZH test(sqrtsVal, mH);
-  test.addDtoTree("Events_20130618/unweighted_unpol_g1_1M_false.root", "SelectedTree");
-  test.addDtoTree("Events_20130618/unweighted_unpol_g4_1M_false.root", "SelectedTree");
-  test.addDtoTree("Events_20130626/unweighted_unpol_f_3_250GeV_5M_false.root", "SelectedTree");
-  test.addDtoTree("bkgData/ee_ZZ_llbb_250GeV_25M_false.root","SelectedTree");
+  test.addDtoTree(Form("%s/%s.root", fileDir.Data(), fileName.Data()),"SelectedTree");
 }

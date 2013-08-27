@@ -50,7 +50,7 @@ public:
 					  false);
 
     altSignal->fa2->setVal(0.0);
-    altSignal->fa3->setVal(0.999999);
+    altSignal->fa3->setVal(0.999999999);
     altSignal->phia2->setVal(0.0);
     altSignal->phia3->setVal(0.0);
     altSignal->sqrts->setVal(sqrtsVal);
@@ -107,8 +107,12 @@ public:
     t->SetBranchAddress(costheta1Branch,&costheta1_);
     t->SetBranchAddress(costheta2Branch,&costheta2_);
     t->SetBranchAddress(phiBranch,&phi_);
-    tt->Branch("pseudoMELA",&KD_,"pseudoMELA/F");
     
+  if ( t->GetBranchStatus("pseudoMELA") )
+    tt->SetBranchAddress("pseudoMELA",&KD_);
+  else 
+    tt->Branch("pseudoMELA",&KD_,"pseudoMELA/F");
+  
     cout << "t entries: "  << t->GetEntries() << endl;
 
     for(int iEvt=0; iEvt<t->GetEntries(); iEvt++){
