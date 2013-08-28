@@ -12,21 +12,25 @@
 
 using namespace RooFit ;
 
+typedef enum{ERROR, INFO, DEBUG} VerbosityLevel; 
+typedef enum{NOPLOTS, SIG, ALL} PlotLevel;
+typedef enum{NOTOYS, EMBED, PURE} ToyLevel; 
+
 
 // 
 // Run by root -l -q -b testfitilckd.C
 // 
 
-void testfitilckd(bool pureToys = true, int ntoysperjob = 10000 ) {
+void testfitilckd(bool pureToys = false, int ntoysperjob = 1000 ) {
  
   float sqrtsVal = 250;
   float mH=125.;
-  bool withAcc = true;
-  bool debug = true;
-  bool doplots =true;
-  bool dotoys = false;
+  bool withAcc = false;
+  VerbosityLevel verb = ERROR;
+  PlotLevel plot = ALL;
+  ToyLevel toy = NOTOYS;
   
-  double fa3Val = 0.;
+  double fa3Val = 0.5;
   TString accName = "false";
   if ( withAcc ) 
     accName = "true";
@@ -61,13 +65,22 @@ void testfitilckd(bool pureToys = true, int ntoysperjob = 10000 ) {
   //  1D KD observable
   // 
   int nbins = 100;
-  RooRealVar* kd = new RooRealVar("pseudoMELA","D^{0-}", 0.3, 1.);
-  if ( sqrtsVal == 350. ) 
-    kd->setRange(0.1, 1.);
-  if ( sqrtsVal == 500. ) 
-    kd->setRange(0.2, 1.);
-  if ( sqrtsVal == 1000. ) 
-    kd->setRange(0., 1.);
+  double xMin = 0.3;
+  double xMax = 1.;
+
+  if ( sqrtsVal == 350. ) {
+    xMin = 0.1;
+  } 
+
+  if ( sqrtsVal == 500. ) {
+    xMin = 0.2;
+  } 
+
+  if ( sqrtsVal == 1000. ) {
+    xMin = 0.;
+  } 
+  
+  RooRealVar* kd = new RooRealVar("pseudoMELA","D^{0-}", xMin, xMax);
   kd->setBins(nbins);
   
   
@@ -76,7 +89,7 @@ void testfitilckd(bool pureToys = true, int ntoysperjob = 10000 ) {
   // 
   TChain *bkgTree = new TChain("SelectedTree");
   TString bkgModeName = Form("ee_ZZ_llbb_%.0fGeV_25M", sqrtsVal);
-  bkgTree->Add(Form("bkgData/%s_%s_withKD.root", bkgModeName.Data(), accName.Data()));
+  bkgTree->Add(Form("samples/ee_ZH/%s_%s.root", bkgModeName.Data(), accName.Data()));
   RooDataSet *bkgData = new RooDataSet("bkgData","bkgData",bkgTree,RooArgSet(*kd));
   RooDataHist *bkgHist = bkgData->binnedClone(0);
   RooHistPdf* bkgPdf = new RooHistPdf("bkgPdf", "bkgPdf", RooArgSet(*kd), *bkgHist);
@@ -87,13 +100,13 @@ void testfitilckd(bool pureToys = true, int ntoysperjob = 10000 ) {
   // 
   
   TChain *zeroplusTree = new TChain("SelectedTree");
-  TString zeroplusFileName = Form("Events_20130618/unweighted_unpol_g1_1M_%s_withKD.root", accName.Data());
+  TString zeroplusFileName = Form("samples/ee_ZH/unweighted_unpol_g1_1M_%s.root", accName.Data());
   if ( sqrtsVal == 350. ) 
-    zeroplusFileName = Form("Events_20130701/unweighted_unpol_g1_350GeV_2M_%s_withKD.root", accName.Data());
+    zeroplusFileName = Form("samples/ee_ZH/unweighted_unpol_g1_350GeV_2M_%s.root", accName.Data());
   if ( sqrtsVal == 500. ) 
-    zeroplusFileName = Form("Events_20130701/unweighted_unpol_g1_500GeV_2M_%s_withKD.root", accName.Data());
+    zeroplusFileName = Form("samples/ee_ZH/unweighted_unpol_g1_500GeV_2M_%s.root", accName.Data());
   if ( sqrtsVal == 1000. ) 
-    zeroplusFileName = Form("Events_20130701/unweighted_unpol_g1_1TeV_1M_%s_withKD.root", accName.Data());
+    zeroplusFileName = Form("samples/ee_ZH/unweighted_unpol_g1_1TeV_1M_%s.root", accName.Data());
   zeroplusTree->Add(zeroplusFileName);
   std::cout << "Reading " << zeroplusFileName << "\n";
   assert(zeroplusTree);
@@ -106,13 +119,13 @@ void testfitilckd(bool pureToys = true, int ntoysperjob = 10000 ) {
   // 
   
   TChain *zerominusTree = new TChain("SelectedTree");
-  TString zerominusFileName = Form("Events_20130618/unweighted_unpol_g4_1M_%s_withKD.root", accName.Data());
+  TString zerominusFileName = Form("samples/ee_ZH/unweighted_unpol_g4_1M_%s.root", accName.Data());
   if ( sqrtsVal == 350. ) 
-    zerominusFileName = Form("Events_20130701/unweighted_unpol_g4_350GeV_2M_%s_withKD.root", accName.Data());
+    zerominusFileName = Form("samples/ee_ZH/unweighted_unpol_g4_350GeV_2M_%s.root", accName.Data());
   if ( sqrtsVal == 500. ) 
-    zerominusFileName = Form("Events_20130701/unweighted_unpol_g4_500GeV_2M_%s_withKD.root", accName.Data());
+    zerominusFileName = Form("samples/ee_ZH/unweighted_unpol_g4_500GeV_2M_%s.root", accName.Data());
   if ( sqrtsVal == 1000. ) 
-    zerominusFileName = Form("Events_20130701/unweighted_unpol_g4_1TeV_1M_%s_withKD.root", accName.Data());
+    zerominusFileName = Form("samples/ee_ZH/unweighted_unpol_g4_1TeV_1M_%s.root", accName.Data());
   zerominusTree->Add(zerominusFileName);
   RooDataSet *zerominusData = new RooDataSet("zerominusData","zerominusData",zerominusTree,RooArgSet(*kd));
   RooDataHist *zerominusHist = zerominusData->binnedClone(0);
@@ -123,13 +136,13 @@ void testfitilckd(bool pureToys = true, int ntoysperjob = 10000 ) {
   // 
   
   TChain *sigTree = new TChain("SelectedTree");
-  TString sigFileName = Form("Events_20130626/unweighted_unpol_f_3_250GeV_5M_%s_withKD.root", accName.Data());
+  TString sigFileName = Form("samples/ee_ZH/unweighted_unpol_f_3_250GeV_5M_%s.root", accName.Data());
   if ( sqrtsVal == 350. ) 
-    sigFileName = Form("Events_20130701/unweighted_unpol_model8_2M_%s_withKD.root", accName.Data());
+    sigFileName = Form("samples/ee_ZH/unweighted_unpol_model8_2M_%s.root", accName.Data());
   if ( sqrtsVal == 500. ) 
-    sigFileName = Form("Events_20130626/unweighted_unpol_f_3_500GeV_5M_%s_withKD.root", accName.Data());
+    sigFileName = Form("samples/ee_ZH/unweighted_unpol_f_3_500GeV_5M_%s.root", accName.Data());
   if ( sqrtsVal == 1000. ) 
-    sigFileName = Form("Events_20130701/unweighted_unpol_model9_1M_%s_withKD.root", accName.Data());
+    sigFileName = Form("samples/ee_ZH//unweighted_unpol_model9_1M_%s.root", accName.Data());
   sigTree->Add(sigFileName);
   RooDataSet *sigData = new RooDataSet("sigData","sigData",sigTree,RooArgSet(*kd));
   //Define signal model with 0+, 0- mixture
@@ -151,7 +164,7 @@ void testfitilckd(bool pureToys = true, int ntoysperjob = 10000 ) {
   RooAddPdf* sigPdf = new RooAddPdf("sigPdf","ps+sm",*zerominusPdf, *zeroplusPdf, rfv_fa3Obs);  
     
   
-  if ( dotoys ) {
+  if ( toy > NOTOYS  ) {
     
     TString isPureName = "embd";
     if ( pureToys ) isPureName = "pure";
@@ -165,7 +178,7 @@ void testfitilckd(bool pureToys = true, int ntoysperjob = 10000 ) {
     // Fit the dataset
     // 
     
-    TFile *toyresults = new TFile(Form("toyresults_KD_%s_%.0fGeV_acc%s.root", isPureName.Data(), sqrtsVal, accName.Data()), "RECREATE");
+    TFile *toyresults = new TFile(Form("toyresults_eezh/toyresults_KD_%s_%.0fGeV_acc%s.root", isPureName.Data(), sqrtsVal, accName.Data()), "RECREATE");
     gROOT->cd();
     
     TTree *tree_fit = new TTree("fittree", "fittree");
@@ -203,8 +216,12 @@ void testfitilckd(bool pureToys = true, int ntoysperjob = 10000 ) {
       nsig->setConstant(kTRUE);
       nbkg->setConstant(kTRUE);
 
-      int printlevel = 1; // set to -1 to suppress all outputs
+      int printlevel = - 1; // set to -1 to suppress all outputs
 
+      if ( verb == DEBUG ) 
+	printlevel  = 1; 
+      
+      
       RooAddPdf* totalPdf = new RooAddPdf("totalPdf","totalPdf",RooArgList(*sigPdf,*bkgPdf),RooArgList(*nsig,*nbkg));   
       RooDataSet* toyData; 
 
@@ -229,14 +246,14 @@ void testfitilckd(bool pureToys = true, int ntoysperjob = 10000 ) {
 	}
 	
 	for(int iEvent=isigEvent; iEvent<isigEvent+nsigEvents; iEvent++){
-	  if(debug) cout << "generating signal event: " << iEvent << " embedTrackerSig: " << embedTrackerSig << endl;
+	  if( verb == DEBUG ) cout << "generating signal event: " << iEvent << " embedTrackerSig: " << embedTrackerSig << endl;
 	  tempEvent = (RooArgSet*) sigData->get(embedTrackerSig);
 	  toyData->add(*tempEvent);
 	  embedTrackerSig++;
 	}
 
 	for(int iEvent=ibkgEvent; iEvent<ibkgEvent+nbkgEvents; iEvent++){
-	  if(debug) cout << "generating background event: " << iEvent << " embedTrackerBkg: " << embedTrackerBkg << endl;
+	  if( verb == DEBUG ) cout << "generating background event: " << iEvent << " embedTrackerBkg: " << embedTrackerBkg << endl;
 	  tempEvent = (RooArgSet*) bkgData->get(embedTrackerBkg);
 	  toyData->add(*tempEvent);
 	  embedTrackerBkg++;
@@ -246,7 +263,7 @@ void testfitilckd(bool pureToys = true, int ntoysperjob = 10000 ) {
 
       RooFitResult* toyfitresults =  totalPdf->fitTo(*toyData, RooFit::PrintLevel(printlevel), RooFit::Save(true), RooFit::Extended(kTRUE) ); 
       
-      if ( debug ) {
+      if ( verb == DEBUG ) {
 	std::cout << "toy trial " << i << "\n"; 
 	std::cout << "fa3 = " << rrv_fa3.getVal() << " +/- " << rrv_fa3.getError() << "\n";
 	std::cout << "nsig = " << nsig->getVal() << " +/- " << nsig->getError() << "\n";
@@ -277,30 +294,47 @@ void testfitilckd(bool pureToys = true, int ntoysperjob = 10000 ) {
   // Make Plots
   // 
   
-  if ( doplots ) {
-    gROOT->ProcessLine(".L ~/tdrstyle.C");
+  if ( plot > NOPLOTS ) {
+    gROOT->ProcessLine(".L tdrstyle.C");
     setTDRStyle();
-    gStyle->SetPadLeftMargin(0.16);
     TGaxis *gaxis = new TGaxis();
     gaxis->SetMaxDigits(3);
     
     RooPlot* kdframe =  kd->frame(nbins);
-    //toyData->plotOn(kdframe, LineColor(kBlack), MarkerStyle(24));
-    //totalPdf->plotOn(kdframe, LineColor(kBlack));
-    sigData->plotOn(kdframe, LineColor(kBlack), MarkerStyle(24));
-    sigPdf->plotOn(kdframe, LineColor(kBlack));
-    /*
-    bkgData->plotOn(kdframe, LineColor(kBlack), MarkerStyle(24), Rescale(5.));
-    bkgPdf->plotOn(kdframe,LineColor(kBlack), Normalization(5.));
-    zeroplusData->plotOn(kdframe, LineColor(kRed), MarkerStyle(20), Rescale(1.));
-    zeroplusPdf->plotOn(kdframe,LineColor(kRed), Normalization(1.));
-    zerominusData->plotOn(kdframe, LineColor(kBlue), MarkerStyle(22), Rescale(1.));
-    zerominusPdf->plotOn(kdframe,LineColor(kBlue), Normalization(1.));
-    */
-    TCanvas *c1 = new TCanvas();
+    kdframe->GetXaxis()->CenterTitle();
+    kdframe->GetYaxis()->CenterTitle();
+    kdframe->GetYaxis()->SetTitle(" ");
+
+    TH1F *kd_test = new TH1F("kd_test", "kd_test", nbins, xMin, xMax);                                                                  
+    zerominusTree->Project("kd_test", "pseudoMELA");                                                                                         
+    double ymax_kd = kd_test->GetMaximum(); 
+    
+    double rescale = 0.00001;
+
+    if ( plot == ALL ) {
+      zeroplusData->plotOn(kdframe, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale));
+      zeroplusPdf->plotOn(kdframe,  LineColor(kRed),LineWidth(2), Normalization(rescale));
+      zerominusData->plotOn(kdframe, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale));
+      zerominusPdf->plotOn(kdframe, LineColor(kBlue),LineWidth(2), Normalization(rescale));
+      
+      double bkgscale = 3.;
+      bkgData->plotOn(kdframe, LineColor(kBlack), Rescale(rescale*bkgscale));
+      bkgPdf->plotOn(kdframe, LineColor(kBlack), Normalization(rescale*bkgscale));
+    }
+    
+    if ( plot == SIG || plot == ALL ) {
+      sigData->plotOn(kdframe, MarkerColor(kGreen+2), MarkerStyle(25),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale*0.2));
+      sigPdf->plotOn(kdframe,  LineColor(kGreen+2), Normalization(rescale*0.2));
+    }
+    
+    if ( plot == ALL ) {
+      kdframe->SetMaximum(ymax_kd * 1.2 * rescale);
+    }
+
+    TCanvas *c1 = new TCanvas("c1", "c1", 600, 600);
     kdframe->Draw();
     
-    TString plotName = Form("plots/KD_mX%.0f_sqrts%.0f_acc%s", mH, sqrtsVal, accName.Data());
+    TString plotName = Form("plots_eezh/KD_mX%.0f_sqrts%.0f_acc%s", mH, sqrtsVal, accName.Data());
     c1->SaveAs(Form("%s.eps", plotName.Data()));
     c1->SaveAs(Form("%s.png", plotName.Data()));
     delete kdframe;
