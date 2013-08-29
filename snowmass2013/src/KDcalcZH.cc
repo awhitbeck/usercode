@@ -80,6 +80,15 @@ public:
     
     float c = 0.84;
 
+   if ( SMHiggs->sqrts->getVal() == 350. ) 
+      c = 2;
+
+    if ( SMHiggs->sqrts->getVal() == 500. ) 
+      c = 0.5;
+
+    if ( SMHiggs->sqrts->getVal() == 1000. ) 
+      c = 2;
+
     KD = SMHiggsProb/(SMHiggsProb+c*altSignalProb);
 
   };

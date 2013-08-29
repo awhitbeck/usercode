@@ -125,7 +125,7 @@ public:
     if(altSignalProb<0.0) cout << "KDcalcPPZH::computeKD - ERROR: altSig prob is negative!!!" << endl;
     
     float c = 2e-09;
-    if ( withAcc ) c = 1e-09; 
+    if ( withAcc ) c = 1e-09;
     KD = SMHiggsProb/(SMHiggsProb+c*altSignalProb);
     
   };
