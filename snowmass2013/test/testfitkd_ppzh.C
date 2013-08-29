@@ -20,37 +20,34 @@ typedef enum{NOTOYS, EMBED, PURE} ToyLevel;
 // Run by root -l -n -q loadLib.C testfitkd_ppzh.C 
 // 
 
-void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 1000 ) {
+void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 2000 ) {
  
   float sqrtsVal = 14000;
-  
   float mH=125.;
   bool withAcc = true;
   VerbosityLevel verb = ERROR;
-  PlotLevel plot = SIG;
+  PlotLevel plot = ALL;
   ToyLevel toy = NOTOYS;
   
+  // double fa3Val = 0.385797;
   double fa3Val = 0.5;
   TString accName = "false";
   if ( withAcc ) 
     accName = "true";
   
-  float lumi =3000; // in unit of fb
+  float lumi =300; // in unit of fb
   
-  float nsigperfb = 0.1;
-  float nbkgperfb = 0.5;
+  float nsigperfb = 0.23;
+  float nbkgperfb = nsigperfb * 5.;
   
   float nsigEvents = lumi*nsigperfb; 
   float nbkgEvents = lumi*nbkgperfb; 
   
-  if ( nbkgperfb == 0. ) 
-    fa3Val = 0.15;
-
   //
   //  1D KD observable
   // 
   int nbins = 10;
-  double xMin = 0.; 
+  double xMin = 0; 
   double xMax = 1.;
   RooRealVar* kd = new RooRealVar("pseudoMELA","D^{0-}", xMin, xMax);
   kd->setBins(nbins);
@@ -60,207 +57,64 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 1000 ) {
   // 
   TChain *bkgTree = new TChain("SelectedTree");
   TString bkgModeName = Form("pp_ZZ_llbb_25M");
-  bkgTree->Add(Form("samples/pp_ZH/%s_%s_withKD.root", bkgModeName.Data(), accName.Data()));
+  bkgTree->Add(Form("samples/pp_ZH/%s_%s.root", bkgModeName.Data(), accName.Data()));
   RooDataSet *bkgData = new RooDataSet("bkgData","bkgData",bkgTree,RooArgSet(*kd));
   RooDataHist *bkgHist = bkgData->binnedClone(0);
   RooHistPdf* bkgPdf = new RooHistPdf("bkgPdf", "bkgPdf", RooArgSet(*kd), *bkgHist);
-  
   
   // 
   // 0+
   // 
   
   TChain *zeroplusTree = new TChain("SelectedTree");
-  TString zeroplusFileName = Form("samples/pp_ZH/pp_ZH_llbb_14TeV_1M_%s_withKD.root", accName.Data());
+  //  TString zeroplusFileName = Form("samples/pp_ZH/pp_ZH_llbb_0p_toydata_%s.root", accName.Data());
+  TString zeroplusFileName = Form("samples/pp_ZH/pp_ZH_llbb_g1_1M_%s.root", accName.Data());
   zeroplusTree->Add(zeroplusFileName);
   std::cout << "Reading " << zeroplusFileName << "\n";
   assert(zeroplusTree);
   RooDataSet *zeroplusData = new RooDataSet("zeroplusData","zeroplusData",zeroplusTree,RooArgSet(*kd));
   RooDataHist *zeroplusHist = zeroplusData->binnedClone(0);
   RooHistPdf* zeroplusPdf = new RooHistPdf("zeroplusPdf", "zeroplusPdf", RooArgSet(*kd), *zeroplusHist);
-  
+
 
   // 
-  // Now make a PDF based on puretoy dataset
+  // 0-
   // 
   
-  int nEventswoAcc =  1e+6;
-
-  // define the signal model parameters
-  double g1Gen    = 1.;
-  double g1ImGen  = 0.;
-  double g2Gen    = 0.;
-  double g2ImGen  = 0.;
-  double g3Gen    = 0.;
-  double g3ImGen  = 0.;
-  double g4Gen    = 0.;
-  double g4ImGen  = 0.;
+  TChain *zerominusTree = new TChain("SelectedTree");
+  // TString zerominusFileName = Form("samples/pp_ZH/pp_ZH_llbb_0m_toydata_%s.root", accName.Data());
+  TString zerominusFileName = Form("samples/pp_ZH/pp_ZH_llbb_g4_1M_%s.root", accName.Data());
+  zerominusTree->Add(zerominusFileName);
+  std::cout << "Reading " << zerominusFileName << "\n";
+  assert(zerominusTree);
+  RooDataSet *zerominusData = new RooDataSet("zerominusData","zerominusData",zerominusTree,RooArgSet(*kd));
+  RooDataHist *zerominusHist = zerominusData->binnedClone(0);
+  RooHistPdf* zerominusPdf = new RooHistPdf("zerominusPdf", "zerominusPdf", RooArgSet(*kd), *zerominusHist);
   
-  // Observables (5D)
-  RooRealVar* h1 = new RooRealVar("costheta1","h1",0, -1,1);
-  RooRealVar* h2 = new RooRealVar("costheta2","h2",0, -1,1);
-  RooRealVar* Phi = new RooRealVar("phi","Phi",0, -TMath::Pi(),TMath::Pi());
-  RooRealVar* m= new RooRealVar("m","m", 775, 150, 1400);
-  RooRealVar* Y= new RooRealVar("Y","Y", 0, -4, 4);
-  
-  // Parameters
-  RooRealVar* sqrts= new RooRealVar("sqrts","sqrts", sqrtsVal);
-  RooRealVar* mX = new RooRealVar("mX","mX", mH);
-  RooRealVar* mZ = new RooRealVar("mZ","mZ", 91.1876);
-  RooRealVar* gamZ = new RooRealVar("gamZ","gamZ",2.4952);
-  RooRealVar* R1Val = new RooRealVar("R1Val","R1Val", 0.);
-  RooRealVar* R2Val = new RooRealVar("R2Val","R2Val", 0.15);
-    
-  // amplitude parameters
-  int para = 2;
-  RooRealVar* a1Val  = new RooRealVar("a1Val","a1Val",0.);
-  RooRealVar* phi1Val= new RooRealVar("phi1Val","phi1Val",0.);
-  RooRealVar* a2Val  = new RooRealVar("a2Val","a2Val",0.);
-  RooRealVar* phi2Val= new RooRealVar("phi2Val","phi2Val",0.);
-  RooRealVar* a3Val  = new RooRealVar("a3Val","a3Val",0.);
-  RooRealVar* phi3Val= new RooRealVar("phi3Val","phi3Val",0.);
-  
-  RooRealVar* g1Val  = new RooRealVar("g1Val","g1Val", 0, 100);
-  RooRealVar* g2Val  = new RooRealVar("g2Val","g2Val", 0, 100);
-  RooRealVar* g3Val  = new RooRealVar("g3Val","g3Val", 0, 100);
-  RooRealVar* g4Val  = new RooRealVar("g4Val","g4Val", 0, 100);
-  
-  RooRealVar* g1ValIm  = new RooRealVar("g1ValIm","g1ValIm", -100, 100);
-  RooRealVar* g2ValIm  = new RooRealVar("g2ValIm","g2ValIm", -100, 100);
-  RooRealVar* g3ValIm  = new RooRealVar("g3ValIm","g3ValIm", -100, 100);
-  RooRealVar* g4ValIm  = new RooRealVar("g4ValIm","g4ValIm", -100, 100);
-  
-  RooRealVar* fa2  = new RooRealVar("fa2","f_{g2}", 0.,1.0);
-  RooRealVar* fa3  = new RooRealVar("fa3","f_{g4}", 0.,1.0);
-  RooRealVar* phia2  = new RooRealVar("phia2","#phi_{g2}", -2.*TMath::Pi(),2*TMath::Pi());
-  RooRealVar* phia3  = new RooRealVar("phia3","#phi_{g4}", -2.*TMath::Pi(),2*TMath::Pi());
-  
-
-  g1Val->setVal(g1Gen);
-  g2Val->setVal(g2Gen);
-  g3Val->setVal(g3Gen);
-  g4Val->setVal(g4Gen);
-
-  g1ValIm->setVal(g1ImGen);
-  g2ValIm->setVal(g2ImGen);
-  g3ValIm->setVal(g3ImGen);
-  g4ValIm->setVal(g4ImGen);
-
-  fa2->setVal(0.);
-  fa3->setVal(0.0);
-  phia2->setVal(0.);
-  phia3->setVal(0.);
-
-  // set the PDF
-  RooSpinZero_3D_ZH_pp *sigPdf_pp = new RooSpinZero_3D_ZH_pp("sigPdf_pp","sigPdf_pp",
-							     *h1,*h2,*Phi, *m, *Y,
-							     *sqrts, *mX, *mZ, *R1Val, *R2Val, para, 
-							     *a1Val, *phi1Val, *a2Val, *phi2Val,*a3Val, *phi3Val, 
-							     *g1Val, *g2Val, *g3Val, *g4Val, *g1ValIm, *g2ValIm, *g3ValIm, *g4ValIm,
-							     *fa2, *fa3, *phia2, *phia3, false);
+  //
+  // Signal Model
   // 
-  //  0+ from 5D phase space
-  // 
-  RooDataSet *zeroplusToyData = sigPdf_pp->generate(RooArgSet(*h1, *h2, *Phi, *m, *Y), nEventswoAcc);
-  KDcalcPPZH test(sqrtsVal, mH);
-  float KD = 0.;
-  TH1D *hkd_zeroplus = new TH1D("hkd_zeropplus", "hkd_zeroplus", nbins, xMin, xMax);
-  for (int i = 0; i < nEventswoAcc; i++) {
-    KD = 0.;
-    RooArgSet *tempEvent = (RooArgSet*) zeroplusToyData->get(i);
-    float costheta1_ = ((RooRealVar*) tempEvent->find("costheta1"))->getVal();
-    float costheta2_ = ((RooRealVar*) tempEvent->find("costheta2"))->getVal();
-    float phi_ = ((RooRealVar*) tempEvent->find("phi"))->getVal();
-    float m_ = ((RooRealVar*) tempEvent->find("m"))->getVal();
-    float Y_ = ((RooRealVar*) tempEvent->find("Y"))->getVal();
-    test.computeKD(mH, costheta1_, costheta2_, phi_, m_, Y_, KD, withAcc);
-    hkd_zeroplus->Fill(KD);
-    if ( verb == DEBUG ) {
-      std::cout << "generated phase space (h1, h2, phi, m, Y): (" 
-		<< costheta1_ << ", " << costheta2_ << ", " << phi_ << ", " << m_ << ", " << Y_
-		<< ")\t KD = " << KD << "\n"; 
-    }
-  }
 
-  hkd_zeropplus->Scale( zeroplusTree->GetEntries() / hkd_zeroplus->Integral());
-  
-  RooDataHist* zeroplusToyHist = new RooDataHist("zeroplusToyHist","zeroplusToyHist",RooArgSet(*kd), hkd_zeroplus);
-  RooHistPdf* zeroplusToyPdf = new RooHistPdf("zeroplusToyPdf", "zeroplusToyPdf", RooArgSet(*kd), *zeroplusToyHist);
-  
-  // 
-  //  0- from 5D phase space
-  // 
-  g1Val->setVal(0.);
-  g4Val->setVal(1.);
-  fa3->setVal(0.9999999);
-
-  RooDataSet *zerominusToyData = sigPdf_pp->generate(RooArgSet(*h1, *h2, *Phi, *m, *Y), nEventswoAcc);
-  
-  TH1D *hkd_zerominus = new TH1D("hkd_zerominus", "hkd_zerominus", nbins, xMin, xMax);
-  for (int i = 0; i < nEventswoAcc; i++) {
-    KD = 0.;
-    RooArgSet *tempEvent = (RooArgSet*) zerominusToyData->get(i);
-    float costheta1_ = ((RooRealVar*) tempEvent->find("costheta1"))->getVal();
-    float costheta2_ = ((RooRealVar*) tempEvent->find("costheta2"))->getVal();
-    float phi_ = ((RooRealVar*) tempEvent->find("phi"))->getVal();
-    float m_ = ((RooRealVar*) tempEvent->find("m"))->getVal();
-    float Y_ = ((RooRealVar*) tempEvent->find("Y"))->getVal();
-    test.computeKD(mH, costheta1_, costheta2_, phi_, m_, Y_, KD, withAcc);
-    hkd_zerominus->Fill(KD);
-    if ( verb == DEBUG ) {
-      std::cout << "generated phase space (h1, h2, phi, m, Y): (" 
-		<< costheta1_ << ", " << costheta2_ << ", " << phi_ << ", " << m_ << ", " << Y_
-		<< ")\t KD = " << KD << "\n"; 
-    }
-  }
-
-  hkd_zerominus->Scale( zeroplusTree->GetEntries() / hkd_zerominus->Integral());
-  RooDataHist* zerominusToyHist = new RooDataHist("zerominusToyHist","zerominusToyHist",RooArgSet(*kd), hkd_zerominus);
-  RooHistPdf* zerominusToyPdf = new RooHistPdf("zerominusToyPdf", "zerominusToyPdf", RooArgSet(*kd), *zerominusToyHist);
-  
-  // 
-  // Define Signal PDF
-  // 
-  g1Val->setVal(1.);
-  g4Val->setVal(0.852604);
-  double fa3_suppression = 250.;
-  if ( withAcc ) fa3_suppression = 800.;
-  fa3->setVal(fa3Val/fa3_suppression);
-
-  std::cout << "fa2 = " << fa2->getVal() << "\n";
-  std::cout << "fa3 = " << fa3->getVal() << "\n";
-  RooDataSet *sigToyData = sigPdf_pp->generate(RooArgSet(*h1, *h2, *Phi, *m, *Y), nEventswoAcc);
-
-  TH1D *hkd_sig = new TH1D("hkd_sig", "hkd_sig", nbins, xMin, xMax);
-  for (int i = 0; i < nEventswoAcc; i++) {
-    KD = 0.;
-    RooArgSet *tempEvent = (RooArgSet*) sigToyData->get(i);
-    float costheta1_ = ((RooRealVar*) tempEvent->find("costheta1"))->getVal();
-    float costheta2_ = ((RooRealVar*) tempEvent->find("costheta2"))->getVal();
-    float phi_ = ((RooRealVar*) tempEvent->find("phi"))->getVal();
-    float m_ = ((RooRealVar*) tempEvent->find("m"))->getVal();
-    float Y_ = ((RooRealVar*) tempEvent->find("Y"))->getVal();
-    test.computeKD(mH, costheta1_, costheta2_, phi_, m_, Y_, KD, withAcc);
-    hkd_sig->Fill(KD);
-    if ( verb == DEBUG ) {
-      std::cout << "generated phase space (h1, h2, phi, m, Y): (" 
-		<< costheta1_ << ", " << costheta2_ << ", " << phi_ << ", " << m_ << ", " << Y_
-		<< ")\t KD = " << KD << "\n"; 
-    }
-  }
-  RooDataHist* sigToyHist = new RooDataHist("sigToyHist","sigToyHist",RooArgSet(*kd), hkd_sig);
-  RooHistPdf* sigToyPdf = new RooHistPdf("sigToyPdf", "sigToyPdf", RooArgSet(*kd), *sigToyHist);
-  
+  TChain *sigTree = new TChain("SelectedTree");
+  // TString sigFileName = Form("samples/pp_ZH/pp_ZH_llbb_0mix_toydata_%s.root", accName.Data());
+  TString sigFileName = Form("samples/pp_ZH/pp_ZH_llbb_g1_p_g4_1M_%s.root", accName.Data());
+  sigTree->Add(sigFileName);
+  std::cout << "Reading " << sigFileName << "\n";
+  assert(sigTree);
+  RooDataSet *sigData = new RooDataSet("sigData","sigData",sigTree,RooArgSet(*kd));
+  RooDataHist *sigHist = sigData->binnedClone(0);
+  RooHistPdf* sigPdf_MC = new RooHistPdf("sigPdf_MC", "sigPdf_MC", RooArgSet(*kd), *sigHist);
+  //Define signal model with 0+, 0- mixture
   RooRealVar rrv_fa3("fa3","fa3",fa3Val,0.,1.);  //free parameter of the model
-  RooFormulaVar rfv_fa3Obs("fa3obs","1/ (1 + (1/@0 - 1)*1)",RooArgList(rrv_fa3));
-  /*
-  if ( withAcc ) {
-    rfv_fa3Obs = RooFormulaVar("fa3obs","1/ (1 + (1/@0 - 1)*0.985732)",RooArgList(rrv_fa3));
-  }
-  */
-  RooAddPdf* sigPdf = new RooAddPdf("sigPdf","ps+sm",*zerominusToyPdf, *zeroplusToyPdf, rfv_fa3Obs);  
-     
+  // eff(0+) / eff(0-)
+  double eff_0plus_vs_0minus = 1.;
+  //  if ( withAcc ) eff_0plus_vs_0minus = 0.176893;
+  char *formula = Form("1/ (1 + (1/@0 - 1)*%.6f)", eff_0plus_vs_0minus);
+  RooFormulaVar rfv_fa3Obs("fa3obs",formula,RooArgList(rrv_fa3));
+  std::cout << "f3 (observed) = " << rfv_fa3Obs.getVal() << "\n";
+  RooAddPdf* sigPdf = new RooAddPdf("sigPdf","ps+sm",*zerominusPdf, *zeroplusPdf, rfv_fa3Obs);  
   
+  // RooFitResult* toyfitresults_sig =  sigPdf->fitTo(*sigData, RooFit::PrintLevel(1), RooFit::Save(true)); 
 
   //
   // Perform Toy Experiments
@@ -269,7 +123,7 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 1000 ) {
   if ( toy > NOTOYS ) {
     
     TString isPureName = "embd";
-    if ( pureToys ) isPureName = "pure";
+    if ( toy == PURE ) isPureName = "pure";
     // 
     // toy generation
     // 
@@ -315,12 +169,14 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 1000 ) {
       rrv_fa3.setVal(fa3Val); 
       nsig->setConstant(kTRUE);
       nbkg->setConstant(kTRUE);
-
       int printlevel =  -1; // set to -1 to suppress all outputs
-
-      if ( verb == INFO ) 
-	printlevel  = 1; 
       
+      if ( verb == INFO) {
+	std::cout << "-----------toy trial " << i << " Generated values------ \n"; 
+	std::cout << "f3 = " << rrv_fa3.getVal() << ",\t nsig = " << nsig->getVal() << ",\t nbkg = " << nbkg->getVal() << "\n";
+	std::cout << "--------------------------------------------------\n";
+      	printlevel  = 1; 
+      }
       
       RooAddPdf* totalPdf = new RooAddPdf("totalPdf","totalPdf",RooArgList(*sigPdf,*bkgPdf),RooArgList(*nsig,*nbkg));   
       RooDataSet* toyData = totalPdf->generate(RooArgSet(*kd), nsigEvents+nbkgEvents);
@@ -328,11 +184,12 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 1000 ) {
       RooFitResult* toyfitresults =  totalPdf->fitTo(*toyData, RooFit::PrintLevel(printlevel), RooFit::Save(true), RooFit::Extended(kTRUE) ); 
       
       if ( verb == INFO) {
-	std::cout << "toy trial " << i << "\n"; 
+	std::cout << "-----------toy trial " << i << ": Fit values-------------\n"; 
 	std::cout << "fa3 = " << rrv_fa3.getVal() << " +/- " << rrv_fa3.getError() << "\n";
 	std::cout << "nsig = " << nsig->getVal() << " +/- " << nsig->getError() << "\n";
 	std::cout << "nbkg = " << nbkg->getVal() << " +/- " << nbkg->getError() << "\n";
 	std::cout << "fit status " << toyfitresults->status() << "\n";
+	std::cout << "--------------------------------------------------\n";
       }
       
       m_fa3 = rrv_fa3.getVal();
@@ -361,34 +218,47 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 1000 ) {
   
   if ( plot >  NOPLOTS ) {
     
-    gROOT->ProcessLine(".L ~/tdrstyle.C");
+    gROOT->ProcessLine(".L tdrstyle.C");
     setTDRStyle();
     gStyle->SetPadLeftMargin(0.16);
     TGaxis *gaxis = new TGaxis();
     gaxis->SetMaxDigits(3);
     
-    RooPlot* kdframe =  kd->frame(nbins);
+    double rescale = 0.00001;
+    double rescale_0m = rescale;
+    if ( withAcc ) rescale_0m = rescale*0.18;
+    
+    TH1F *kd_test = new TH1F("kd_test", "kd_test", nbins, xMin, xMax);
+    sigTree->Project("kd_test", "pseudoMELA");
+    double ymax_kd = kd_test->GetMaximum(); 
 
+    RooPlot* kdframe =  kd->frame(nbins);
+    kdframe->GetXaxis()->CenterTitle();
+    kdframe->GetYaxis()->CenterTitle();
+    kdframe->GetYaxis()->SetTitle(" ");
+    
     if ( plot == ALL ) {
-      zeroplusData->plotOn(kdframe, MarkerColor(kRed), MarkerStyle(24));
-      // zeroplusPdf->plotOn(kdframe, LineColor(kRed), LineStyle(kDashed));
-      zeroplusToyPdf->plotOn(kdframe, LineColor(kRed));
-      zerominusToyPdf->plotOn(kdframe, LineColor(kBlue));
+      zeroplusData->plotOn(kdframe, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale));
+      zeroplusPdf->plotOn(kdframe,  LineColor(kRed),LineWidth(2), Normalization(rescale));
+      
+      zerominusData->plotOn(kdframe, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale_0m));
+      zerominusPdf->plotOn(kdframe, LineColor(kBlue),LineWidth(2), Normalization(rescale_0m));
+
       double bkgscale = 6.;
-      if ( withAcc ) bkgscale = 15.;
-      bkgData->plotOn(kdframe, LineColor(kBlack), Rescale(bkgscale));
-      bkgPdf->plotOn(kdframe, LineColor(kBlack), Normalization(bkgscale));
+      if ( withAcc ) bkgscale = 20.;
+      bkgData->plotOn(kdframe, LineColor(kBlack), Rescale(bkgscale*rescale));
+      bkgPdf->plotOn(kdframe, LineColor(kBlack), Normalization(bkgscale*rescale));
     }
 
-    if ( plot == SIG ) {
-      sigToyPdf->plotOn(kdframe, LineColor(kBlack), LineStyle(kDashed));
-      zeroplusToyPdf->plotOn(kdframe, LineColor(kRed));
-      zerominusToyPdf->plotOn(kdframe, LineColor(kBlue));
-      sigPdf->plotOn(kdframe, LineColor(kBlack));
+    if ( plot == SIG || plot == ALL  ) {
+      sigData->plotOn(kdframe, MarkerColor(kGreen+2), MarkerStyle(25),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale/10.));
+      sigPdf->plotOn(kdframe,  LineColor(kGreen+2), Normalization(rescale/10.));
+	// sigPdf_MC->plotOn(kdframe,  LineColor(kBlack));
     }
 
     
-    TCanvas *c1 = new TCanvas();
+    TCanvas *c1 = new TCanvas("c1","c1",600,600);
+    kdframe->SetMaximum(ymax_kd * 1.2 * rescale / 10.);
     kdframe->Draw();
 
     TString plotAppendix = "";
@@ -408,13 +278,11 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 1000 ) {
   delete zeroplusTree;
   delete zeroplusData;
   delete zeroplusPdf;
-  delete zeroplusToyData;
-  delete zeroplusToyHist;  
-  delete zeroplusToyPdf;
-  delete zerominusToyData;
-  delete zerominusToyHist;  
-  delete zerominusToyPdf;
-  delete sigToyData;
-  delete sigToyHist;  
-  delete sigToyPdf;
+  delete zerominusTree;
+  delete zerominusData;
+  delete zerominusPdf;
+  delete sigTree;
+  delete sigData;
+  delete sigPdf;
+
 }
