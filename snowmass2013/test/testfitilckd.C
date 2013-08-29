@@ -13,7 +13,7 @@
 using namespace RooFit ;
 
 typedef enum{ERROR, INFO, DEBUG} VerbosityLevel; 
-typedef enum{NOPLOTS, SIG, ALL} PlotLevel;
+typedef enum{NOPLOTS, SIG, BKG, ALL} PlotLevel;
 typedef enum{NOTOYS, EMBED, PURE} ToyLevel; 
 
 
@@ -30,7 +30,7 @@ void testfitilckd(bool pureToys = false, int ntoysperjob = 1000 ) {
   PlotLevel plot = ALL;
   ToyLevel toy = NOTOYS;
   
-  double fa3Val = 0.5;
+  double fa3Val = 0.1;
   TString accName = "false";
   if ( withAcc ) 
     accName = "true";
@@ -316,10 +316,6 @@ void testfitilckd(bool pureToys = false, int ntoysperjob = 1000 ) {
       zeroplusPdf->plotOn(kdframe,  LineColor(kRed),LineWidth(2), Normalization(rescale));
       zerominusData->plotOn(kdframe, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale));
       zerominusPdf->plotOn(kdframe, LineColor(kBlue),LineWidth(2), Normalization(rescale));
-      
-      double bkgscale = 3.;
-      bkgData->plotOn(kdframe, LineColor(kBlack), Rescale(rescale*bkgscale));
-      bkgPdf->plotOn(kdframe, LineColor(kBlack), Normalization(rescale*bkgscale));
     }
     
     if ( plot == SIG || plot == ALL ) {
@@ -327,6 +323,11 @@ void testfitilckd(bool pureToys = false, int ntoysperjob = 1000 ) {
       sigPdf->plotOn(kdframe,  LineColor(kGreen+2), Normalization(rescale*0.2));
     }
     
+    if ( plot == BKG ) {
+      bkgData->plotOn(kdframe, LineColor(kBlack));
+      bkgPdf->plotOn(kdframe, LineColor(kBlack));
+    }
+
     if ( plot == ALL ) {
       kdframe->SetMaximum(ymax_kd * 1.2 * rescale);
     }
