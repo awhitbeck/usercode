@@ -19,8 +19,10 @@ if [ "$sqrts" -eq "250" ]; then
 cat > list_samples.txt <<EOF
 unweighted_unpol_g1_1M
 unweighted_unpol_g4_1M
-unweighted_unpol_f_3_500GeV_5M
+unweighted_unpol_f_3_250GeV_5M
 ee_ZZ_llbb_250GeV_25M
+ee_ZH_f3_p5_phi_0_250GeV_1M
+ee_ZH_f3_p5_phi_pi2_250GeV_1M
 EOF
 fi
 
