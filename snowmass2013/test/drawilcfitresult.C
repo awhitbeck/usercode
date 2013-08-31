@@ -46,7 +46,7 @@ void drawilcfitresult()
   colliderType collider = kLHCZH;
   plotLevel plot = kOneD;
   toyLevel toy = PURE;
-  bool withAcceptance = true;
+  bool withAcceptance = false;
   
   TString accName = "false";
   if (withAcceptance )  accName = "true";
@@ -70,10 +70,11 @@ void drawilcfitresult()
       
       vector<float> energies;
       energies.push_back(250.);
+      /*
       energies.push_back(350.);
       energies.push_back(500.);
       energies.push_back(1000.);
-      
+      */
       //
       // 1D Plots
       // 
@@ -82,18 +83,17 @@ void drawilcfitresult()
 	float sqrtsVal = energies.at(i);
 	TString toyName = Form("%s_f_3_%.0fGeV_acc%s", toyMode.Data(), sqrtsVal, accName.Data());
 	drawsingle(sqrtsVal, f2gen, f3gen, toyName, kF3, collider, Form("f_{3}"), nBins);
-	// drawsingle(sqrtsVal, f2gen, f3gen, toyName, kFA3, collider, Form("f_{a3}"), nBins);
+	//drawsingle(sqrtsVal, f2gen, f3gen, toyName, kFA3, collider, Form("f_{a3}"), nBins);
       }
     } // end of ILC plots
 
     if ( collider == kLHCZH ) {
       float sqrtsVal = 14000;
-      float lumi = 300; 
+      float lumi = 3000; 
       TString toyName = Form("KD_%s_%.0fGeV_acctrue_%.0fifb", toyMode.Data(), sqrtsVal, lumi);
-      
       if ( lumi == 3000. ) f3gen = 0.385797;
       if ( lumi == 300. ) f3gen = 0.5; 
-      //drawsingle(sqrtsVal, f2gen, f3gen, toyName, kF3, collider, Form("f_{3}"), nBins);
+      drawsingle(sqrtsVal, f2gen, f3gen, toyName, kF3, collider, Form("f_{3}"), nBins);
       drawsingle(sqrtsVal, f2gen, f3gen, toyName, kF3ACC, collider, Form("f_{3}"), nBins);
     }
   }
@@ -118,7 +118,7 @@ void drawsingle(float sqrtsVal, float f2gen, float f3gen, TString toyName, int v
   
   float fa2gen(0.);
   float fa3gen(0.);
-  if ( collider == kLHCZH && variable == kF3ACC) 
+  if ( collider == kLHCZH && ( variable == kF3ACC || variable == kF3 ) ) 
     f3gen = calcfacc(f3gen);
   calcgcoup(f2gen, f3gen, sqrtsVal, collider, fa2gen, fa3gen);
 
@@ -146,7 +146,8 @@ void drawsingle(float sqrtsVal, float f2gen, float f3gen, TString toyName, int v
   float xMin = TMath::Max(xgen-6.*xerr,0.);
   float xMax = TMath::Min(xgen+6.*xerr,1.);
   
-
+  std::cout << "xgen = " << xgen << "\n";
+ 
   TH1F *h_var = new TH1F("h_var", "h_var", nBins, xMin, xMax);
   TH1F *h_var_pull = new TH1F("h_var_pull", "h_var_pull", 40, -4, 4);
 
@@ -199,7 +200,6 @@ void drawsingle(float sqrtsVal, float f2gen, float f3gen, TString toyName, int v
       if ( variable == kF3 ) {
 	double f3_bf_acc = calcfacc(f3_);
 	h_var->Fill(f3_bf_acc);
-	//h_var->Fill(f3_);
 	h_var_pull->Fill(f3_pull_);
       } else if ( variable == kF3ACC ) {
 	h_var->Fill(f3_);
@@ -230,6 +230,9 @@ void drawsingle(float sqrtsVal, float f2gen, float f3gen, TString toyName, int v
   h_var_pull->GetXaxis()->CenterTitle(true);
   h_var_pull->GetYaxis()->CenterTitle(true);
   
+  
+  h_var->Scale(1./h_var->Integral());
+  h_var_pull->Scale(1./h_var->Integral());
 
   TCanvas *c1 = new TCanvas("c1", "c1", 600, 600);
   c1->cd();
@@ -239,6 +242,8 @@ void drawsingle(float sqrtsVal, float f2gen, float f3gen, TString toyName, int v
   double xfit_min = TMath::Max (h_var->GetMean() - 3*h_var->GetRMS(), 0.);
   double xfit_max = TMath::Min (h_var->GetMean() + 3*h_var->GetRMS(), 1.);
   h_var->Fit("gaus", "", "", xfit_min, xfit_max);
+  c1->SaveAs(Form("%s/plots/%s_fitresults_%s.eps", toyDir.Data(), var.Data(), toyName.Data()));
+  c1->SaveAs(Form("%s/plots//%s_fitresults_%s.png", toyDir.Data(), var.Data(), toyName.Data()));
 
   //
   // get the fit results and calculate the fa3 errors
@@ -252,7 +257,7 @@ void drawsingle(float sqrtsVal, float f2gen, float f3gen, TString toyName, int v
   float f3sigma = fitsigma; 
   std::cout << "-----------------------------------------------------\n";
   std::cout << Form("Results for sqrts = %.0f GeV\n", sqrtsVal) ;
-  std::cout << Form("direct fit results : %.3f +/- %.3f\n", fitmean, fitsigma);
+  std::cout << Form("toy fit results : %.3f +/- %.3f\n", fitmean, fitsigma);
   float f3_p1sigma = f3mean + f3sigma;
   float f3_m1sigma = f3mean - f3sigma;  
   
@@ -262,8 +267,9 @@ void drawsingle(float sqrtsVal, float f2gen, float f3gen, TString toyName, int v
     f3_p1sigma = calcfacc(fitmean + fitsigma);
     f3_m1sigma = calcfacc(fitmean - fitsigma);
   }
-  std::cout << Form("f3 (before cuts): %.3f (+ %.3f, -%.3f)\n",  f3mean, f3_p1sigma-f3mean, f3mean-f3_m1sigma);
-
+  std::cout << Form("f3 (before cuts) generated: %.3f \n",  f3gen);
+  std::cout << Form("f3 (before cuts) from toy fits: %.3f (+ %.3f, -%.3f)\n",  f3mean, f3_p1sigma-f3mean, f3mean-f3_m1sigma);
+  std::cout << "-----------------------------------------------------\n";
   float fa2_mean = 0.; // dummy  
   float fa3_mean = 0.;
   calcgcoup(0, f3mean, sqrtsVal, collider, fa2_mean , fa3_mean);
@@ -280,8 +286,6 @@ void drawsingle(float sqrtsVal, float f2gen, float f3gen, TString toyName, int v
   std::cout << Form("fa3 results from fit : %.7f (+%.7f, -%.7f)\n", fa3_mean, fa3_p1sigma-fa3_mean, fa3_mean-fa3_m1sigma); 
   std::cout << "-----------------------------------------------------\n";
 
-  c1->SaveAs(Form("%s/plots/%s_fitresults_%s.eps", toyDir.Data(), var.Data(), toyName.Data()));
-  c1->SaveAs(Form("%s/plots//%s_fitresults_%s.png", toyDir.Data(), var.Data(), toyName.Data()));
 
   /*
   c1->Clear();
