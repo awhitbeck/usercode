@@ -21,7 +21,7 @@ bool weightedevents = false;
 void calcfractionphase(double sqrts, double g1Re,  double g1Im,  double g2Re,   double g2Im,  double g4Re,  double g4Im, 
 		       double & fa2, double & fa3, double & phia2, double & phia3);
 
-void plotPdf_5D_ZH(float mH = 125, float sqrtsVal =  500.) {
+void plotPdf_5D_ZH(float mH = 125, float sqrtsVal =  250.) {
     
     gROOT->ProcessLine(".L ~/tdrstyle.C");
     setTDRStyle();
@@ -47,10 +47,8 @@ void plotPdf_5D_ZH(float mH = 125, float sqrtsVal =  500.) {
     double r1val = (r1 + P_ele ) / (1 + r1*P_ele); 
     
     // these values define the generator couplings
-    // TString modeName = Form("g1_1TeV_1M");
-    TString modeName = Form("g1_%.0fGeV_2M", sqrtsVal);
-    //TString modeName = Form("model8_2M");
-    TString fileName = Form("Events_20130701/unweighted_%s_%s_false.root", beamPolarName.Data(), modeName.Data());
+    TString modeName = Form("g1_1M", sqrtsVal);
+    TString fileName = Form("Events_20130618/unweighted_%s_%s_false.root", beamPolarName.Data(), modeName.Data());
     
     double g1Gen =   1;
     double g1ImGen = 0.;

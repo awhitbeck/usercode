@@ -17,7 +17,7 @@ using namespace std;
 
 enum variables{kcostheta1,kcostheta2,kphi,km,kY};
 
-void plotLHCPPZHproj(variables var=kcostheta2){
+void plotLHCPPZHproj(variables var=km) {
 
   RooRealVar* costheta1 = new RooRealVar("costheta1","cos#theta_{1}",-1.,1.);
   RooRealVar* costheta2 = new RooRealVar("costheta2","cos#theta_{2}",-1.,1.);
@@ -150,6 +150,8 @@ void plotLHCPPZHproj(variables var=kcostheta2){
   //TGaxis::SetMaxDigits(3);
   plot->SetMaximum(ymax*1.1);
   
+  if ( var == km ) 
+    plot->SetMaximum(ymax*1.3);
 
   TCanvas* can = new TCanvas("can","can",600,600);
   // plot styles
