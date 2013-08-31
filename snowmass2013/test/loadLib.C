@@ -25,6 +25,9 @@
   gROOT->LoadMacro("../src/PlaygroundPPZH.cc+");
   gROOT->LoadMacro("../src/KDcalcPPZH.cc+");
 
+  // tools for pp->WH jj
+  gROOT->LoadMacro("../src/RooSpinZero_3D_WH_pp.cc+");
+
   // stat tools from summer 2012 paper 
   gROOT->LoadMacro("../src/statsFactory.cc+");
   
