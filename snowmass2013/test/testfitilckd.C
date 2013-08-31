@@ -30,7 +30,7 @@ void testfitilckd(bool pureToys = false, int ntoysperjob = 1000 ) {
   PlotLevel plot = ALL;
   ToyLevel toy = NOTOYS;
   
-  double fa3Val = 0.1;
+  double fa3Val = 0.5;
   TString accName = "false";
   if ( withAcc ) 
     accName = "true";
@@ -80,7 +80,7 @@ void testfitilckd(bool pureToys = false, int ntoysperjob = 1000 ) {
     xMin = 0.;
   } 
   
-  RooRealVar* kd = new RooRealVar("pseudoMELA","D^{0-}", xMin, xMax);
+  RooRealVar* kd = new RooRealVar("pseudoMELA","D_{0-}", xMin, xMax);
   kd->setBins(nbins);
   
   
@@ -136,7 +136,8 @@ void testfitilckd(bool pureToys = false, int ntoysperjob = 1000 ) {
   // 
   
   TChain *sigTree = new TChain("SelectedTree");
-  TString sigFileName = Form("samples/ee_ZH/unweighted_unpol_f_3_250GeV_5M_%s.root", accName.Data());
+  TString sigFileName = Form("samples/ee_ZH/ee_ZH_f3_p5_phi_0_250GeV_1M_false.root"); 
+  // TString sigFileName = Form("samples/ee_ZH/unweighted_unpol_f_3_250GeV_5M_%s.root", accName.Data());
   if ( sqrtsVal == 350. ) 
     sigFileName = Form("samples/ee_ZH/unweighted_unpol_model8_2M_%s.root", accName.Data());
   if ( sqrtsVal == 500. ) 
@@ -146,24 +147,33 @@ void testfitilckd(bool pureToys = false, int ntoysperjob = 1000 ) {
   sigTree->Add(sigFileName);
   RooDataSet *sigData = new RooDataSet("sigData","sigData",sigTree,RooArgSet(*kd));
   //Define signal model with 0+, 0- mixture
-  RooRealVar rrv_fa3("fa3","fa3",0.1,0.,1.);  //free parameter of the model
-  RooFormulaVar rfv_fa3Obs("fa3obs","1/ (1 + (1/@0 - 1)*1)",RooArgList(rrv_fa3));
-  if ( withAcc ) {
-    // fa3Obs = 1/1 / ( 1 + ( -1 +1 / fa3) * e1 / e3 ) 
-    // e1 and e3 are the efficiency  of your cuts on SM and P
-    if ( sqrtsVal == 250. ) 
-      rfv_fa3Obs = RooFormulaVar("fa3obs","1/ (1 + (1/@0 - 1)*0.985732)",RooArgList(rrv_fa3));
-    if ( sqrtsVal == 350. ) 
-      rfv_fa3Obs = RooFormulaVar("fa3obs","1/ (1 + (1/@0 - 1)*1.009)",RooArgList(rrv_fa3));
-    if ( sqrtsVal == 500. ) 
-      rfv_fa3Obs = RooFormulaVar("fa3obs","1/ (1 + (1/@0 - 1)*1.0302)",RooArgList(rrv_fa3));
-    if ( sqrtsVal == 1000. ) 
-      rfv_fa3Obs = RooFormulaVar("fa3obs","1/ (1 + (1/@0 - 1)*1.0575)",RooArgList(rrv_fa3));
+  RooRealVar rrv_fa3("fa3","fa3",fa3Val ,0.,1.);  //free parameter of the model
+  double eff_0plus_vs_0minus = 1.;
+  if ( withAcc ) { 
+    if ( sqrtsVal == 250. )   eff_0plus_vs_0minus = 0.985732; 
+    if ( sqrtsVal == 350. )   eff_0plus_vs_0minus = 1.009;
+    if ( sqrtsVal == 500. )   eff_0plus_vs_0minus = 1.0302;
+    if ( sqrtsVal == 1000. )   eff_0plus_vs_0minus =1.0575;
   }
-
+  char *formula = Form("1/ (1 + (1/@0 - 1)*%.6f)", eff_0plus_vs_0minus);
+  RooFormulaVar rfv_fa3Obs("fa3obs",formula,RooArgList(rrv_fa3));
   RooAddPdf* sigPdf = new RooAddPdf("sigPdf","ps+sm",*zerominusPdf, *zeroplusPdf, rfv_fa3Obs);  
     
-  
+  //
+  // Signal Model with phase
+  // 
+
+  TChain *sigPhaseTree = new TChain("SelectedTree");
+  TString sigPhaseFileName = Form("samples/ee_ZH/ee_ZH_f3_p5_phi_pi2_250GeV_1M_false.root"); 
+  sigPhaseTree->Add(sigPhaseFileName);
+  std::cout << "Reading " << sigPhaseFileName << "\n";
+  assert(sigPhaseTree);
+  RooDataSet *sigPhaseData = new RooDataSet("sigPhaseData","sigPhaseData",sigPhaseTree,RooArgSet(*kd));
+
+  //
+  // start toy MC
+  // 
+
   if ( toy > NOTOYS  ) {
     
     TString isPureName = "embd";
@@ -298,29 +308,48 @@ void testfitilckd(bool pureToys = false, int ntoysperjob = 1000 ) {
     gROOT->ProcessLine(".L tdrstyle.C");
     setTDRStyle();
     TGaxis *gaxis = new TGaxis();
-    gaxis->SetMaxDigits(3);
+    // gaxis->SetMaxDigits(3);
+
+
+    TH1F *kd_test_0m = new TH1F("kd_test_0m", "kd_test_0m", nbins, xMin, xMax);
+    zerominusTree->Project("kd_test_0m", "pseudoMELA"); 
+    double rescale_0m = 1./kd_test_0m->Integral();
+    kd_test_0m->Scale(rescale_0m);
+    double ymax_kd = kd_test_0m->GetMaximum();
+    std::cout << "rescale_0m = " << rescale_0m << "\n";
+    
+    TH1F *kd_test_0p = new TH1F("kd_test_0p", "kd_test_0p", nbins, xMin, xMax);
+    zeroplusTree->Project("kd_test_0p", "pseudoMELA"); 
+    double rescale_0p = 1./kd_test_0p->Integral();
+    kd_test_0p->Scale(rescale_0p);
+    ymax_kd = kd_test_0p->GetMaximum() > ymax_kd ? kd_test_0p->GetMaximum() : ymax_kd;
+    std::cout << "rescale_0p = " << rescale_0p << "\n";
+
+    TH1F *kd_test_0mix = new TH1F("kd_test_0mix", "kd_test_0mix", nbins, xMin, xMax);
+    sigTree->Project("kd_test_0mix", "pseudoMELA"); // "wt");
+    double rescale_0mix = 1./kd_test_0mix->Integral();
+    kd_test_0mix->Scale(rescale_0mix);
+    std::cout << "rescale_0mix = " << rescale_0mix << "\n";
+    ymax_kd = kd_test_0mix->GetMaximum() > ymax_kd ? kd_test_0mix->GetMaximum() : ymax_kd;
+
+
     
     RooPlot* kdframe =  kd->frame(nbins);
     kdframe->GetXaxis()->CenterTitle();
     kdframe->GetYaxis()->CenterTitle();
     kdframe->GetYaxis()->SetTitle(" ");
-
-    TH1F *kd_test = new TH1F("kd_test", "kd_test", nbins, xMin, xMax);                                                                  
-    zerominusTree->Project("kd_test", "pseudoMELA");                                                                                         
-    double ymax_kd = kd_test->GetMaximum(); 
     
-    double rescale = 0.00001;
-
     if ( plot == ALL ) {
-      zeroplusData->plotOn(kdframe, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale));
-      zeroplusPdf->plotOn(kdframe,  LineColor(kRed),LineWidth(2), Normalization(rescale));
-      zerominusData->plotOn(kdframe, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale));
-      zerominusPdf->plotOn(kdframe, LineColor(kBlue),LineWidth(2), Normalization(rescale));
+      zeroplusData->plotOn(kdframe, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale_0p));
+      zeroplusPdf->plotOn(kdframe,  LineColor(kRed),LineWidth(2), Normalization(rescale_0p));
+      zerominusData->plotOn(kdframe, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale_0m));
+      zerominusPdf->plotOn(kdframe, LineColor(kBlue),LineWidth(2), Normalization(rescale_0m));
     }
     
     if ( plot == SIG || plot == ALL ) {
-      sigData->plotOn(kdframe, MarkerColor(kGreen+2), MarkerStyle(25),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale*0.2));
-      sigPdf->plotOn(kdframe,  LineColor(kGreen+2), Normalization(rescale*0.2));
+      sigData->plotOn(kdframe, MarkerColor(kGreen+2), MarkerStyle(25),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale_0mix));
+      sigPdf->plotOn(kdframe,  LineColor(kGreen+2), Normalization(rescale_0mix));
+      sigPhaseData->plotOn(kdframe, MarkerColor(kMagenta+1), MarkerStyle(20),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale_0mix));
     }
     
     if ( plot == BKG ) {
@@ -329,7 +358,7 @@ void testfitilckd(bool pureToys = false, int ntoysperjob = 1000 ) {
     }
 
     if ( plot == ALL ) {
-      kdframe->SetMaximum(ymax_kd * 1.2 * rescale);
+      kdframe->SetMaximum(ymax_kd * 1.1 );
     }
 
     TCanvas *c1 = new TCanvas("c1", "c1", 600, 600);
