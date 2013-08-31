@@ -69,7 +69,8 @@ void setTDRStyle() {
 
 //For the fit/function:
   tdrStyle->SetOptFit(0);
-  tdrStyle->SetFitFormat("5.4g");
+  //tdrStyle->SetOptFit(000000010);
+  tdrStyle->SetFitFormat("7.4g");
   tdrStyle->SetFuncColor(2);
   tdrStyle->SetFuncStyle(1);
   tdrStyle->SetFuncWidth(1);
@@ -82,6 +83,7 @@ void setTDRStyle() {
 // For the statistics box:
   tdrStyle->SetOptFile(0);
   tdrStyle->SetOptStat(0); // To display the mean and RMS:   SetOptStat("mr");
+  //tdrStyle->SetOptStat("mr"); // To display the mean and RMS:   SetOptStat("mr");
   tdrStyle->SetStatColor(kWhite);
   tdrStyle->SetStatFont(42);
   tdrStyle->SetStatFontSize(0.010);
@@ -98,7 +100,7 @@ void setTDRStyle() {
   tdrStyle->SetPadTopMargin(0.05);
   tdrStyle->SetPadBottomMargin(0.15);
   tdrStyle->SetPadLeftMargin(0.14);
-  tdrStyle->SetPadRightMargin(0.04);
+  tdrStyle->SetPadRightMargin(0.048);
 
 // For the Global title:
 
