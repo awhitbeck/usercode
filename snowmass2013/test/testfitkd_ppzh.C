@@ -30,7 +30,7 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 2000 ) {
   ToyLevel toy = NOTOYS;
   
   // double fa3Val = 0.385797;
-  double fa3Val = 0.5;
+  double fa3Val = 0.486562; // 0.5;
   TString accName = "false";
   if ( withAcc ) 
     accName = "true";
@@ -49,7 +49,7 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 2000 ) {
   int nbins = 10;
   double xMin = 0; 
   double xMax = 1.;
-  RooRealVar* kd = new RooRealVar("pseudoMELA","D^{0-}", xMin, xMax);
+  RooRealVar* kd = new RooRealVar("pseudoMELA","D_{0-}", xMin, xMax);
   kd->setBins(nbins);
   
   //
@@ -67,8 +67,8 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 2000 ) {
   // 
   
   TChain *zeroplusTree = new TChain("SelectedTree");
-  //  TString zeroplusFileName = Form("samples/pp_ZH/pp_ZH_llbb_0p_toydata_%s.root", accName.Data());
-  TString zeroplusFileName = Form("samples/pp_ZH/pp_ZH_llbb_g1_1M_%s.root", accName.Data());
+  TString zeroplusFileName = Form("samples/pp_ZH/pp_ZH_llbb_0p_toydata_%s.root", accName.Data());
+  // TString zeroplusFileName = Form("samples/pp_ZH/pp_ZH_llbb_g1_1M_%s.root", accName.Data());
   zeroplusTree->Add(zeroplusFileName);
   std::cout << "Reading " << zeroplusFileName << "\n";
   assert(zeroplusTree);
@@ -82,8 +82,8 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 2000 ) {
   // 
   
   TChain *zerominusTree = new TChain("SelectedTree");
-  // TString zerominusFileName = Form("samples/pp_ZH/pp_ZH_llbb_0m_toydata_%s.root", accName.Data());
-  TString zerominusFileName = Form("samples/pp_ZH/pp_ZH_llbb_g4_1M_%s.root", accName.Data());
+  TString zerominusFileName = Form("samples/pp_ZH/pp_ZH_llbb_0m_toydata_%s.root", accName.Data());
+  // TString zerominusFileName = Form("samples/pp_ZH/pp_ZH_llbb_g4_1M_%s.root", accName.Data());
   zerominusTree->Add(zerominusFileName);
   std::cout << "Reading " << zerominusFileName << "\n";
   assert(zerominusTree);
@@ -96,8 +96,8 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 2000 ) {
   // 
 
   TChain *sigTree = new TChain("SelectedTree");
-  // TString sigFileName = Form("samples/pp_ZH/pp_ZH_llbb_0mix_toydata_%s.root", accName.Data());
-  TString sigFileName = Form("samples/pp_ZH/pp_ZH_llbb_g1_p_g4_1M_%s.root", accName.Data());
+  TString sigFileName = Form("samples/pp_ZH/pp_ZH_llbb_0mix_f3p5_toydata_%s.root", accName.Data());
+  //TString sigFileName = Form("samples/pp_ZH/pp_ZH_llbb_g1_p_g4_1M_%s.root", accName.Data());
   sigTree->Add(sigFileName);
   std::cout << "Reading " << sigFileName << "\n";
   assert(sigTree);
@@ -108,13 +108,27 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 2000 ) {
   RooRealVar rrv_fa3("fa3","fa3",fa3Val,0.,1.);  //free parameter of the model
   // eff(0+) / eff(0-)
   double eff_0plus_vs_0minus = 1.;
-  //  if ( withAcc ) eff_0plus_vs_0minus = 0.176893;
+  if ( withAcc ) eff_0plus_vs_0minus = 0.176893; // this is from toydata
   char *formula = Form("1/ (1 + (1/@0 - 1)*%.6f)", eff_0plus_vs_0minus);
   RooFormulaVar rfv_fa3Obs("fa3obs",formula,RooArgList(rrv_fa3));
   std::cout << "f3 (observed) = " << rfv_fa3Obs.getVal() << "\n";
   RooAddPdf* sigPdf = new RooAddPdf("sigPdf","ps+sm",*zerominusPdf, *zeroplusPdf, rfv_fa3Obs);  
   
   // RooFitResult* toyfitresults_sig =  sigPdf->fitTo(*sigData, RooFit::PrintLevel(1), RooFit::Save(true)); 
+
+
+  
+
+  //
+  // Signal Model with phase
+  // 
+
+  TChain *sigPhaseTree = new TChain("SelectedTree");
+  TString sigPhaseFileName = Form("samples/pp_ZH/pp_ZH_llbb_0mix_f3p5_phi3piover2_toydata_%s.root", accName.Data());
+  sigPhaseTree->Add(sigPhaseFileName);
+  std::cout << "Reading " << sigPhaseFileName << "\n";
+  assert(sigPhaseTree);
+  RooDataSet *sigPhaseData = new RooDataSet("sigPhaseData","sigPhaseData",sigPhaseTree,RooArgSet(*kd));
 
   //
   // Perform Toy Experiments
@@ -224,41 +238,55 @@ void testfitkd_ppzh(bool pureToys = true, int ntoysperjob = 2000 ) {
     TGaxis *gaxis = new TGaxis();
     gaxis->SetMaxDigits(3);
     
-    double rescale = 0.00001;
-    double rescale_0m = rescale;
-    if ( withAcc ) rescale_0m = rescale*0.18;
+    TH1F *kd_test_0m = new TH1F("kd_test_0m", "kd_test_0m", nbins, xMin, xMax);
+    zerominusTree->Project("kd_test_0m", "pseudoMELA","wt");
+    double rescale_kd_0m = 1./kd_test_0m->Integral();
+    kd_test_0m->Scale(rescale_kd_0m);
+    double ymax_kd = kd_test_0m->GetMaximum();
     
-    TH1F *kd_test = new TH1F("kd_test", "kd_test", nbins, xMin, xMax);
-    sigTree->Project("kd_test", "pseudoMELA");
-    double ymax_kd = kd_test->GetMaximum(); 
-
+    TH1F *kd_test_0p = new TH1F("kd_test_0p", "kd_test_0p", nbins, xMin, xMax);
+    zeroplusTree->Project("kd_test_0p", "pseudoMELA","wt");
+    double rescale_kd_0p = 1./kd_test_0p->Integral();
+    kd_test_0p->Scale(rescale_kd_0p);
+    ymax_kd = kd_test_0p->GetMaximum() > ymax_kd ? kd_test_0p->GetMaximum() : ymax_kd;
+    
+    TH1F *kd_test_0mix = new TH1F("kd_test_0mix", "kd_test_0mix", nbins, xMin, xMax);
+    sigTree->Project("kd_test_0mix", "pseudoMELA","wt");
+    double rescale_kd_0mix = 1./kd_test_0mix->Integral();
+    kd_test_0mix->Scale(rescale_kd_0mix);
+    ymax_kd = kd_test_0mix->GetMaximum() > ymax_kd ? kd_test_0mix->GetMaximum() : ymax_kd;
+    
     RooPlot* kdframe =  kd->frame(nbins);
     kdframe->GetXaxis()->CenterTitle();
     kdframe->GetYaxis()->CenterTitle();
     kdframe->GetYaxis()->SetTitle(" ");
     
     if ( plot == ALL ) {
-      zeroplusData->plotOn(kdframe, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale));
-      zeroplusPdf->plotOn(kdframe,  LineColor(kRed),LineWidth(2), Normalization(rescale));
+      zeroplusData->plotOn(kdframe, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale_kd_0p));
+      zeroplusPdf->plotOn(kdframe,  LineColor(kRed),LineWidth(2), Normalization(rescale_kd_0p));
       
-      zerominusData->plotOn(kdframe, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale_0m));
-      zerominusPdf->plotOn(kdframe, LineColor(kBlue),LineWidth(2), Normalization(rescale_0m));
+      zerominusData->plotOn(kdframe, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale_kd_0m));
+      zerominusPdf->plotOn(kdframe, LineColor(kBlue),LineWidth(2), Normalization(rescale_kd_0m));
 
+      /*
       double bkgscale = 6.;
       if ( withAcc ) bkgscale = 20.;
       bkgData->plotOn(kdframe, LineColor(kBlack), Rescale(bkgscale*rescale));
       bkgPdf->plotOn(kdframe, LineColor(kBlack), Normalization(bkgscale*rescale));
+      */
     }
 
     if ( plot == SIG || plot == ALL  ) {
-      sigData->plotOn(kdframe, MarkerColor(kGreen+2), MarkerStyle(25),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale/10.));
-      sigPdf->plotOn(kdframe,  LineColor(kGreen+2), Normalization(rescale/10.));
-	// sigPdf_MC->plotOn(kdframe,  LineColor(kBlack));
+      sigData->plotOn(kdframe, MarkerColor(kGreen+3), MarkerStyle(25),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale_kd_0mix));
+      sigPdf->plotOn(kdframe,  LineColor(kGreen+3), Normalization(rescale_kd_0mix));
+      sigPhaseData->plotOn(kdframe, MarkerColor(kMagenta+1), MarkerStyle(20),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale_kd_0mix));
     }
+    
+    kdframe->SetMaximum(ymax_kd*1.1);
+
 
     
     TCanvas *c1 = new TCanvas("c1","c1",600,600);
-    kdframe->SetMaximum(ymax_kd * 1.2 * rescale / 10.);
     kdframe->Draw();
 
     TString plotAppendix = "";
