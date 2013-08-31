@@ -12,11 +12,18 @@ fi
 
 rm -f list_samples.txt;
 cat > list_samples.txt <<EOF
+pp_ZH_llbb_g1_1M
+pp_ZH_llbb_g4_1M
+pp_ZH_llbb_g1_p_g4_1M
+pp_ZH_llbb_g1_p_ig4_1M
 pp_ZH_llbb_0p_toydata
 pp_ZH_llbb_0m_toydata
 pp_ZH_llbb_0mix_toydata
+pp_ZH_llbb_0mix_f3p5_toydata
+pp_ZH_llbb_0mix_f3p5_phi3piover2_toydata
 pp_ZZ_llbb_25M
 EOF
+
 
 for i in `cat list_samples.txt` ; do
     sample=${i%%,*}_${acceptance};
