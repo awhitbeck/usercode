@@ -19,6 +19,8 @@ public:
   
   ScalarPdfFactoryZH* SMHiggs;
   ScalarPdfFactoryZH* altSignal;
+  ScalarPdfFactoryZH* mixHiggs;
+  
 
   KDcalcZH(double sqrtsVal, double mX){
 
@@ -33,7 +35,7 @@ public:
 				       costheta2,
 				       phi,
 				       mH,
-				       2,
+				       1,
 				       false);
 
     SMHiggs->fa2->setVal(0.0);
@@ -46,17 +48,36 @@ public:
 					  costheta2,
 					  phi,
 					  mH,
-					  2,
+					  1,
 					  false);
 
     altSignal->fa2->setVal(0.0);
     altSignal->fa3->setVal(0.999999999);
+    altSignal->g1Val->setVal(0.0);
+    altSignal->g4Val->setVal(1.0);
     altSignal->phia2->setVal(0.0);
     altSignal->phia3->setVal(0.0);
     altSignal->sqrts->setVal(sqrtsVal);
 
+
+    mixHiggs   = new ScalarPdfFactoryZH(costheta1,
+				       costheta2,
+				       phi,
+				       mH,
+				       1,
+				       false);
+
+    mixHiggs->fa2->setVal(0.0);
+    mixHiggs->fa3->setVal(0.5);
+    mixHiggs->phia2->setVal(0.0);
+    mixHiggs->phia3->setVal(0.0);
+    mixHiggs->g1Val->setVal(1.0);
+    mixHiggs->g4Val->setVal(0.351949);
+    mixHiggs->sqrts->setVal(sqrtsVal);
+
     SMHiggs->makeParamsConst(true);
     altSignal->makeParamsConst(true);
+    mixHiggs->makeParamsConst(true);
 
   };
 
@@ -66,13 +87,15 @@ public:
 		 float costheta1_,
 		 float costheta2_,
 		 float phi_,
-		 float& KD){
+		 float& KD,
+		 float& KDInt){
     
     mH->setVal(mH_);
     costheta1->setVal(costheta1_);
     costheta2->setVal(costheta2_);
     phi->setVal(phi_);
 
+    // calculate 0+ vs 0- KD
     float SMHiggsProb = SMHiggs->PDF->getVal();
     if(SMHiggsProb<0.0) cout << "KDcalcZH::computeKD - ERROR: SMHiggs prob is negative!!!" << endl;
     float altSignalProb = altSignal->PDF->getVal();
@@ -91,7 +114,23 @@ public:
 
     KD = SMHiggsProb/(SMHiggsProb+c*altSignalProb);
 
+
+    // calculate the interference KD
+    float mixHiggsProb = mixHiggs->PDF->getVal();
+    if(mixHiggsProb<0.0) cout << "KDcalcZH::computeKD - ERROR: mixHiggs prob is negative!!!" << endl;
+    
+    double intProb = 2 * mixHiggsProb - SMHiggsProb - altSignalProb; 
+    KDInt = intProb; // / (SMHiggsProb + altSignalProb); 
+    /*
+    std::cout << "SMHiggsProb = " << SMHiggsProb << "\n";
+    std::cout << "altSignalProb = " << altSignalProb << "\n";
+    std::cout << "intProb = " << intProb << "\n";
+    std::cout << "mixHiggsProb = " << mixHiggsProb << "\n";
+    */
   };
+
+
+
 
   //template <class T>
   void addDtoTree(TString fileName,
@@ -111,6 +150,7 @@ public:
 
     float mH_,costheta1_,costheta2_,phi_;
     float KD_;
+    float KDInt_;
 
     t->SetBranchAddress(mHBranch,&mH_);
     t->SetBranchAddress(costheta1Branch,&costheta1_);
@@ -121,6 +161,11 @@ public:
     tt->SetBranchAddress("pseudoMELA",&KD_);
   else 
     tt->Branch("pseudoMELA",&KD_,"pseudoMELA/F");
+
+  if ( t->GetBranchStatus("pseudoMELAInt") )
+    tt->SetBranchAddress("pseudoMELAInt",&KDInt_);
+  else 
+    tt->Branch("pseudoMELAInt",&KDInt_,"pseudoMELAInt/F");
   
     cout << "t entries: "  << t->GetEntries() << endl;
 
@@ -132,7 +177,7 @@ public:
 
       t->GetEntry(iEvt);
 
-      computeKD(mH_,costheta1_,costheta2_,phi_,KD_);
+      computeKD(mH_,costheta1_,costheta2_,phi_,KD_, KDInt_);
 
       /*
       cout << "mH: " << mH_ << endl;
