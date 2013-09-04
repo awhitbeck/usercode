@@ -63,48 +63,72 @@ ClassImp(RooSpinZero_KDInt_ZH)
 
 Int_t RooSpinZero_KDInt_ZH::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const
 {
-  /*
   if (matchArgs(allVars,analVars,RooArgSet(*kd.absArg(), *kdint.absArg()))) return 3 ;
   if (matchArgs(allVars,analVars,kd)) return 1 ;
   if (matchArgs(allVars,analVars,kdint)) return 2 ;
-  */
+
   return 0 ;
 
 }
 
 Double_t RooSpinZero_KDInt_ZH::analyticalIntegral(Int_t code, const char* rangeName) const
 {
-   
+
+  int nbinsx = histos[0]->GetXaxis()->GetNbins();
+  double binwidthx = histos[0]->GetXaxis()->GetBinWidth(1);
+  double xMin = histos[0]->GetXaxis()->GetBinLowEdge(1);
+  double xMax = histos[0]->GetXaxis()->GetBinUpEdge(nbinsx);
+  double dx = (xMax - xMin) / nbinsx; 
+
+  
+  int nbinsy = histos[0]->GetYaxis()->GetNbins();
+  double binwidthy = histos[0]->GetYaxis()->GetBinWidth(1);
+  double yMin = histos[0]->GetYaxis()->GetBinLowEdge(1);
+  double yMax = histos[0]->GetYaxis()->GetBinUpEdge(nbinsy);
+  double dy = (yMax - yMin) / nbinsy; 
+
+  /*
+  std::cout << "nbinsx = " << nbinsx << ", binwidthx = " << binwidthx << ", xMin = " << xMin << ", xMax = " << xMax << "\n";
+  std::cout << "nbinsy = " << nbinsy << ", binwidthy = " << binwidthy << ", yMin = " << yMin << ", yMax = " << yMax << "\n";
+  */
+  
    switch(code)
      {
 
-       // integrate out the kdint
+       // integrate out kd, depend on kdint
      case 1: 
        {
 
-	 int binx = histos[0]->GetXaxis()->FindBin(kd);
-	 int nbinsy = histos[0]->GetYaxis()->GetNbins();
+	 int biny = histos[0]->GetYaxis()->FindBin(kdint);
+	 
+	 double Int_T1 = histos[0]->Integral(1, nbinsx, biny, biny);
+	 double Int_T2 = histos[1]->Integral(1, nbinsx, biny, biny);
+	 double Int_T4 = histos[2]->Integral(1, nbinsx, biny, biny);
+	 // something related to phase factor, this is by guess
+	 double integral = (1.-fa3) * Int_T1 + fa3 * Int_T2; // + sqrt((1.-fa3)*fa3) * Int_T4; ;
 
-	 double Int_T1 = histos[0]->Integral(binx, binx, 0, nbinsy);
-	 double Int_T2 = histos[1]->Integral(binx, binx, 0, nbinsy);
-	 double Int_T4 = histos[2]->Integral(binx, binx, 0, nbinsy);
-
-	 return (1.-fa3) * Int_T1 + fa3 * Int_T2; // + sqrt((1.-fa3)*fa3) * Int_T4; ;
+	 integral = integral * dx * 2.; 
+	  
+	 return integral; 
 	 
        }
        
-       // integrate out the kd
+       // integrate out  kdint, depend on kd
      case 2: 
        {
+	 
+	 int binx = histos[0]->GetXaxis()->FindBin(kd);
 
-	 int biny = histos[0]->GetYaxis()->FindBin(kdint);
-	 int nbinsx = histos[0]->GetXaxis()->GetNbins();
+	 double Int_T1 = histos[0]->Integral(binx, binx, 1, nbinsy);
+	 double Int_T2 = histos[1]->Integral(binx, binx, 1, nbinsy);
+	 double Int_T4 = histos[2]->Integral(binx, binx, 1, nbinsy);
 
-	 double Int_T1 = histos[0]->Integral(0, nbinsx, biny, biny);
-	 double Int_T2 = histos[1]->Integral(0, nbinsx, biny, biny);
-	 double Int_T4 = histos[2]->Integral(0, nbinsx, biny, biny);
+	 double integral = (1.-fa3) * Int_T1 + fa3 * Int_T2; // + sqrt((1.-fa3)*fa3) * Int_T4; 
+	 
+	 // something related to phase factor, this is by guess
+	 integral = integral * dy * 2.;
 
-	 return (1.-fa3) * Int_T1 + fa3 * Int_T2; // + sqrt((1.-fa3)*fa3) * Int_T4; ;
+	 return integral;
        }
        
      case 3: 
@@ -112,7 +136,17 @@ Double_t RooSpinZero_KDInt_ZH::analyticalIntegral(Int_t code, const char* rangeN
 	 double Int_T1 = histos[0]->Integral();
 	 double Int_T2 = histos[1]->Integral();
 	 double Int_T4 = histos[2]->Integral();
-	 return (1.-fa3) * Int_T1 + fa3 * Int_T2 ; //+ sqrt((1.-fa3)*fa3) * Int_T4; ;
+
+	 double integral = (1.-fa3) * Int_T1 + fa3 * Int_T2 ; //+ sqrt((1.-fa3)*fa3) * Int_T4; ;
+	 int nbinsx = histos[0]->GetXaxis()->GetNbins();
+	 int nbinsy = histos[0]->GetYaxis()->GetNbins();
+
+
+	 integral = integral * dx * dy * 4.;
+
+	 // std::cout << __LINE__ << " "<< integral << "\n";
+
+	 return integral;
        }
        
      }
