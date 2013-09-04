@@ -19,8 +19,9 @@ public:
   RooSpinZero_KDInt_ZH() {} ; 
   RooSpinZero_KDInt_ZH(const char *name, const char *title,
 		    RooAbsReal& _kd,
+		    RooAbsReal& _kdint,
 		    RooAbsReal& _fa3,
- 		    vector<TH1F*>& _histos,
+ 		    vector<TH2F*>& _histos,
 		    bool  _withAcc);
 		    
   RooSpinZero_KDInt_ZH(const RooSpinZero_KDInt_ZH& other, const char* name=0) ;
@@ -34,8 +35,9 @@ public:
 protected:
 
   RooRealProxy kd ;
+  RooRealProxy kdint ;
   RooRealProxy fa3 ;
-  vector<TH1F*> histos;
+  vector<TH2F*> histos;
   bool withAcc;
   
     
