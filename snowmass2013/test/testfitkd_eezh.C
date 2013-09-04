@@ -44,10 +44,10 @@ void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
   float mH=125.;
   bool withAcc = false;
   VerbosityLevel verb = INFO;
-  PlotLevel plot = SIG;
-  ToyLevel toy = NOTOYS;
+  PlotLevel plot = NOPLOTS;
+  ToyLevel toy = EMBED;
   
-  double fa3Val = 0.5;
+  double fa3Val = 0.1;
   TString accName = "false";
   if ( withAcc ) 
     accName = "true";
@@ -119,8 +119,9 @@ void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
   // 
   
   TChain *sigTree = new TChain("SelectedTree");
-  TString sigFileName = Form("samples/ee_ZH/ee_ZH_f3_p5_phi_0_250GeV_1M_false.root"); 
-  //TString sigFileName = Form("samples/ee_ZH/unweighted_unpol_f_3_250GeV_5M_%s.root", accName.Data());
+  //TString sigFileName = Form("samples/ee_ZH/ee_ZH_f3_p5_phi_0_250GeV_1M_false.root"); 
+  TString sigFileName = Form("samples/ee_ZH/unweighted_unpol_f_3_250GeV_5M_%s.root", accName.Data());
+  //TString sigFileName = Form("samples/ee_ZH/ee_ZH_f3_p5_phi_0_250GeV_1M_false.root"); 
   sigTree->Add(sigFileName);
   RooDataSet *sigData = new RooDataSet("sigData","sigData",sigTree,RooArgSet(*kd, *kdint));
   RooDataHist *sigHist = sigData->binnedClone(0);
@@ -141,19 +142,16 @@ void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
   TH2F *hist_zeroplus = new TH2F("hist_zeroplus", "hist_zeroplus", nbins, xMin, xMax, nbins_kdint, xMin_kdint, xMax_kdint);
   zeroplusTree->Project("hist_zeroplus", "pseudoMELAInt:pseudoMELA"); 
   hist_zeroplus->Scale(1./hist_zeroplus->Integral());
-  // hist_zeroplus->Scale(nbins * nbins_kdint/ ((xMax - xMin) * (xMax_kdint - xMin_kdint)) );
   std::cout << "hist_zeroplus->Integral() = " << hist_zeroplus->Integral() << "\n";
 
   TH2F *hist_zerominus = new TH2F("hist_zerominus", "hist_zerominus", nbins, xMin, xMax, nbins_kdint, xMin_kdint, xMax_kdint);
   zerominusTree->Project("hist_zerominus", "pseudoMELAInt:pseudoMELA"); 
   hist_zerominus->Scale(1./hist_zerominus->Integral());
-  // hist_zerominus->Scale(nbins * nbins_kdint/ ((xMax - xMin) * (xMax_kdint - xMin_kdint)) );
   std::cout << "hist_zerominus->Integral() = " << hist_zerominus->Integral() << "\n";
 
   TH2F *hist_zerointerf = new TH2F("hist_zerointerf", "hist_zerointerf", nbins, xMin, xMax, nbins_kdint, xMin_kdint, xMax_kdint);
   zeroplusTree->Project("hist_zerointerf", "pseudoMELAInt:pseudoMELA"); 
   hist_zerointerf->Scale(1./hist_zerointerf->Integral());
-  // 4147202133064608hist_zerointerf->Scale(nbins * nbins_kdint/ ((xMax - xMin) * (xMax_kdint - xMin_kdint)) );
   std::cout << "hist_zerointerf->Integral() = " << hist_zerointerf->Integral() << "\n";
   
 
@@ -278,7 +276,7 @@ void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
 
       RooFitResult* toyfitresults =  totalPdf->fitTo(*toyData, RooFit::PrintLevel(printlevel), RooFit::Save(true), RooFit::Extended(kTRUE) ); 
       
-      if ( verb == DEBUG ) {
+      if ( verb >= INFO ) {
 	std::cout << "toy trial " << i << "\n"; 
 	std::cout << "fa3 = " << rrv_fa3.getVal() << " +/- " << rrv_fa3.getError() << "\n";
 	std::cout << "nsig = " << nsig->getVal() << " +/- " << nsig->getError() << "\n";
@@ -348,7 +346,7 @@ void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
     if ( plot == SIG || plot == ALL ) {
       sigData->plotOn(kdframe, MarkerColor(kGreen+2), MarkerStyle(25),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale_0mix));
       sigPdf->plotOn(kdframe,  LineColor(kGreen+2), Normalization(rescale_0mix));
-      sigPhaseData->plotOn(kdframe, MarkerColor(kMagenta+1), MarkerStyle(20),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale_0mix));
+      // sigPhaseData->plotOn(kdframe, MarkerColor(kMagenta+1), MarkerStyle(20),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale_0mix));
     }
     
     if ( plot == BKG ) {
@@ -400,7 +398,8 @@ void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
     if ( plot == SIG || plot == ALL ) {
       sigData->plotOn(kdintframe, MarkerColor(kGreen+2), MarkerStyle(25),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale_0mix));
       sigPdf->plotOn(kdintframe,  LineColor(kGreen+2), Normalization(rescale_0mix));
-      sigPhaseData->plotOn(kdintframe, MarkerColor(kMagenta+1), MarkerStyle(20),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale_0mix));
+      // sigPhaseData->plotOn(kdintframe, MarkerColor(kMagenta+1), MarkerStyle(20),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale_0mix));
+
     }
     
     if ( plot == BKG ) {
