@@ -29,7 +29,7 @@ using namespace RooFit ;
 
 
 // 
-// Run by root -l -q -b testfitkd_eezh.C
+// Run by root -l -n -q -b loadLib.C testfitkd_eezh.C+
 // 
 
 void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
@@ -44,7 +44,7 @@ void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
   float mH=125.;
   bool withAcc = false;
   VerbosityLevel verb = INFO;
-  PlotLevel plot = NOPLOTS;
+  PlotLevel plot = SIG; // NOPLOTS;
   ToyLevel toy = NOTOYS;
   
   double fa3Val = 0.1;
@@ -185,7 +185,7 @@ void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
 
   RooAbsPdf *sigPdf = new RooSpinZero_KDInt_ZH("sigPdf", "sigPdf", *kd, *kdint, rrv_fa3, histos, withAcc);
   
-  RooFitResult* toyfitresults_total =  sigPdf->fitTo(*sigData, RooFit::PrintLevel(1), RooFit::Save(true));
+  // RooFitResult* fitresults_sig =  sigPdf->fitTo(*sigData, RooFit::PrintLevel(1), RooFit::Save(true));
   //
   // Signal Model with phase
   // 
