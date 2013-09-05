@@ -1,36 +1,50 @@
+// Root headers
+#include <vector>
+#include "TH2F.h"
+#include "TChain.h"
+#include "TFile.h"
+#include "TCanvas.h"
+#include "TAxis.h"
+
+// RooFit headers
 #include "RooDataSet.h"
 #include "RooRealVar.h"
 #include "RooDataSet.h"
 #include "RooGaussian.h"
-#include "TCanvas.h"
-#include "TAxis.h"
 #include "RooPlot.h"
 #include "RooAddPdf.h"
 #include "RooAbsPdf.h"
 #include "RooFormulaVar.h"
 #include "RooAbsReal.h"
+#include "RooHistPdf.h"
+#include "RooFitResult.h"
+
+// snowmass code headers
+#include "../src/../src/RooSpinZero_KD_ZH.cc"
+#include "../src/ScalarPdfFactoryZH.cc"
+#include "../src/../src/PlaygroundZH.cc"
 
 using namespace RooFit ;
 
-typedef enum{ERROR, INFO, DEBUG} VerbosityLevel; 
-typedef enum{NOPLOTS, SIG, BKG, ALL} PlotLevel;
-typedef enum{NOTOYS, EMBED, PURE} ToyLevel; 
-
-
 // 
-// Run by root -l -q -b testfitilckd.C
+// Run by root -l -b -n loadLib.C testfitilckd.C+
 // 
 
-void testfitilckd(bool pureToys = false, int ntoysperjob = 1000 ) {
- 
+void testfitilckd(int ntoysperjob = 1 ) {
+  
+  typedef enum{ERROR, INFO, DEBUG} VerbosityLevel; 
+  typedef enum{NOPLOTS, SIG, BKG, ALL} PlotLevel;
+  typedef enum{NOTOYS, EMBED, PURE} ToyLevel; 
+  
+
   float sqrtsVal = 250;
   float mH=125.;
   bool withAcc = false;
   VerbosityLevel verb = ERROR;
-  PlotLevel plot = ALL;
-  ToyLevel toy = NOTOYS;
+  PlotLevel plot = NOPLOTS;
+  ToyLevel toy = EMBED;
   
-  double fa3Val = 0.5;
+  double fa3Val = 0.1;
   TString accName = "false";
   if ( withAcc ) 
     accName = "true";
@@ -136,8 +150,8 @@ void testfitilckd(bool pureToys = false, int ntoysperjob = 1000 ) {
   // 
   
   TChain *sigTree = new TChain("SelectedTree");
-  TString sigFileName = Form("samples/ee_ZH/ee_ZH_f3_p5_phi_0_250GeV_1M_false.root"); 
-  // TString sigFileName = Form("samples/ee_ZH/unweighted_unpol_f_3_250GeV_5M_%s.root", accName.Data());
+  // TString sigFileName = Form("samples/ee_ZH/ee_ZH_f3_p5_phi_0_250GeV_1M_false.root"); 
+  TString sigFileName = Form("samples/ee_ZH/unweighted_unpol_f_3_250GeV_5M_%s.root", accName.Data());
   if ( sqrtsVal == 350. ) 
     sigFileName = Form("samples/ee_ZH/unweighted_unpol_model8_2M_%s.root", accName.Data());
   if ( sqrtsVal == 500. ) 
@@ -157,8 +171,57 @@ void testfitilckd(bool pureToys = false, int ntoysperjob = 1000 ) {
   }
   char *formula = Form("1/ (1 + (1/@0 - 1)*%.6f)", eff_0plus_vs_0minus);
   RooFormulaVar rfv_fa3Obs("fa3obs",formula,RooArgList(rrv_fa3));
-  RooAddPdf* sigPdf = new RooAddPdf("sigPdf","ps+sm",*zerominusPdf, *zeroplusPdf, rfv_fa3Obs);  
-    
+  // -------------------------------------------------------------- 
+  //	Use this PDF to reproduce the old results in the paper 								
+  // RooAddPdf* sigPdf = new RooAddPdf("sigPdf","ps+sm",*zerominusPdf, *zeroplusPdf, rfv_fa3Obs);  
+  // -------------------------------------------------------------- 
+
+  // 
+  // Use the histogram based 
+  // 
+
+  TH1F *hist_zeroplus = new TH1F("hist_zeroplus", "hist_zeroplus", nbins, xMin, xMax);
+  zeroplusTree->Project("hist_zeroplus", "pseudoMELA");
+  hist_zeroplus->Scale(1./hist_zeroplus->Integral());
+  std::cout << "hist_zeroplus->Integral() = " << hist_zeroplus->Integral() << "\n";
+
+  TH1F *hist_zerominus = new TH1F("hist_zerominus", "hist_zerominus", nbins, xMin, xMax);
+  zerominusTree->Project("hist_zerominus", "pseudoMELA");
+  hist_zerominus->Scale(1./hist_zerominus->Integral());
+  std::cout << "hist_zerominus->Integral() = " << hist_zerominus->Integral() << "\n";
+
+
+  TChain *f3p5Tree = new TChain("SelectedTree");
+  TString f3p5FileName = Form("samples/ee_ZH/ee_ZH_f3_p5_phi_0_250GeV_1M_false.root"); 
+  f3p5Tree->Add(f3p5FileName);
+  double g4mix = 0.351949; // this is the g4 value correspoinding to f3 = 0.5
+
+  TH1F *hist_f3p5 = new TH1F("hist_f3p5", "hist_f3p5", nbins, xMin, xMax);
+  f3p5Tree->Project("hist_f3p5", "pseudoMELA");
+  hist_f3p5->Scale(2./hist_f3p5->Integral());
+  std::cout << "hist_f3p5->Integral() = " << hist_f3p5->Integral() << "\n";
+
+  
+  TH1F *hist_zerointerf = new TH1F("hist_zerointerf", "hist_zerointerf", nbins, xMin, xMax);
+  
+  //  Fill in the interference term
+  for ( int i = 1 ; i < nbins + 1 ; i++ ) {
+    double SMHiggsProb = hist_zeroplus->GetBinContent(i);
+    double altSignalProb = hist_zerominus->GetBinContent(i);
+    double mixSignalProb = hist_f3p5->GetBinContent(i);
+    double intProb = mixSignalProb - SMHiggsProb - altSignalProb; 
+    intProb = intProb;
+    hist_zerointerf->SetBinContent(i, intProb); 
+  }
+  
+  vector<TH1F*> histos;
+  histos.push_back(hist_zeroplus);
+  histos.push_back(hist_zerominus);
+  histos.push_back(hist_zerointerf);
+
+  RooAbsPdf *sigPdf = new RooSpinZero_KD_ZH("sigPdf", "sigPdf", *kd,  rfv_fa3Obs, histos, withAcc);
+  
+
   //
   // Signal Model with phase
   // 
@@ -177,7 +240,7 @@ void testfitilckd(bool pureToys = false, int ntoysperjob = 1000 ) {
   if ( toy > NOTOYS  ) {
     
     TString isPureName = "embd";
-    if ( pureToys ) isPureName = "pure";
+    if ( toy == PURE ) isPureName = "pure";
     // 
     // toy generation
     // 
@@ -188,8 +251,7 @@ void testfitilckd(bool pureToys = false, int ntoysperjob = 1000 ) {
     // Fit the dataset
     // 
     
-    TFile *toyresults = new TFile(Form("toyresults_eezh/toyresults_KD_%s_%.0fGeV_acc%s.root", isPureName.Data(), sqrtsVal, accName.Data()), "RECREATE");
-    gROOT->cd();
+    TFile *toyresults = new TFile(Form("toyresults_eezh/toyresults_KD_%s_%.0fGeV_acc%s_new.root", isPureName.Data(), sqrtsVal, accName.Data()), "RECREATE");
     
     TTree *tree_fit = new TTree("fittree", "fittree");
     
@@ -235,7 +297,7 @@ void testfitilckd(bool pureToys = false, int ntoysperjob = 1000 ) {
       RooAddPdf* totalPdf = new RooAddPdf("totalPdf","totalPdf",RooArgList(*sigPdf,*bkgPdf),RooArgList(*nsig,*nbkg));   
       RooDataSet* toyData; 
 
-      if ( pureToys ) 
+      if ( toy == PURE ) 
 	toyData = totalPdf->generate(RooArgSet(*kd), nsigEvents+nbkgEvents);
       else {
 	// reset the events starting point
@@ -252,7 +314,7 @@ void testfitilckd(bool pureToys = false, int ntoysperjob = 1000 ) {
 	     || (nbkgEvents+embedTrackerBkg > bkgData->sumEntries()) ) {
 	  cout << "PlaygroundZH::generate() - ERROR!!! PlaygroundZH::data does not have enough events to fill toy!!!!  bye :) " << endl;
 	  toyData = NULL;
-	  return kNotEnoughEvents;
+	  return; // kNotEnoughEvents;
 	}
 	
 	for(int iEvent=isigEvent; iEvent<isigEvent+nsigEvents; iEvent++){
@@ -273,7 +335,7 @@ void testfitilckd(bool pureToys = false, int ntoysperjob = 1000 ) {
 
       RooFitResult* toyfitresults =  totalPdf->fitTo(*toyData, RooFit::PrintLevel(printlevel), RooFit::Save(true), RooFit::Extended(kTRUE) ); 
       
-      if ( verb == DEBUG ) {
+      if ( verb >= INFO ) {
 	std::cout << "toy trial " << i << "\n"; 
 	std::cout << "fa3 = " << rrv_fa3.getVal() << " +/- " << rrv_fa3.getError() << "\n";
 	std::cout << "nsig = " << nsig->getVal() << " +/- " << nsig->getError() << "\n";
@@ -305,11 +367,6 @@ void testfitilckd(bool pureToys = false, int ntoysperjob = 1000 ) {
   // 
   
   if ( plot > NOPLOTS ) {
-    gROOT->ProcessLine(".L tdrstyle.C");
-    setTDRStyle();
-    TGaxis *gaxis = new TGaxis();
-    // gaxis->SetMaxDigits(3);
-
 
     TH1F *kd_test_0m = new TH1F("kd_test_0m", "kd_test_0m", nbins, xMin, xMax);
     zerominusTree->Project("kd_test_0m", "pseudoMELA"); 
@@ -349,17 +406,16 @@ void testfitilckd(bool pureToys = false, int ntoysperjob = 1000 ) {
     if ( plot == SIG || plot == ALL ) {
       sigData->plotOn(kdframe, MarkerColor(kGreen+2), MarkerStyle(25),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale_0mix));
       sigPdf->plotOn(kdframe,  LineColor(kGreen+2), Normalization(rescale_0mix));
-      sigPhaseData->plotOn(kdframe, MarkerColor(kMagenta+1), MarkerStyle(20),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale_0mix));
+      // sigPhaseData->plotOn(kdframe, MarkerColor(kMagenta+1), MarkerStyle(20),MarkerSize(1.5),XErrorSize(0),DataError(RooAbsData::None), Rescale(rescale_0mix));
     }
     
     if ( plot == BKG ) {
       bkgData->plotOn(kdframe, LineColor(kBlack));
       bkgPdf->plotOn(kdframe, LineColor(kBlack));
     }
-
-    if ( plot == ALL ) {
-      kdframe->SetMaximum(ymax_kd * 1.1 );
-    }
+    
+    kdframe->SetMaximum(ymax_kd * 1.1 );
+      
 
     TCanvas *c1 = new TCanvas("c1", "c1", 600, 600);
     kdframe->Draw();
