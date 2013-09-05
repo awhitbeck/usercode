@@ -55,7 +55,9 @@ ClassImp(RooSpinZero_KDInt_ZH)
    Double_t T2 = histos[1]->GetBinContent(binx, biny);
    Double_t T4 = histos[2]->GetBinContent(binx, biny);
    
-   value = (1.-fa3) * T1 + fa3 * T2; //  + sqrt((1.-fa3)*fa3) * T4; 
+   value = (1.-fa3) * T1 + fa3 * T2 + sqrt((1.-fa3)*fa3) * T4; 
+   
+   if ( value < 0.0000) return 0.;
    
    return value ; 
    
@@ -63,6 +65,7 @@ ClassImp(RooSpinZero_KDInt_ZH)
 
 Int_t RooSpinZero_KDInt_ZH::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const
 {
+
   if (matchArgs(allVars,analVars,RooArgSet(*kd.absArg(), *kdint.absArg()))) return 3 ;
   if (matchArgs(allVars,analVars,kd)) return 1 ;
   if (matchArgs(allVars,analVars,kdint)) return 2 ;
@@ -105,9 +108,9 @@ Double_t RooSpinZero_KDInt_ZH::analyticalIntegral(Int_t code, const char* rangeN
 	 double Int_T2 = histos[1]->Integral(1, nbinsx, biny, biny);
 	 double Int_T4 = histos[2]->Integral(1, nbinsx, biny, biny);
 	 // something related to phase factor, this is by guess
-	 double integral = (1.-fa3) * Int_T1 + fa3 * Int_T2; // + sqrt((1.-fa3)*fa3) * Int_T4; ;
+	 double integral = (1.-fa3) * Int_T1 + fa3 * Int_T2  + sqrt((1.-fa3)*fa3) * Int_T4; ;
 
-	 integral = integral * dx * 2.; 
+	 integral = integral * dx * 4.; 
 	  
 	 return integral; 
 	 
@@ -123,10 +126,10 @@ Double_t RooSpinZero_KDInt_ZH::analyticalIntegral(Int_t code, const char* rangeN
 	 double Int_T2 = histos[1]->Integral(binx, binx, 1, nbinsy);
 	 double Int_T4 = histos[2]->Integral(binx, binx, 1, nbinsy);
 
-	 double integral = (1.-fa3) * Int_T1 + fa3 * Int_T2; // + sqrt((1.-fa3)*fa3) * Int_T4; 
+	 double integral = (1.-fa3) * Int_T1 + fa3 * Int_T2 +  sqrt((1.-fa3)*fa3) * Int_T4; 
 	 
 	 // something related to phase factor, this is by guess
-	 integral = integral * dy * 2.;
+	 integral = integral * dy * 4.;
 
 	 return integral;
        }
@@ -137,7 +140,7 @@ Double_t RooSpinZero_KDInt_ZH::analyticalIntegral(Int_t code, const char* rangeN
 	 double Int_T2 = histos[1]->Integral();
 	 double Int_T4 = histos[2]->Integral();
 
-	 double integral = (1.-fa3) * Int_T1 + fa3 * Int_T2 ; //+ sqrt((1.-fa3)*fa3) * Int_T4; ;
+	 double integral = (1.-fa3) * Int_T1 + fa3 * Int_T2 + sqrt((1.-fa3)*fa3) * Int_T4; ;
 	 int nbinsx = histos[0]->GetXaxis()->GetNbins();
 	 int nbinsy = histos[0]->GetYaxis()->GetNbins();
 

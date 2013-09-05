@@ -45,14 +45,14 @@ void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
   bool withAcc = false;
   VerbosityLevel verb = INFO;
   PlotLevel plot = NOPLOTS;
-  ToyLevel toy = EMBED;
+  ToyLevel toy = NOTOYS;
   
   double fa3Val = 0.1;
   TString accName = "false";
   if ( withAcc ) 
     accName = "true";
   
-  float lumi = 25000; // in unit of fb
+  float lumi = 250; // in unit of fb
     
   float nsigperfb = 8;
   float nbkgperfb = 0.8;
@@ -149,11 +149,34 @@ void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
   hist_zerominus->Scale(1./hist_zerominus->Integral());
   std::cout << "hist_zerominus->Integral() = " << hist_zerominus->Integral() << "\n";
 
-  TH2F *hist_zerointerf = new TH2F("hist_zerointerf", "hist_zerointerf", nbins, xMin, xMax, nbins_kdint, xMin_kdint, xMax_kdint);
-  zeroplusTree->Project("hist_zerointerf", "pseudoMELAInt:pseudoMELA"); 
-  hist_zerointerf->Scale(1./hist_zerointerf->Integral());
-  std::cout << "hist_zerointerf->Integral() = " << hist_zerointerf->Integral() << "\n";
+
+  TChain *f3p5Tree = new TChain("SelectedTree");
+  TString f3p5FileName = Form("samples/ee_ZH/ee_ZH_f3_p5_phi_0_250GeV_1M_false.root"); 
+  f3p5Tree->Add(f3p5FileName);
+  double g4mix = 0.351949; // this is the g4 value correspoinding to f3 = 0.5
+
+  TH2F *hist_f3p5 = new TH2F("hist_f3p5", "hist_f3p5", nbins, xMin, xMax, nbins_kdint, xMin_kdint, xMax_kdint);
+  f3p5Tree->Project("hist_f3p5", "pseudoMELAInt:pseudoMELA"); 
+  hist_f3p5->Scale(2./hist_f3p5->Integral());
+  std::cout << "hist_f3p5->Integral() = " << hist_f3p5->Integral() << "\n";
+
   
+  TH2F *hist_zerointerf = new TH2F("hist_zerointerf", "hist_zerointerf", nbins, xMin, xMax, nbins_kdint, xMin_kdint, xMax_kdint);
+  
+  //  Fill in the interference term
+  for ( int i = 1 ; i < nbins + 1 ; i++ ) {
+    for ( int j = 1 ; j < nbins_kdint + 1 ; j++ ) 
+      {
+	double SMHiggsProb = hist_zeroplus->GetBinContent(i, j);
+	double altSignalProb = hist_zerominus->GetBinContent(i, j);
+	double mixSignalProb = hist_f3p5->GetBinContent(i,j);
+	double intProb = mixSignalProb - SMHiggsProb - altSignalProb; 
+	intProb = intProb;
+	hist_zerointerf->SetBinContent(i, j, intProb); 
+      }
+  }
+  
+
 
   vector<TH2F*> histos;
   histos.push_back(hist_zeroplus);
@@ -161,7 +184,8 @@ void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
   histos.push_back(hist_zerointerf);
 
   RooAbsPdf *sigPdf = new RooSpinZero_KDInt_ZH("sigPdf", "sigPdf", *kd, *kdint, rrv_fa3, histos, withAcc);
-
+  
+  RooFitResult* toyfitresults_total =  sigPdf->fitTo(*sigData, RooFit::PrintLevel(1), RooFit::Save(true));
   //
   // Signal Model with phase
   // 
