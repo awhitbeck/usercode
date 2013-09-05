@@ -20,6 +20,7 @@ public:
   RooSpinZero_KD_ZH(const char *name, const char *title,
 		    RooAbsReal& _kd,
 		    RooAbsReal& _fa3,
+ 		    vector<TH1F*>& _histos,
 		    bool  _withAcc);
 		    
   RooSpinZero_KD_ZH(const RooSpinZero_KD_ZH& other, const char* name=0) ;
@@ -28,14 +29,13 @@ public:
   
   Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const ;
   Double_t analyticalIntegral(Int_t code, const char* rangeName=0) const ;
-  
-	
+  	
 protected:
 
   RooRealProxy kd ;
   RooRealProxy fa3 ;
+  vector<TH1F*> histos;
   bool withAcc;
-  
     
   Double_t evaluate() const ;
 
