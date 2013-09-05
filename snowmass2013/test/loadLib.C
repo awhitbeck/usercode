@@ -34,6 +34,10 @@
   // code to convert fa3
   gROOT->LoadMacro("../src/fa3Converter.cc+");
 
+  // code for the 1D KD
+  gROOT->LoadMacro("../src/RooSpinZero_KD_ZH.cc+");
+  gROOT->LoadMacro("../src/RooSpinZero_KDInt_ZH.cc+");
+
   // loading tdr style for plots
   gROOT->ProcessLine(".L  tdrstyle.C");
   setTDRStyle();  
