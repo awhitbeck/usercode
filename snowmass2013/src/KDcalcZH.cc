@@ -2,10 +2,12 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "RooRealVar.h"
-
+#include <math.h>
+#include "TMath.h"
 #include "ScalarPdfFactoryZH.cc"
 
 using namespace std;
+using namespace TMath;
 
 class KDcalcZH {
 
@@ -120,13 +122,33 @@ public:
     if(mixHiggsProb<0.0) cout << "KDcalcZH::computeKD - ERROR: mixHiggs prob is negative!!!" << endl;
     
     double intProb = 2 * mixHiggsProb - SMHiggsProb - altSignalProb; 
-    KDInt = intProb; // / (SMHiggsProb + altSignalProb); 
+    KDInt = intProb / (SMHiggsProb + altSignalProb); 
     /*
+    std::cout <<"-------From PDF--------------------\n";
     std::cout << "SMHiggsProb = " << SMHiggsProb << "\n";
     std::cout << "altSignalProb = " << altSignalProb << "\n";
-    std::cout << "intProb = " << intProb << "\n";
     std::cout << "mixHiggsProb = " << mixHiggsProb << "\n";
+    std::cout << "intProb = " << intProb << "\n";
+    std::cout << "KD = " << KD << "\n";
+    std::cout << "KDInt = " << KDInt << "\n";
     */
+    double g4mix = 0.351949;
+
+    double SMHiggsProb_func = zeropdfvalue(1., 0., 0, costheta1_, costheta2_, phi_, 0.15, 0.15, mH_); 
+    double altSignalProb_func = zeropdfvalue(0., 1., 0, costheta1_, costheta2_, phi_, 0.15, 0.15, mH_); 
+    double mixHiggsProb_func = zeropdfvalue(1., g4mix, 0, costheta1_, costheta2_, phi_, 0.15, 0.15, mH_); 
+    double intProb_func = mixHiggsProb_func - SMHiggsProb_func - altSignalProb_func * g4mix*g4mix ; 
+    double KDInt_func = intProb_func / (SMHiggsProb_func + altSignalProb_func * g4mix*g4mix); 
+    /*
+    std::cout <<"-------From Function--------------------\n";
+    std::cout << "SMHiggsProb_func = " << SMHiggsProb_func << "\n";
+    std::cout << "altSignalProb_func = " << altSignalProb_func << "\n";
+    std::cout << "mixHiggsProb_func = " << mixHiggsProb_func << "\n";
+    std::cout << "intProb_func = " << intProb_func << "\n";
+    std::cout << "KDInt_func = " << KDInt_func << "\n";
+    */
+    KDInt = KDInt_func;
+
   };
 
 
@@ -196,5 +218,81 @@ public:
     f->Close();
     ff->Close();
   };
+
+
+  double zeropdfvalue(double g1Val, double g4Val, double g4ValIm, double h1, double h2, double Phi, double R1Val, double R2Val, double mH) 
+  {
+    double mX = mH;
+    double sqrts = 250.;
+    double mZ =91.188;
+    
+    double s=-(mX*mX-sqrts*sqrts-mZ*mZ)/2.;
+    double kappa=s/(1000*1000);
+
+    double g1ValIm = 1.;
+    double a1=0,a2=0,a3=0,a1Im=0,a2Im=0,a3Im=0;
+    double g1(1.0), g1Im(0.), g2(0.), g2Im(0.), g3(0.), g3Im(0.), g4(0.), g4Im(0.);
+    g1   =  g1Val;
+    g1Im =  0.;
+    g2   =  0.;
+    g2Im =  0.;
+    g3   =  0.;
+    g3Im =  0.;
+    g4   = - g4Val;
+    g4Im = - g4ValIm;
+    
+    a1 = g1*mZ*mZ/(mX*mX) + g2*2.*s/(mX*mX) + g3*kappa*s/(mX*mX);
+    a1Im = g1Im*mZ*mZ/(mX*mX) + g2Im*2.*s/(mX*mX) + g3Im*kappa*s/(mX*mX);
+    a2 = -2.*g2 - g3*kappa;
+    a2Im = -2.*g2Im - g3Im*kappa;
+    a3 = -2.*g4;
+    a3Im = -2.*g4Im;
+
+
+   Double_t x = pow((mX*mX-sqrts*sqrts-mZ*mZ)/(2.*sqrts*mZ),2)-1;
+   
+   Double_t A00Real = - (a1*sqrt(1+x) + a2*(mZ*sqrts)/(mX*mX)*x);
+   Double_t A00Imag = - (a1Im*sqrt(1+x) + a2Im*(mZ*sqrts)/(mX*mX)*x);
+
+   Double_t Ap0Real = a1 - a3Im*(mZ*sqrts)/(mX*mX)*sqrt(x);
+   Double_t Ap0Imag = a1Im + a3*(mZ*sqrts)/(mX*mX)*sqrt(x);
+
+   Double_t Am0Real = a1 + a3Im*(mZ*sqrts)/(mX*mX)*sqrt(x);
+   Double_t Am0Imag = a1Im - a3*(mZ*sqrts)/(mX*mX)*sqrt(x);
+
+   Double_t f00 = A00Real*A00Real + A00Imag*A00Imag;
+   Double_t fp0 = Ap0Real*Ap0Real + Ap0Imag*Ap0Imag;
+   Double_t fm0 = Am0Real*Am0Real + Am0Imag*Am0Imag;
+
+   /*   
+   Double_t ftotal = f00 + fp0 + fm0;
+   // normalize to the total
+   f00 = f00 / ftotal;
+   fp0 = fp0 / ftotal;
+   fm0 = fm0 / ftotal;
+   */
+   Double_t phi00=atan2(A00Imag,A00Real);
+   Double_t phip0=atan2(Ap0Imag,Ap0Real)-phi00;
+   Double_t phim0=atan2(Am0Imag,Am0Real)-phi00;
+   
+   Double_t value = 0;
+   
+
+   value += (f00*(-1 + Power(h1,2))*(-1 + Power(h2,2)))/4.;
+
+   value += (fp0*(1 + Power(h1,2) - 2*h1*R1Val)*(1 + Power(h2,2) + 2*h2*R2Val))/16.;
+
+   value += (fm0*(1 + Power(h1,2) + 2*h1*R1Val)*(1 + Power(h2,2) - 2*h2*R2Val))/16.;
+
+   value += -(Sqrt(f00)*Sqrt(fp0)*Sqrt(1 - Power(h1,2))*Sqrt(1 - Power(h2,2))*(h1 - R1Val)*(h2 + R2Val)*Cos(Phi + phip0))/4.;
+
+   value += -(Sqrt(f00)*Sqrt(fm0)*Sqrt(1 - Power(h1,2))*Sqrt(1 - Power(h2,2))*(h1 + R1Val)*(h2 - R2Val)*Cos(Phi - phim0))/4.;
+
+   value += (Sqrt(fm0)*Sqrt(fp0)*(-1 + Power(h1,2))*(-1 + Power(h2,2))*Cos(2*Phi - phim0 + phip0))/8.;
+
+
+   return value ; 
+
+  }; 
 
 };
