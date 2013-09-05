@@ -5,7 +5,7 @@
 
 using namespace PlaygroundZHhelpers;
 
-void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index = 1) {
+void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index = 0) {
 
   //   gROOT->ProcessLine(".x  loadLib.C");
   
@@ -64,27 +64,25 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index = 1) {
     std::cout << "nsigEvents = " << nsigEvents << ",\t nbkgEvents = " << nbkgEvents << "\n";
   }
 
-  
-  TString modeName = Form("f_3_%.0fGeV_5M", sqrtsVal);
-  //TString modeName = Form("fa3_%.0fGeV_5M", sqrtsVal);
-  TString fileName = Form("Events_20130626/unweighted_unpol_%s_%s.root", modeName.Data(), accName.Data());
+  TString modeName = Form("f_3_250GeV_5M");
+  TString fileName = Form("samples/ee_ZH/unweighted_unpol_%s_%s.root", modeName.Data(), accName.Data());
   if ( sqrtsVal == 350. ) {
     modeName = Form("model8_2M", sqrtsVal);
-    fileName = Form("Events_20130701/unweighted_unpol_%s_%s.root", modeName.Data(), accName.Data());
+    fileName = Form("samples/ee_ZH/unweighted_unpol_%s_%s.root", modeName.Data(), accName.Data());
   }
   if ( sqrtsVal == 1000. ) {
     modeName = Form("model9_1M", sqrtsVal);
-    fileName = Form("Events_20130701/unweighted_unpol_%s_%s.root", modeName.Data(), accName.Data());
+    fileName = Form("samples/ee_ZH/unweighted_unpol_%s_%s.root", modeName.Data(), accName.Data());
   }
   TString treeName = "SelectedTree";
   
   double g1Re = 1;
   double g1Im = 0.;
-  double g2Re = 0.;
+  double g2Re = 0.0856212;
   double g2Im = 0.;
   double g3Re = 0.;
   double g3Im = 0.;
-  double g4Re = 0.117316;
+  double g4Re = 0.131164;
   if ( sqrtsVal == 350.)
     g4Re = 0.046863;
   if ( sqrtsVal == 500 ) 
@@ -96,7 +94,7 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index = 1) {
   // below will be recalculated once Playground is defined
   double fa2Val = 0.;
   double phia2Val = 0;
-  double fa3Val = 0.;
+  double fa3Val = 0.1;
   double phia3Val = 0;
   int parameterization = 2; 
   
@@ -118,7 +116,7 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index = 1) {
     test.loadSigTree(fileName, treeName);
   if(debug) cout << test.data << endl;
   if ( loadBkgData ) {
-    test.loadBkgTree(Form("bkgData/ee_ZZ_llbb_%.0fGeV_25M_%s.root", sqrtsVal, accName.Data()), treeName);
+    test.loadBkgTree(Form("samples/ee_ZH/ee_ZZ_llbb_%.0fGeV_25M_%s.root", sqrtsVal, accName.Data()), treeName);
   }
   
   // 
@@ -128,16 +126,16 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index = 1) {
    // ScalarPdfFactoryZH *scalar = test.scalar;
    test.scalar->sqrts->setVal(sqrtsVal);
    test.scalar->sqrts->setConstant(kTRUE);
-   test.calcfractionphase(sqrtsVal, g1Re, g1Im, g2Re, g2Im, g4Re, g4Im, fa2Val, fa3Val, phia2Val, phia3Val);
+   // test.calcfractionphase(sqrtsVal, g1Re, g1Im, g2Re, g2Im, g4Re, g4Im, fa2Val, fa3Val, phia2Val, phia3Val);
 
   if ( parameterization == 2 ) {
     
     test.scalar->fa2->setVal(fa2Val);
-    test.scalar->fa2->setConstant(kTRUE);
+    // test.scalar->fa2->setConstant(kTRUE);
 
     test.scalar->phia2->setVal(phia2Val);
     test.scalar->phia2->setRange(-2*TMath::Pi(), 2*TMath::Pi());
-    test.scalar->phia2->setConstant(kTRUE);
+    // test.scalar->phia2->setConstant(kTRUE);
     
     test.scalar->fa3->setVal(fa3Val);
     //test.scalar->fa3->setConstant(kTRUE);
@@ -207,7 +205,7 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index = 1) {
 
   // From RooDataHist
   TChain *bkgTree = new TChain("SelectedTree");
-  bkgTree->Add(Form("bkgData/ee_ZZ_llbb_%.0fGeV_25M_%s.root", sqrtsVal, accName.Data()));
+  bkgTree->Add(Form("samples/ee_ZH/ee_ZZ_llbb_%.0fGeV_25M_%s.root", sqrtsVal, accName.Data()));
   RooDataSet *bkgData = new RooDataSet("bkgData","bkgData",bkgTree,RooArgSet(*costheta1, *costheta2, *phi));
   RooDataHist *bkgHist = bkgData->binnedClone(0);
   RooHistPdf* bkgPdf = new RooHistPdf("bkgPdf", "bkgPdf", RooArgSet(*costheta1, *costheta2, *phi), *bkgHist);
@@ -366,8 +364,12 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index = 1) {
       test.nsig->setVal(nsigEvents);
       test.nbkg->setVal(nbkgEvents);
 
+      test.scalar->fa2->setConstant(kTRUE);
+      test.scalar->phia2->setConstant(kTRUE);
+
       //test.scalar->fa3->setConstant(kTRUE);
-      //test.scalar->phia3->setConstant(kTRUE);
+      test.scalar->phia3->setConstant(kTRUE);
+
       test.nsig->setConstant(kTRUE);
       test.nbkg->setConstant(kTRUE);
 
@@ -378,7 +380,7 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index = 1) {
 
       if(test.generate(test.scalar->PDF, bkgPdf, toy_index, pureToys)!=kNoError) break;
 
-      RooFitResult *toyfitresults = test.fitData(test.scalar->PDF, bkgPdf, true, 1);
+      RooFitResult *toyfitresults = test.fitData(test.scalar->PDF, bkgPdf, true, -1);
 
       if ( debug ) {
 	std::cout << "toy trial " << i << "\n"; 
