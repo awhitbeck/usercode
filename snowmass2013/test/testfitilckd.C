@@ -1,3 +1,13 @@
+
+// Before you run, make sure, you have 
+// 1. ln -s /export/d1/scratch/ygao/samples/ samples
+// 2. mkdir -p plots_eezh/
+// 3. mkdir -p toyresults_eezh/plots/
+// 
+// Run by root -l -b -n loadLib.C testfitilckd.C+
+// 
+
+
 // Root headers
 #include <vector>
 #include "TH2F.h"
@@ -25,10 +35,6 @@
 #include "../src/../src/PlaygroundZH.cc"
 
 using namespace RooFit ;
-
-// 
-// Run by root -l -b -n loadLib.C testfitilckd.C+
-// 
 
 void testfitilckd(int ntoysperjob = 1 ) {
   
