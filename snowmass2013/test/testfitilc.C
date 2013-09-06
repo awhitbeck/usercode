@@ -3,7 +3,7 @@
 // 1. ln -s /export/d1/scratch/ygao/samples/ samples
 // 2. mkdir -p plots_eezh/
 // 3. mkdir -p toyresults_eezh/
-// run by root -l -b loadlib.C testfitilc.C
+// run by root -l -n loadLib.C -b testfitilc.C
 // 
 #include "../src/PlaygroundZH.cc"
 
