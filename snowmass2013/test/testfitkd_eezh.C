@@ -1,3 +1,14 @@
+
+// 
+// Before you run, make sure, you have 
+// 1. ln -s /export/d1/scratch/ygao/samples/ samples
+// 2. mkdir -p plots_eezh/
+// 3. mkdir -p toyresults_eezh/plots/
+// Run by root -l -n -q -b loadLib.C testfitkd_eezh.C+
+// 
+
+
+
 // Root headers
 #include <vector>
 #include "TH2F.h"
@@ -20,19 +31,19 @@
 #include "RooFitResult.h"
 
 // snowmass code headers
-#include "../src/ScalarPdfFactoryPPZH.cc"
 #include "../src/../src/RooSpinZero_KDInt_ZH.cc"
-#include "../src/../src/PlaygroundPPZH.cc"
+#include "../src/../src/PlaygroundZH.cc"
+#include "../src/ScalarPdfFactoryZH.cc"
 
+// 
+// Do 
+// Create symbolic link to the samples/
+// 
 
 using namespace RooFit ;
 
 
-// 
-// Run by root -l -n -q -b loadLib.C testfitkd_eezh.C+
-// 
-
-void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
+void testfitkd_eezh(int ntoysperjob = 1) {
 
 
   typedef enum{ERROR, INFO, DEBUG} VerbosityLevel; 
@@ -43,9 +54,9 @@ void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
   float sqrtsVal = 250;
   float mH=125.;
   bool withAcc = false;
-  VerbosityLevel verb = INFO;
-  PlotLevel plot = SIG; // NOPLOTS;
-  ToyLevel toy = NOTOYS;
+  VerbosityLevel verb = ERROR;
+  PlotLevel plot = NOPLOTS;
+  ToyLevel toy = PURE;
   
   double fa3Val = 0.1;
   TString accName = "false";
@@ -55,7 +66,7 @@ void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
   float lumi = 250; // in unit of fb
     
   float nsigperfb = 8;
-  float nbkgperfb = 0.8;
+  float nbkgperfb = 0.0;
 
   float nsigEvents = lumi*nsigperfb; 
   float nbkgEvents = lumi*nbkgperfb; 
@@ -63,11 +74,11 @@ void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
   //
   //  1D KD observable
   // 
-  int nbins = 100;
+  int nbins = 20;
   double xMin = 0.3;
   double xMax = 1.;
 
-  int nbins_kdint = 50;
+  int nbins_kdint = 20;
   double xMin_kdint = -0.5;
   double xMax_kdint = 0.5;
 
@@ -119,7 +130,7 @@ void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
   // 
   
   TChain *sigTree = new TChain("SelectedTree");
-  //TString sigFileName = Form("samples/ee_ZH/ee_ZH_f3_p5_phi_0_250GeV_1M_false.root"); 
+  // TString sigFileName = Form("samples/ee_ZH/ee_ZH_f3_p5_phi_0_250GeV_1M_false.root"); 
   TString sigFileName = Form("samples/ee_ZH/unweighted_unpol_f_3_250GeV_5M_%s.root", accName.Data());
   //TString sigFileName = Form("samples/ee_ZH/ee_ZH_f3_p5_phi_0_250GeV_1M_false.root"); 
   sigTree->Add(sigFileName);
@@ -204,7 +215,7 @@ void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
   if ( toy > NOTOYS  ) {
     
     TString isPureName = "embd";
-    if ( pureToys ) isPureName = "pure";
+    if ( toy == PURE  ) isPureName = "pure";
     // 
     // toy generation
     // 
@@ -215,9 +226,7 @@ void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
     // Fit the dataset
     // 
     
-    TFile *toyresults = new TFile(Form("toyresults_eezh/toyresults_KD_%s_%.0fGeV_acc%s_new.root", isPureName.Data(), sqrtsVal, accName.Data()), "RECREATE");
-    //    gROOT->cd();
-    
+    TFile *toyresults = new TFile(Form("toyresults_eezh/toyresults_KDInt_%s_%.0fGeV_acc%s_f3p1_sigonly_test.root", isPureName.Data(), sqrtsVal, accName.Data()), "RECREATE");
     TTree *tree_fit = new TTree("fittree", "fittree");
     
     Float_t m_fa3, m_fa3_err, m_fa3_pull;
@@ -262,7 +271,7 @@ void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
       RooAddPdf* totalPdf = new RooAddPdf("totalPdf","totalPdf",RooArgList(*sigPdf,*bkgPdf),RooArgList(*nsig,*nbkg));   
       RooDataSet* toyData; 
 
-      if ( pureToys ) 
+      if ( toy == PURE ) 
 	toyData = totalPdf->generate(RooArgSet(*kd), nsigEvents+nbkgEvents);
       else {
 	// reset the events starting point
@@ -439,15 +448,15 @@ void testfitkd_eezh(bool pureToys = false, int ntoysperjob = 1) {
     kdframe->Draw();
     
     TString plotName = Form("plots_eezh/KD_mX%.0f_sqrts%.0f_acc%s", mH, sqrtsVal, accName.Data());
-    c1->SaveAs(Form("%s.eps", plotName.Data()));
-    c1->SaveAs(Form("%s.png", plotName.Data()));
+    c1->SaveAs(Form("%s_f3p1.eps", plotName.Data()));
+    c1->SaveAs(Form("%s_f3p1.png", plotName.Data()));
 
     c1->Clear();
 
     kdintframe->Draw();
     plotName = Form("plots_eezh/KDInt_mX%.0f_sqrts%.0f_acc%s", mH, sqrtsVal, accName.Data());
-    c1->SaveAs(Form("%s.eps", plotName.Data()));
-    c1->SaveAs(Form("%s.png", plotName.Data()));
+    c1->SaveAs(Form("%s_f3p1.eps", plotName.Data()));
+    c1->SaveAs(Form("%s_f3p1.png", plotName.Data()));
 
     delete kdframe;
     delete kdintframe;
