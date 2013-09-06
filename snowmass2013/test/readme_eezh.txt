@@ -31,9 +31,10 @@ https://github.com/awhitbeck/usercode/blob/master/snowmass2013/test/testfitilckd
 
 - This code uses the  new TH1F based PDF, not on the HistPdf for the signal. 
 - The nominal analysis uses 100 bins in the D0-
+- It can be configured to run 1D analysis based on 250 GeV KDInt
 - The default code runs 1 embeded toys for the f3 = 0.1, Here is the expected output
 
-root -l -b toyresults_eezh/toyresults_KD_embd_250GeV_accfalse_new.root
+root -l toyresults_eezh/toyresults_pseudoMELA_embd_250GeV_accfalse_new.root
 root [3] fittree->Scan("fa3:fa3_err:fa3_pull")
 ************************************************
 *    Row   *       fa3 *   fa3_err *  fa3_pull *
