@@ -1,4 +1,8 @@
-/// This script makes a fit and draws the projections after fit when required
+// This script makes a fit and draws the projections after fit when required
+// Before you run, make sure, you have 
+// 1. ln -s /export/d1/scratch/ygao/samples/ samples
+// 2. mkdir -p plots_eezh/
+// 3. mkdir -p toyresults_eezh/
 // run by root -l -b loadlib.C testfitilc.C
 // 
 #include "../src/PlaygroundZH.cc"
@@ -288,7 +292,7 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index = 0) {
 
   if ( dotoys ) {
     
-    TFile *toyresults = new TFile(Form("toyresults_%s_acc%s_%i.root", isPureName.Data(), accName.Data(), random_seed), "RECREATE");
+    TFile *toyresults = new TFile(Form("toyresults_eezh/toyresults_%s_acc%s_%i.root", isPureName.Data(), accName.Data(), random_seed), "RECREATE");
     gROOT->cd();
     
     TTree *tree_fit = new TTree("fittree", "fittree");
@@ -479,8 +483,8 @@ void testfitilc(bool pureToys=false, int ntoysperjob = 1, int seed_index = 0) {
     if ( dotoys ) 
       fitName = "toy";
 
-    c1->SaveAs(Form("ilcplots/projection_%s_%s.eps", fitName.Data(), modeName.Data()));
-    c1->Print(Form("ilcplots/projection_%s_%s.png", fitName.Data(), modeName.Data()));
+    c1->SaveAs(Form("plots_eezh/projection_%s_%s.eps", fitName.Data(), modeName.Data()));
+    c1->Print(Form("plots_eezh/projection_%s_%s.png", fitName.Data(), modeName.Data()));
 
     delete c1; 
   }
