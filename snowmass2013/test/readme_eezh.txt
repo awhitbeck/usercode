@@ -32,7 +32,7 @@ https://github.com/awhitbeck/usercode/blob/master/snowmass2013/test/testfitilckd
 - This code uses the  new TH1F based PDF, not on the HistPdf for the signal. 
 - The nominal analysis uses 100 bins in the D0-
 - It can be configured to run 1D analysis based on 250 GeV KDInt
-- The default code runs 1 embeded toys for the f3 = 0.1, Here is the expected output
+- The default code runs 1 embeded toys for the f3 = 0.1 with bkg, Here is the expected output
 
 root -l toyresults_eezh/toyresults_pseudoMELA_embd_250GeV_accfalse_new.root
 root [3] fittree->Scan("fa3:fa3_err:fa3_pull")
@@ -44,11 +44,11 @@ root [3] fittree->Scan("fa3:fa3_err:fa3_pull")
 
 
 --------------------------------
-Running the 2D analysis based on D_{0-} and Dbkg
+Running the 2D analysis based on D_{0-} and Dint
 --------------------------------
 https://github.com/awhitbeck/usercode/blob/master/snowmass2013/test/testfitkd_eezh.C
 
-- The current code runs one puretoy for f3 = 0.1, here is an example output
+- The current code runs one puretoy for f3 = 0.1 (without bkg), here is an example output
 
 root -l -b toyresults_eezh/toyresults_KDInt_pure_250GeV_accfalse_f3p1_sigonly_test.root 
 root [1] fittree->Scan("fa3:fa3_err:fa3_pull")
@@ -65,7 +65,7 @@ Running the 3D fit results
 https://github.com/awhitbeck/usercode/blob/master/snowmass2013/test/testfitilc.C
 
 
-- The default code performs one embeded toy, output is like this,
+- The default code performs one embeded toy for f3 = 0.1 with bkg, output is like this,
 
 root -l -b  toyresults_eezh/toyresults_embd_accfalse_487563.root
 root [2] fittree->Scan("fa3:fa3_err:fa3_pull")
