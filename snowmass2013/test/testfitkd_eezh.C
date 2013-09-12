@@ -272,7 +272,7 @@ void testfitkd_eezh(int ntoysperjob = 1) {
       RooDataSet* toyData; 
 
       if ( toy == PURE ) 
-	toyData = totalPdf->generate(RooArgSet(*kd), nsigEvents+nbkgEvents);
+	toyData = totalPdf->generate(RooArgSet(*kd,*kdint), nsigEvents+nbkgEvents);
       else {
 	// reset the events starting point
 	embedTrackerSig = toy_index * nsigEvents;
@@ -282,7 +282,7 @@ void testfitkd_eezh(int ntoysperjob = 1) {
 	int ibkgEvent = toy_index * nbkgEvents;
 	
 	RooArgSet *tempEvent;
-	toyData = new RooDataSet("toyData","toyData",RooArgSet(*kd));
+	toyData = new RooDataSet("toyData","toyData",RooArgSet(*kd,*kdint));
 	
 	if(  (nsigEvents+embedTrackerSig > sigData->sumEntries()) 
 	     || (nbkgEvents+embedTrackerBkg > bkgData->sumEntries()) ) {
