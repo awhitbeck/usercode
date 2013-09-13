@@ -11,6 +11,13 @@
 #include "RooPlot.h"
 using namespace RooFit ;
 
+// 
+// 1. ln -s /export/d1/scratch/ygao/samples/ samples
+// 2. mkdir -p plots_eezh/
+// 3. mkdir -p toyresults_eezh/plots/
+// run by 
+// root -l -b plotPdf_3D_ZZ.C
+
 
 void plotPdf_3D_ZZ(float sqrtsVal = 250.) {
     
@@ -107,11 +114,11 @@ void plotPdf_3D_ZZ(float sqrtsVal = 250.) {
     
     // data points
     TChain *bkgTree = new TChain("SelectedTree");
-    bkgTree->Add(Form("bkgData/%s_false.root", modeName.Data()));
+    bkgTree->Add(Form("samples/ee_ZH/%s_false.root", modeName.Data()));
     RooDataSet *bkgData = new RooDataSet("bkgData","bkgData",bkgTree,RooArgSet(*h1, *h2, *Phi));
     
     TChain *bkgTree_acc = new TChain("SelectedTree");
-    bkgTree_acc->Add(Form("bkgData/%s_true.root", modeName.Data()));
+    bkgTree_acc->Add(Form("samples/ee_ZH/%s_true.root", modeName.Data()));
     RooDataSet *bkgData_acc = new RooDataSet("bkgData_acc","bkgData_acc",bkgTree_acc,RooArgSet(*h1, *h2, *Phi));
 
     RooDataHist *bkgHist = bkgData->binnedClone(0);
@@ -242,13 +249,13 @@ void plotPdf_3D_ZZ(float sqrtsVal = 250.) {
     // 
     // Read input file
     // 
-    TFile *fin_signal = new TFile(Form("Events_20130618/unweighted_unpol_g1_1M_%s.root", accName.Data()));
+    TFile *fin_signal = new TFile(Form("samples/ee_ZH//unweighted_unpol_g1_1M_%s.root", accName.Data()));
     TTree* tin_signal = (TTree*) fin_signal->Get("SelectedTree");
     std::cout << "signal events is " << tin_signal->GetEntries() << "\n";
     RooDataSet sigData = RooDataSet("sigData","sigData",tin_signal,RooArgSet(*h1,*h2,*Phi));
 
 
-    TFile *fin_signal_acc = new TFile(Form("Events_20130618/unweighted_unpol_g1_1M_true.root"));
+    TFile *fin_signal_acc = new TFile(Form("samples/ee_ZH/unweighted_unpol_g1_1M_true.root"));
     TTree* tin_signal_acc = (TTree*) fin_signal_acc->Get("SelectedTree");
     std::cout << "signal events is " << tin_signal_acc->GetEntries() << "\n";
     RooDataSet sigData_acc = RooDataSet("sigData_acc","sigData_acc",tin_signal_acc,RooArgSet(*h1,*h2,*Phi));
@@ -379,18 +386,22 @@ void plotPdf_3D_ZZ(float sqrtsVal = 250.) {
     czz->cd();
     
     h1frame->Draw();
-    czz->SaveAs(Form("paperplots/h1_ee_%.0fGeV_acc.eps", sqrtsVal));
-    czz->SaveAs(Form("paperplots/h1_ee_%.0fGeV_acc.png", sqrtsVal));
+    czz->SaveAs(Form("plots_eezh//h1_ee_%.0fGeV_acc.eps", sqrtsVal));
+    czz->SaveAs(Form("plots_eezh//h1_ee_%.0fGeV_acc.C", sqrtsVal));
+    czz->SaveAs(Form("plots_eezh//h1_ee_%.0fGeV_acc.root", sqrtsVal));
 
     czz->Clear();
     h2frame->Draw();
-    czz->SaveAs(Form("paperplots/h2_ee_%.0fGeV_acc.eps", sqrtsVal));
-    czz->SaveAs(Form("paperplots/h2_ee_%.0fGeV_acc.png", sqrtsVal));
+    czz->SaveAs(Form("plots_eezh//h2_ee_%.0fGeV_acc.eps", sqrtsVal));
+    czz->SaveAs(Form("plots_eezh//h2_ee_%.0fGeV_acc.C", sqrtsVal));
+    czz->SaveAs(Form("plots_eezh//h2_ee_%.0fGeV_acc.root", sqrtsVal));
     
     czz->Clear();
     phiframe->Draw();
-    czz->SaveAs(Form("paperplots/phi_ee_%.0fGeV_acc.eps", sqrtsVal));
-    czz->SaveAs(Form("paperplots/phi_ee_%.0fGeV_acc.png", sqrtsVal));
+    czz->SaveAs(Form("plots_eezh//phi_ee_%.0fGeV_acc.eps", sqrtsVal));
+    czz->SaveAs(Form("plots_eezh//phi_ee_%.0fGeV_acc.C", sqrtsVal));
+    czz->SaveAs(Form("plots_eezh//phi_ee_%.0fGeV_acc.root", sqrtsVal));
+
 
 
     delete bkgTree;
