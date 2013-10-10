@@ -100,8 +100,8 @@ public:
     embedTracker=0;
     embedTracker_bkg=0;
 
-    z1mass = new RooRealVar("Z1Mass","m_{Z1}",90.,12.,120.);
-    z2mass = new RooRealVar("Z2Mass","m_{Z2}",25.,12.,120.);
+    z1mass = new RooRealVar("Z1Mass","m_{Z1}",90.,0.,120.);
+    z2mass = new RooRealVar("Z2Mass","m_{Z2}",25.,0.,120.);
     costhetastar = new RooRealVar("costhetastar","cos#theta*",0.,-1.,1.);
     costheta1 = new RooRealVar("helcosthetaZ1","cos#theta_{1}",0.,-1.,1.);
     costheta2 = new RooRealVar("helcosthetaZ2","cos#theta_{2}",0.,-1.,1.);

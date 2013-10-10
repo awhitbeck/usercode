@@ -3,7 +3,7 @@
 
 
 templatePDFwithInterf::templatePDFwithInterf(const char *name, const char *title, 
-					     RooAbsReal &_x, 
+					     RooAbsReal &_x,
 					     vector<TH1F*>& _histos, 
 					     RooAbsReal& _coef):
   RooAbsPdf(name,title),
@@ -22,7 +22,7 @@ templatePDFwithInterf::templatePDFwithInterf(const char *name, const char *title
 
 templatePDFwithInterf::templatePDFwithInterf(const templatePDFwithInterf& other, const char* name) :  
   RooAbsPdf(other,name), 
-  x("x",this,other.x),
+  x("x",this,other.x), 
   coef("coef",this,other.coef),
   histos(other.histos)
 { 
@@ -31,10 +31,20 @@ templatePDFwithInterf::templatePDFwithInterf(const templatePDFwithInterf& other,
 
 Double_t templatePDFwithInterf::evaluate() const{
 
-  Double_t T1 = histos[0]->GetBinContent(histos[0]->FindBin(x));
-  Double_t T2 = histos[1]->GetBinContent(histos[1]->FindBin(x));
-  Double_t T3 = histos[2]->GetBinContent(histos[2]->FindBin(x));
+  Int_t xbin = histos[0]->GetXaxis()->FindBin(x);
+  //Int_t ybin = histos[0]->GetYaxis()->FindBin(y);
 
-  return coef*T1 + (1.-coef)*T2 + sqrt((1-coef)*coef)*T3;
+  Double_t T1 = histos[0]->GetBinContent(xbin);
+  Double_t T2 = histos[1]->GetBinContent(xbin);
+  Double_t T3 = histos[2]->GetBinContent(xbin);
+
+  Double_t total = coef*T1 + (1.-coef)*T2 + sqrt((1-coef)*coef)*T3;
+
+  if(total < 1e-30)
+    {
+      total = 1e-30;
+    }
+
+  return total;
 
 }

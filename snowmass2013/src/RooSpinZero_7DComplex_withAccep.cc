@@ -194,7 +194,7 @@ Double_t sh2 = sqrt(1-h2*h2);
 bool isZZ = true;
 if ( mZ < 90.) isZZ = false;
 if ( isZZ ) {
-if( (m1+m2) > mX || m2>m1 ) return 1e-9;
+if( (m1+m2) > mX || m2>m1 || m2 <= 0.0 || m1 <= 0.0) return 1e-9;
 } else {
 if( (m1+m2) > mX ) return 1e-9;
 }
@@ -383,7 +383,7 @@ Double_t RooSpinZero_7DComplex_withAccep::analyticalIntegral(Int_t code, const c
 bool isZZ = true;
 if ( mZ < 90.) isZZ = false;
 if ( isZZ ) {
-if( (m1+m2) > mX || m2>m1 ) return 1e-9;
+if( (m1+m2) > mX || m2>m1 || m2 <= 0.0 || m1 <= 0.0) return 1e-9;
 } else {
 if( (m1+m2) > mX ) return 1e-9;
 }
