@@ -1,7 +1,16 @@
 {
 
-  //gSystem->AddIncludePath("-I$CMSSW_BASE/src/");
-  //gSystem->AddIncludePath("-I$ROOFITSYS/include/");
+  gSystem->AddIncludePath("-I$CMSSW_BASE/src/");
+  gSystem->AddIncludePath("-I$ROOFITSYS/include/");
+  
+  //gROOT->LoadMacro("../src/RooSpinZero_7DComplex_withAccep_withFepspr.cc+");
+  gROOT->LoadMacro("../src/RooSpinZero_3DKD_ZH_Simultaneous_PMF.cc+");
+  //gROOT->LoadMacro("../src/ScalarPdfFactory_withFepspr.cc+");
+  //gROOT->LoadMacro("fitSimultaneous_7D_fepspr.c+");
+
+  gROOT->LoadMacro("fitSimultaneous_3D_PMF.c+");
+
+  /*
  
   // tools for X->ZZ studies
   gROOT->LoadMacro("../src/RooqqZZ_JHU_ZgammaZZ_fast.cxx+");
@@ -37,6 +46,8 @@
   // code for the 1D KD
   gROOT->LoadMacro("../src/RooSpinZero_KD_ZH.cc+");
   gROOT->LoadMacro("../src/RooSpinZero_KDInt_ZH.cc+");
+
+  */
 
   // loading tdr style for plots
   gROOT->ProcessLine(".L  tdrstyle.C");

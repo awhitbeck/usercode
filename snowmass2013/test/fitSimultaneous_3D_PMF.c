@@ -54,7 +54,7 @@ int execute_fitSimultaneous_3D (sample smp, const int erg_tev, const double fixv
 	cout << "Starting..." << endl;
 	string INPUT_NAME = "Templates/ggtoHtoZZ4l_125_6_IntTmps_Dg_Dgint_";
 	string SAMPLE_INPUT_NAME = "ggtoHtoZZ4l_VariousKDs_";
-	string OUTPUT_NAME = "2DFits/ggtoHtoZZ4l_125_6_PseudoExp_3D_PMF_";
+	string OUTPUT_NAME = "ggtoHtoZZ4l_125_6_PseudoExp_3D_PMF_";
 	if(nevents!=600){
 		char cnevents[20];
 		sprintf(cnevents,"%i%s",nevents,"Events_");
@@ -194,7 +194,7 @@ int execute_fitSimultaneous_3D (sample smp, const int erg_tev, const double fixv
 	cout << "Old iteration was " << iteration_oldfirstevent << endl;
 	cout << "New iteration was " << iteration_newfirstevent << endl;
 
-	string coutput = cinput_common + OUTPUT_NAME + sampleName[smp];
+	string coutput = OUTPUT_NAME + sampleName[smp];
 	char citeration[100];
 	sprintf(citeration,"_%i",iteration);
 	coutput = coutput + citeration;
